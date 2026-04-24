@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://bmw7h3vu7ny2l"
+path="res://.godot/imported/LofiBG_01_Good_Sunfall.atlas-edbbff0962f6f663ecc6ae62dedb1e37.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Good_Sunfall/LofiBG_01_Good_Sunfall.atlas"
+dest_files=["res://.godot/imported/LofiBG_01_Good_Sunfall.atlas-edbbff0962f6f663ecc6ae62dedb1e37.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

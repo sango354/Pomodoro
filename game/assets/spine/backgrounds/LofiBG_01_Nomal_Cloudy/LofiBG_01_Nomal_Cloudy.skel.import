@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://bhewv2f2tlxp5"
+path="res://.godot/imported/LofiBG_01_Nomal_Cloudy.skel-73ba42c5682092b98ff6eac7d10c5269.spskel"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Nomal_Cloudy/LofiBG_01_Nomal_Cloudy.skel"
+dest_files=["res://.godot/imported/LofiBG_01_Nomal_Cloudy.skel-73ba42c5682092b98ff6eac7d10c5269.spskel"]
+
+[params]
+

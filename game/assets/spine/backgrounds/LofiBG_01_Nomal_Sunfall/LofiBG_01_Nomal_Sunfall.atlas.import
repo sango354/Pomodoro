@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://cft1lm7rg5ge3"
+path="res://.godot/imported/LofiBG_01_Nomal_Sunfall.atlas-75633279c2623ec2acbb44d1c6139386.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Nomal_Sunfall/LofiBG_01_Nomal_Sunfall.atlas"
+dest_files=["res://.godot/imported/LofiBG_01_Nomal_Sunfall.atlas-75633279c2623ec2acbb44d1c6139386.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

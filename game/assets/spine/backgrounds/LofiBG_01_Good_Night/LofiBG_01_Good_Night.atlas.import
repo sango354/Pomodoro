@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://dang0rw76gu3k"
+path="res://.godot/imported/LofiBG_01_Good_Night.atlas-e92b6b631d7e8a6dd619dd74e124bc4a.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Good_Night/LofiBG_01_Good_Night.atlas"
+dest_files=["res://.godot/imported/LofiBG_01_Good_Night.atlas-e92b6b631d7e8a6dd619dd74e124bc4a.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://dr21rlt5hgq1"
+path="res://.godot/imported/LofiBG_01_Nomal_Sunfall.skel-89cf8acb7402b82bd10f19de025af513.spskel"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Nomal_Sunfall/LofiBG_01_Nomal_Sunfall.skel"
+dest_files=["res://.godot/imported/LofiBG_01_Nomal_Sunfall.skel-89cf8acb7402b82bd10f19de025af513.spskel"]
+
+[params]
+

@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://sedjgih80365"
+path="res://.godot/imported/LofiBG_01_Good_Day.skel-9306fdfcf24b24c925d816dc32574b4b.spskel"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Good_Day/LofiBG_01_Good_Day.skel"
+dest_files=["res://.godot/imported/LofiBG_01_Good_Day.skel-9306fdfcf24b24c925d816dc32574b4b.spskel"]
+
+[params]
+

@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://cac5iika700ye"
+path="res://.godot/imported/LofiBG_01_Nomal_Night.skel-4054e5b011d501865853293b46669f61.spskel"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Nomal_Night/LofiBG_01_Nomal_Night.skel"
+dest_files=["res://.godot/imported/LofiBG_01_Nomal_Night.skel-4054e5b011d501865853293b46669f61.spskel"]
+
+[params]
+

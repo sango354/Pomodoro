@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://dfc4hc3xvwq5l"
+path="res://.godot/imported/LofiBG_01_Nomal_Night.atlas-32514cfe1a4de7cfb8b836422f990eb4.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Nomal_Night/LofiBG_01_Nomal_Night.atlas"
+dest_files=["res://.godot/imported/LofiBG_01_Nomal_Night.atlas-32514cfe1a4de7cfb8b836422f990eb4.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

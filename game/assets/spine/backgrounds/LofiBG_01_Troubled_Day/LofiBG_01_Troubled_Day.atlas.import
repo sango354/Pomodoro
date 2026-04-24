@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://ia3ierge1d53"
+path="res://.godot/imported/LofiBG_01_Troubled_Day.atlas-2e4c593de377452010bc2276ccc7381c.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Troubled_Day/LofiBG_01_Troubled_Day.atlas"
+dest_files=["res://.godot/imported/LofiBG_01_Troubled_Day.atlas-2e4c593de377452010bc2276ccc7381c.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

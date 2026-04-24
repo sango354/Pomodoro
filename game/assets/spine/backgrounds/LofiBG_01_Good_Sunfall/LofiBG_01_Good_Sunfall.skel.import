@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://bm5jlj40fov6x"
+path="res://.godot/imported/LofiBG_01_Good_Sunfall.skel-61e00b97826d7e2bcda7a393ac7a8069.spskel"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Good_Sunfall/LofiBG_01_Good_Sunfall.skel"
+dest_files=["res://.godot/imported/LofiBG_01_Good_Sunfall.skel-61e00b97826d7e2bcda7a393ac7a8069.spskel"]
+
+[params]
+

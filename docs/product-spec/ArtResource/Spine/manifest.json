@@ -1,0 +1,154 @@
+{
+  "format": "spine",
+  "spineVersion": "4.1.23",
+  "godotRequirement": "Use a Godot Spine runtime/plugin compatible with Spine 4.1.x. Godot built-in AnimatedSprite2D cannot directly play .skel.bytes + .atlas.txt.",
+  "premultipliedAlpha": true,
+  "defaultLoop": true,
+  "recommendedImportRoot": "res://assets/spine/backgrounds",
+  "assets": [
+    {
+      "id": "lofi_bg_01_good_day",
+      "sourceName": "LofiBG_01_Good_Day",
+      "mood": "good",
+      "time": "day",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 124,
+      "files": {
+        "skeleton": "LofiBG_01_Good_Day/LofiBG_01_Good_Day.skel.bytes",
+        "atlas": "LofiBG_01_Good_Day/LofiBG_01_Good_Day.atlas.txt",
+        "texture": "LofiBG_01_Good_Day/LofiBG_01_Good_Day.png"
+      }
+    },
+    {
+      "id": "lofi_bg_01_good_night",
+      "sourceName": "LofiBG_01_Good_Night",
+      "mood": "good",
+      "time": "night",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 117,
+      "files": {
+        "skeleton": "LofiBG_01_Good_Night/LofiBG_01_Good_Night.skel.bytes",
+        "atlas": "LofiBG_01_Good_Night/LofiBG_01_Good_Night.atlas.txt",
+        "texture": "LofiBG_01_Good_Night/LofiBG_01_Good_Night.png"
+      }
+    },
+    {
+      "id": "lofi_bg_01_good_sunfall",
+      "sourceName": "LofiBG_01_Good_Sunfall",
+      "mood": "good",
+      "time": "sunfall",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 115,
+      "files": {
+        "skeleton": "LofiBG_01_Good_Sunfall/LofiBG_01_Good_Sunfall.skel.bytes",
+        "atlas": "LofiBG_01_Good_Sunfall/LofiBG_01_Good_Sunfall.atlas.txt",
+        "texture": "LofiBG_01_Good_Sunfall/LofiBG_01_Good_Sunfall.png"
+      }
+    },
+    {
+      "id": "lofi_bg_01_nomal_cloudy",
+      "sourceName": "LofiBG_01_Nomal_Cloudy",
+      "mood": "normal",
+      "sourceMood": "Nomal",
+      "time": "cloudy",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 116,
+      "files": {
+        "skeleton": "LofiBG_01_Nomal_Cloudy/LofiBG_01_Nomal_Cloudy.skel.bytes",
+        "atlas": "LofiBG_01_Nomal_Cloudy/LofiBG_01_Nomal_Cloudy.atlas.txt",
+        "texture": "LofiBG_01_Nomal_Cloudy/LofiBG_01_Nomal_Cloudy.png"
+      }
+    },
+    {
+      "id": "lofi_bg_01_nomal_day",
+      "sourceName": "LofiBG_01_Nomal_Day",
+      "mood": "normal",
+      "sourceMood": "Nomal",
+      "time": "day",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 116,
+      "files": {
+        "skeleton": "LofiBG_01_Nomal_Day/LofiBG_01_Nomal_Day.skel.bytes",
+        "atlas": "LofiBG_01_Nomal_Day/LofiBG_01_Nomal_Day.atlas.txt",
+        "texture": "LofiBG_01_Nomal_Day/LofiBG_01_Nomal_Day.png"
+      }
+    },
+    {
+      "id": "lofi_bg_01_nomal_night",
+      "sourceName": "LofiBG_01_Nomal_Night",
+      "mood": "normal",
+      "sourceMood": "Nomal",
+      "time": "night",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 116,
+      "files": {
+        "skeleton": "LofiBG_01_Nomal_Night/LofiBG_01_Nomal_Night.skel.bytes",
+        "atlas": "LofiBG_01_Nomal_Night/LofiBG_01_Nomal_Night.atlas.txt",
+        "texture": "LofiBG_01_Nomal_Night/LofiBG_01_Nomal_Night.png"
+      }
+    },
+    {
+      "id": "lofi_bg_01_nomal_sunfall",
+      "sourceName": "LofiBG_01_Nomal_Sunfall",
+      "mood": "normal",
+      "sourceMood": "Nomal",
+      "time": "sunfall",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 116,
+      "files": {
+        "skeleton": "LofiBG_01_Nomal_Sunfall/LofiBG_01_Nomal_Sunfall.skel.bytes",
+        "atlas": "LofiBG_01_Nomal_Sunfall/LofiBG_01_Nomal_Sunfall.atlas.txt",
+        "texture": "LofiBG_01_Nomal_Sunfall/LofiBG_01_Nomal_Sunfall.png"
+      }
+    },
+    {
+      "id": "lofi_bg_01_troubled_day",
+      "sourceName": "LofiBG_01_Troubled_Day",
+      "mood": "troubled",
+      "time": "day",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 100,
+      "files": {
+        "skeleton": "LofiBG_01_Troubled_Day/LofiBG_01_Troubled_Day.skel.bytes",
+        "atlas": "LofiBG_01_Troubled_Day/LofiBG_01_Troubled_Day.atlas.txt",
+        "texture": "LofiBG_01_Troubled_Day/LofiBG_01_Troubled_Day.png"
+      }
+    },
+    {
+      "id": "lofi_bg_01_troubled_night",
+      "sourceName": "LofiBG_01_Troubled_Night",
+      "mood": "troubled",
+      "time": "night",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 100,
+      "files": {
+        "skeleton": "LofiBG_01_Troubled_Night/LofiBG_01_Troubled_Night.skel.bytes",
+        "atlas": "LofiBG_01_Troubled_Night/LofiBG_01_Troubled_Night.atlas.txt",
+        "texture": "LofiBG_01_Troubled_Night/LofiBG_01_Troubled_Night.png"
+      }
+    },
+    {
+      "id": "lofi_bg_01_troubled_sunfall",
+      "sourceName": "LofiBG_01_Troubled_Sunfall",
+      "mood": "troubled",
+      "time": "sunfall",
+      "loop": true,
+      "textureSize": [4096, 4096],
+      "atlasRegions": 100,
+      "files": {
+        "skeleton": "LofiBG_01_Troubled_Sunfall/LofiBG_01_Troubled_Sunfall.skel.bytes",
+        "atlas": "LofiBG_01_Troubled_Sunfall/LofiBG_01_Troubled_Sunfall.atlas.txt",
+        "texture": "LofiBG_01_Troubled_Sunfall/LofiBG_01_Troubled_Sunfall.png"
+      }
+    }
+  ]
+}

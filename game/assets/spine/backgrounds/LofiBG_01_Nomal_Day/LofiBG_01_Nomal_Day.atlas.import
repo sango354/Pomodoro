@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://dfdnrayn3glrd"
+path="res://.godot/imported/LofiBG_01_Nomal_Day.atlas-1912ae40f27c6f54dce575d9316700d5.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Nomal_Day/LofiBG_01_Nomal_Day.atlas"
+dest_files=["res://.godot/imported/LofiBG_01_Nomal_Day.atlas-1912ae40f27c6f54dce575d9316700d5.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

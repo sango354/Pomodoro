@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://cgdjwgownrcld"
+path="res://.godot/imported/LofiBG_01_Good_Night.skel-27882ed5e0b0d048af0b577ebc009e99.spskel"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Good_Night/LofiBG_01_Good_Night.skel"
+dest_files=["res://.godot/imported/LofiBG_01_Good_Night.skel-27882ed5e0b0d048af0b577ebc009e99.spskel"]
+
+[params]
+

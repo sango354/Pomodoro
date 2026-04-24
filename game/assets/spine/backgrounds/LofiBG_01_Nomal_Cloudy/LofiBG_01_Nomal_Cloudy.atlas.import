@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://c4woc4p7rg0mi"
+path="res://.godot/imported/LofiBG_01_Nomal_Cloudy.atlas-1b92c51d5a5beaf41308072179565cc7.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Nomal_Cloudy/LofiBG_01_Nomal_Cloudy.atlas"
+dest_files=["res://.godot/imported/LofiBG_01_Nomal_Cloudy.atlas-1b92c51d5a5beaf41308072179565cc7.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

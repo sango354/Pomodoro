@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://c6oiup7h3w2ym"
+path="res://.godot/imported/LofiBG_01_Nomal_Day.skel-cabdf5889180d5336aaf99db6c3c4f70.spskel"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Nomal_Day/LofiBG_01_Nomal_Day.skel"
+dest_files=["res://.godot/imported/LofiBG_01_Nomal_Day.skel-cabdf5889180d5336aaf99db6c3c4f70.spskel"]
+
+[params]
+

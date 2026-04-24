@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://8clhyhpnexos"
+path="res://.godot/imported/LofiBG_01_Troubled_Sunfall.atlas-09e9d347ba375facb08d3d3b67ef01c0.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Troubled_Sunfall/LofiBG_01_Troubled_Sunfall.atlas"
+dest_files=["res://.godot/imported/LofiBG_01_Troubled_Sunfall.atlas-09e9d347ba375facb08d3d3b67ef01c0.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

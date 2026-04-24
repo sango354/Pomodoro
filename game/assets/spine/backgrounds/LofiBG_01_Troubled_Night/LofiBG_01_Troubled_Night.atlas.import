@@ -1,0 +1,15 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+uid="uid://6jugnirtp1ec"
+path="res://.godot/imported/LofiBG_01_Troubled_Night.atlas-ff500b46acaf429691c356715e4f8969.spatlas"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Troubled_Night/LofiBG_01_Troubled_Night.atlas"
+dest_files=["res://.godot/imported/LofiBG_01_Troubled_Night.atlas-ff500b46acaf429691c356715e4f8969.spatlas"]
+
+[params]
+
+normal_map_prefix="n"

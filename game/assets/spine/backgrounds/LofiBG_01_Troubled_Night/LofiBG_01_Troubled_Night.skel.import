@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.skel"
+type="SpineSkeletonFileResource"
+uid="uid://b7g31l5ts31dt"
+path="res://.godot/imported/LofiBG_01_Troubled_Night.skel-646ed480dd27d06e7d89ea9af30aca87.spskel"
+
+[deps]
+
+source_file="res://assets/spine/backgrounds/LofiBG_01_Troubled_Night/LofiBG_01_Troubled_Night.skel"
+dest_files=["res://.godot/imported/LofiBG_01_Troubled_Night.skel-646ed480dd27d06e7d89ea9af30aca87.spskel"]
+
+[params]
+
