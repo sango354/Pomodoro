@@ -12,6 +12,7 @@
 | `sessions` | 專注與休息 session 歷史 |
 | `tasks` | 輕量任務管理 |
 | `task_session_links` | session 與任務的關聯 |
+| `app_configs` | 通用系統參數設定 |
 | `currencies` | 當前可消耗與成長資源 |
 | `level_progress` | XP 與等級狀態 |
 | `bond_progress` | 角色關係狀態 |
@@ -77,7 +78,17 @@
 | `session_id` | string FK | session ID |
 | `linked_at` | datetime | 綁定時間 |
 
-### 3.5 `currencies`
+### 3.5 `app_configs`
+
+| 欄位 | 型別 | 說明 |
+| --- | --- | --- |
+| `config_key` | string PK | 設定鍵，例如 `min_rewardable_session_sec` |
+| `config_value` | string | 設定值，實際型別由應用層解析 |
+| `value_type` | enum | string、int、float、bool、json |
+| `description` | string | 設定用途說明 |
+| `updated_at` | datetime | 最後更新時間 |
+
+### 3.6 `currencies`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -86,7 +97,7 @@
 | `bond_points_total` | int | 累積 Bond 點數 |
 | `updated_at` | datetime | 最後更新時間 |
 
-### 3.6 `level_progress`
+### 3.7 `level_progress`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -96,7 +107,7 @@
 | `focus_xp_lifetime` | int | 累積經驗值 |
 | `updated_at` | datetime | 最後更新時間 |
 
-### 3.7 `bond_progress`
+### 3.8 `bond_progress`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -107,7 +118,7 @@
 | `bond_points_lifetime` | int | 累積 Bond 點數 |
 | `last_interaction_at` | datetime nullable | 最近互動時間 |
 
-### 3.8 `content_defs`
+### 3.9 `content_defs`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -121,7 +132,7 @@
 | `context_tags_json` | json | 相容情境與主題標籤 |
 | `is_active` | bool | 啟用開關 |
 
-### 3.9 `user_unlocks`
+### 3.10 `user_unlocks`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -131,7 +142,7 @@
 | `unlocked_at` | datetime | 解鎖時間 |
 | `equipped` | bool | 是否已裝備 |
 
-### 3.10 `contexts`
+### 3.11 `contexts`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -143,7 +154,7 @@
 | `display_name` | string | 顯示名稱 |
 | `is_default` | bool | 是否預設 |
 
-### 3.11 `dialogue_defs`
+### 3.12 `dialogue_defs`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -157,7 +168,7 @@
 | `weight` | int | 權重 |
 | `is_active` | bool | 是否可用 |
 
-### 3.12 `event_defs`
+### 3.13 `event_defs`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -169,7 +180,7 @@
 | `is_repeatable` | bool | 是否可重複 |
 | `is_active` | bool | 是否啟用 |
 
-### 3.13 `daily_missions`
+### 3.14 `daily_missions`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -182,7 +193,7 @@
 | `status` | enum | active、claimable、claimed、expired |
 | `reward_payload_json` | json | 任務獎勵 |
 
-### 3.14 `achievement_defs`
+### 3.15 `achievement_defs`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -192,7 +203,7 @@
 | `reward_payload_json` | json | 成就獎勵 |
 | `is_active` | bool | 是否啟用 |
 
-### 3.15 `user_achievements`
+### 3.16 `user_achievements`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -203,7 +214,7 @@
 | `status` | enum | active、unlocked、claimed |
 | `updated_at` | datetime | 最後更新時間 |
 
-### 3.16 `daily_stats`
+### 3.17 `daily_stats`
 
 | 欄位 | 型別 | 說明 |
 | --- | --- | --- |
@@ -220,6 +231,7 @@
 
 - `users` 1:N `sessions`
 - `users` 1:N `tasks`
+- `tasks` 預設為純本地資料，不納入跨裝置同步關聯設計
 - `users` 1:1 `currencies`
 - `users` 1:1 `level_progress`
 - `users` 1:1 `bond_progress`
@@ -232,6 +244,8 @@
 ## 5. 實作備註
 
 - 獎勵發放應與 `reward_granted_at` 一起處理，避免重複給獎
+- 最小可得獎 session 長度等通用參數應由 `app_configs` 管理，不應散落在商業邏輯常數中
 - 每日任務刷新需依使用者時區計算
 - 台詞與事件應採內容資料驅動，而非硬編碼
+- 任務資料於 MVP 階段以本地端持久化為主，後續若要同步，應另外定義同步邊界與衝突處理
 - 統計彙總可由 sessions 與 tasks 非同步整理產生

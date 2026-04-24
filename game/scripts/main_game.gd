@@ -1,10 +1,13 @@
-extends Node
+﻿extends Node
 
 const SAVE_PATH := "user://save.json"
 const ASSET_ROOT := "res://assets/spine/backgrounds"
+const MUSIC_ROOT := "res://assets/music"
 const TARGET_VIEWPORT_SIZE := Vector2(1152, 648)
-const HUD_MAX_WIDTH := 390
-const SIDE_PANEL_MAX_WIDTH := 300
+const TASK_PANEL_WIDTH := 430
+const TASK_ITEM_WIDTH := 258
+const TIMER_RAIL_WIDTH := 190
+const SETTINGS_PANEL_WIDTH := 300
 const MIN_REWARDABLE_SESSION_SEC := 300
 const BASE_FOCUS_POINTS := 20
 const BASE_BOND := 10
@@ -14,6 +17,7 @@ const TASK_BONUS_XP := 10
 
 var app_state := "idle"
 var session_mode := "focus"
+var result_dismissed := false
 var planned_duration_sec := 25 * 60
 var elapsed_sec := 0.0
 var pause_elapsed_sec := 0.0
@@ -57,22 +61,35 @@ var root_2d: Node2D
 var ui_layer: CanvasLayer
 var app_container: Control
 var timer_label: Label
+var break_time_label: Label
 var phase_label: Label
 var task_label: Label
 var message_label: Label
-var fp_label: Label
-var level_label: Label
-var bond_label: Label
+var fp_label: Button
+var level_label: Button
+var bond_label: Button
 var stats_label: Label
 var progress_bar: ProgressBar
-var task_input: LineEdit
-var task_select: OptionButton
 var duration_minutes := 25
+var break_duration_minutes := 5
 var duration_value_label: Label
-var start_button: Button
-var pause_button: Button
-var end_button: Button
+var break_duration_value_label: Label
+var primary_timer_button: Button
+var reset_button: Button
+var settings_button: Button
+var settings_panel: PanelContainer
 var task_list: VBoxContainer
+var music_player: AudioStreamPlayer
+var music_files: Array[String] = []
+var current_music_index := -1
+var music_loop := false
+var music_list_panel: PanelContainer
+var music_list: VBoxContainer
+var track_label: Label
+var play_button: Button
+var loop_button: Button
+var volume_slider: HSlider
+var result_dismiss_layer: Button
 var result_panel: PanelContainer
 var result_title: Label
 var result_rewards: Label
@@ -118,7 +135,7 @@ func _build_scene() -> void:
 
 	var overlay := ColorRect.new()
 	overlay.name = "ReadabilityOverlay"
-	overlay.color = Color(0.04, 0.045, 0.05, 0.28)
+	overlay.color = Color(0.04, 0.045, 0.05, 0.16)
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	app_container.add_child(overlay)
 
@@ -126,141 +143,147 @@ func _build_scene() -> void:
 	margins.name = "LayoutMargins"
 	margins.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margins.add_theme_constant_override("margin_left", 28)
-	margins.add_theme_constant_override("margin_top", 22)
+	margins.add_theme_constant_override("margin_top", 24)
 	margins.add_theme_constant_override("margin_right", 28)
 	margins.add_theme_constant_override("margin_bottom", 22)
 	app_container.add_child(margins)
 
 	var layers := Control.new()
-	layers.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	layers.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	layers.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margins.add_child(layers)
 
-	var left := VBoxContainer.new()
-	left.custom_minimum_size = Vector2(HUD_MAX_WIDTH, 0)
-	left.size = Vector2(HUD_MAX_WIDTH, 0)
-	left.anchor_left = 0.0
-	left.anchor_top = 0.0
-	left.anchor_right = 0.0
-	left.anchor_bottom = 0.0
-	left.offset_left = 0
-	left.offset_top = 0
-	left.offset_right = HUD_MAX_WIDTH
-	left.offset_bottom = 450
-	left.add_theme_constant_override("separation", 8)
-	layers.add_child(left)
-
-	var right := VBoxContainer.new()
-	right.custom_minimum_size = Vector2(SIDE_PANEL_MAX_WIDTH, 0)
-	right.size = Vector2(SIDE_PANEL_MAX_WIDTH, 0)
-	right.anchor_left = 1.0
-	right.anchor_top = 0.0
-	right.anchor_right = 1.0
-	right.anchor_bottom = 0.0
-	right.offset_left = -SIDE_PANEL_MAX_WIDTH
-	right.offset_top = 0
-	right.offset_right = 0
-	right.offset_bottom = 420
-	right.add_theme_constant_override("separation", 8)
-	layers.add_child(right)
-
-	_build_timer_panel(left)
-	_build_progress_panel(left)
-	_build_result_panel(left)
-	_build_task_panel(right)
-	_build_stats_panel(right)
+	_build_top_bar(layers)
+	_build_task_panel(layers)
+	_build_timer_rail(layers)
+	_build_settings_panel(layers)
+	_build_result_dismiss_layer(layers)
+	_build_result_panel(layers)
+	_build_bottom_bar(layers)
+	_build_audio_player()
+	_scan_music_files()
 
 
-func _build_timer_panel(parent: VBoxContainer) -> void:
+func _build_top_bar(parent: Control) -> void:
+	var bar := PanelContainer.new()
+	bar.name = "TopBar"
+	bar.anchor_left = 1.0
+	bar.anchor_top = 0.0
+	bar.anchor_right = 1.0
+	bar.anchor_bottom = 0.0
+	bar.offset_left = -330
+	bar.offset_top = 0
+	bar.offset_right = 0
+	bar.offset_bottom = 46
+	bar.add_theme_stylebox_override("panel", _new_panel_style(0.42))
+	parent.add_child(bar)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 14)
+	margin.add_theme_constant_override("margin_right", 14)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	bar.add_child(margin)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	margin.add_child(row)
+
+	var focus_button := _new_icon_button("FP", "Focus Points")
+	fp_label = focus_button
+	row.add_child(focus_button)
+
+	var level_button := _new_icon_button("LV", "Focus Level")
+	level_label = level_button
+	row.add_child(level_button)
+
+	var bond_button := _new_icon_button("BD", "Bond")
+	bond_label = bond_button
+	row.add_child(bond_button)
+
+	var unlocks := _new_icon_button("UL", "Unlocks")
+	row.add_child(unlocks)
+
+	var stats := _new_icon_button("ST", "Stats")
+	stats.pressed.connect(_toggle_stats_message)
+	row.add_child(stats)
+
+
+func _build_timer_rail(parent: Control) -> void:
 	var panel := _new_panel()
-	panel.custom_minimum_size = Vector2(HUD_MAX_WIDTH, 316)
+	panel.name = "TimerRail"
+	panel.anchor_left = 1.0
+	panel.anchor_top = 0.0
+	panel.anchor_right = 1.0
+	panel.anchor_bottom = 0.0
+	panel.offset_left = -TIMER_RAIL_WIDTH
+	panel.offset_top = 64
+	panel.offset_right = 0
+	panel.offset_bottom = 430
+	panel.custom_minimum_size = Vector2(TIMER_RAIL_WIDTH, 0)
 	parent.add_child(panel)
 	var box := _panel_box(panel)
-	box.add_child(_new_title("Lo-fi Focus"))
 
 	phase_label = _new_muted_label("")
+	phase_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(phase_label)
 
 	timer_label = Label.new()
 	timer_label.text = "25:00"
 	timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	timer_label.add_theme_font_size_override("font_size", 50)
+	timer_label.add_theme_font_size_override("font_size", 42)
 	box.add_child(timer_label)
+
+	var break_label := _new_muted_label("Break 05:00")
+	break_label.name = "BreakLabel"
+	break_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	break_time_label = break_label
+	box.add_child(break_label)
 
 	progress_bar = ProgressBar.new()
 	progress_bar.max_value = 100
 	progress_bar.show_percentage = false
 	box.add_child(progress_bar)
 
-	var preset_row := HBoxContainer.new()
-	preset_row.add_theme_constant_override("separation", 6)
-	box.add_child(preset_row)
-	for minutes in [15, 25, 45]:
-		var preset := Button.new()
-		preset.text = "%d" % minutes
-		preset.custom_minimum_size = Vector2(54, 32)
-		preset.pressed.connect(_set_duration_minutes.bind(minutes))
-		preset_row.add_child(preset)
-
-	var duration_row := HBoxContainer.new()
-	duration_row.add_theme_constant_override("separation", 8)
-	box.add_child(duration_row)
-	var focus_label := _new_muted_label("Focus")
-	focus_label.custom_minimum_size = Vector2(58, 32)
-	duration_row.add_child(focus_label)
-
-	var minus_button := Button.new()
-	minus_button.text = "-"
-	minus_button.custom_minimum_size = Vector2(36, 32)
-	minus_button.pressed.connect(_adjust_duration_minutes.bind(-5))
-	duration_row.add_child(minus_button)
-
-	duration_value_label = _new_muted_label("")
-	duration_value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	duration_value_label.custom_minimum_size = Vector2(82, 32)
-	duration_row.add_child(duration_value_label)
-
-	var plus_button := Button.new()
-	plus_button.text = "+"
-	plus_button.custom_minimum_size = Vector2(36, 32)
-	plus_button.pressed.connect(_adjust_duration_minutes.bind(5))
-	duration_row.add_child(plus_button)
-
-	task_select = OptionButton.new()
-	task_select.custom_minimum_size = Vector2(0, 32)
-	task_select.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	box.add_child(task_select)
-
-	var controls := HBoxContainer.new()
+	var controls := VBoxContainer.new()
 	controls.add_theme_constant_override("separation", 8)
 	box.add_child(controls)
 
-	start_button = Button.new()
-	start_button.text = "Start"
-	start_button.custom_minimum_size = Vector2(76, 32)
-	start_button.pressed.connect(_on_start_pressed)
-	controls.add_child(start_button)
+	primary_timer_button = Button.new()
+	primary_timer_button.text = "Start"
+	primary_timer_button.custom_minimum_size = Vector2(0, 36)
+	primary_timer_button.pressed.connect(_on_primary_timer_pressed)
+	controls.add_child(primary_timer_button)
 
-	pause_button = Button.new()
-	pause_button.text = "Pause"
-	pause_button.custom_minimum_size = Vector2(76, 32)
-	pause_button.pressed.connect(_on_pause_pressed)
-	controls.add_child(pause_button)
+	reset_button = Button.new()
+	reset_button.text = "Reset"
+	reset_button.custom_minimum_size = Vector2(0, 36)
+	reset_button.pressed.connect(_on_end_pressed)
+	controls.add_child(reset_button)
 
-	end_button = Button.new()
-	end_button.text = "End"
-	end_button.custom_minimum_size = Vector2(76, 32)
-	end_button.pressed.connect(_on_end_pressed)
-	controls.add_child(end_button)
+	settings_button = Button.new()
+	settings_button.text = "Settings"
+	settings_button.custom_minimum_size = Vector2(0, 34)
+	settings_button.pressed.connect(_toggle_settings_panel)
+	box.add_child(settings_button)
 
 	task_label = _new_muted_label("")
+	task_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(task_label)
 	message_label = _new_muted_label("")
+	message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(message_label)
 
 
-func _build_result_panel(parent: VBoxContainer) -> void:
+func _build_result_panel(parent: Control) -> void:
 	result_panel = _new_panel()
+	result_panel.anchor_left = 0.0
+	result_panel.anchor_top = 1.0
+	result_panel.anchor_right = 0.0
+	result_panel.anchor_bottom = 1.0
+	result_panel.offset_left = 0
+	result_panel.offset_top = -260
+	result_panel.offset_right = 430
+	result_panel.offset_bottom = -82
 	parent.add_child(result_panel)
 	var box := _panel_box(result_panel)
 	result_title = _new_title("Session Result")
@@ -274,77 +297,238 @@ func _build_result_panel(parent: VBoxContainer) -> void:
 
 	mark_task_done_button = Button.new()
 	mark_task_done_button.text = "Mark Task Done"
+	mark_task_done_button.custom_minimum_size = Vector2(126, 30)
 	mark_task_done_button.pressed.connect(_on_mark_bound_task_done)
 	buttons.add_child(mark_task_done_button)
 
 	break_button = Button.new()
 	break_button.text = "Start Break"
+	break_button.custom_minimum_size = Vector2(104, 30)
 	break_button.pressed.connect(_on_break_pressed)
 	buttons.add_child(break_button)
 
 
-func _build_progress_panel(parent: VBoxContainer) -> void:
-	var panel := _new_panel()
-	parent.add_child(panel)
-	var box := _panel_box(panel)
-	box.add_child(_new_title("Progress"))
-	fp_label = _new_muted_label("")
-	level_label = _new_muted_label("")
-	bond_label = _new_muted_label("")
-	box.add_child(fp_label)
-	box.add_child(level_label)
-	box.add_child(bond_label)
+func _build_result_dismiss_layer(parent: Control) -> void:
+	result_dismiss_layer = Button.new()
+	result_dismiss_layer.name = "ResultDismissLayer"
+	result_dismiss_layer.flat = true
+	result_dismiss_layer.visible = false
+	result_dismiss_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	result_dismiss_layer.text = ""
+	result_dismiss_layer.focus_mode = Control.FOCUS_NONE
+	result_dismiss_layer.pressed.connect(_dismiss_result_panel)
+	parent.add_child(result_dismiss_layer)
 
 
-func _build_task_panel(parent: VBoxContainer) -> void:
-	var panel := _new_panel()
-	parent.add_child(panel)
-	var box := _panel_box(panel)
-	box.add_child(_new_title("Tasks"))
+func _build_task_panel(parent: Control) -> void:
+	var box := VBoxContainer.new()
+	box.anchor_left = 0.0
+	box.anchor_top = 0.0
+	box.anchor_right = 0.0
+	box.anchor_bottom = 0.0
+	box.offset_left = 0
+	box.offset_top = 0
+	box.offset_right = TASK_PANEL_WIDTH
+	box.offset_bottom = 284
+	box.add_theme_constant_override("separation", 8)
+	parent.add_child(box)
 
-	var add_row := HBoxContainer.new()
-	add_row.add_theme_constant_override("separation", 8)
-	box.add_child(add_row)
-	task_input = LineEdit.new()
-	task_input.placeholder_text = "New task"
-	task_input.custom_minimum_size = Vector2(0, 32)
-	task_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	task_input.text_submitted.connect(_on_task_submitted)
-	add_row.add_child(task_input)
+	var header := HBoxContainer.new()
+	header.add_theme_constant_override("separation", 8)
+	box.add_child(header)
+
+	var title := _new_title("Tasks")
+	title.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	title.add_theme_constant_override("shadow_offset_x", 2)
+	title.add_theme_constant_override("shadow_offset_y", 2)
+	header.add_child(title)
 
 	var add_button := Button.new()
 	add_button.text = "+"
-	add_button.custom_minimum_size = Vector2(36, 32)
+	add_button.tooltip_text = "Add task"
+	add_button.custom_minimum_size = Vector2(34, 32)
 	add_button.pressed.connect(_on_add_task_pressed)
-	add_row.add_child(add_button)
+	header.add_child(add_button)
 
 	task_list = VBoxContainer.new()
 	task_list.add_theme_constant_override("separation", 6)
 	box.add_child(task_list)
 
 
-func _build_stats_panel(parent: VBoxContainer) -> void:
-	var panel := _new_panel()
-	parent.add_child(panel)
-	var box := _panel_box(panel)
-	box.add_child(_new_title("Today"))
+func _build_settings_panel(parent: Control) -> void:
+	settings_panel = _new_panel()
+	settings_panel.name = "SettingsPanel"
+	settings_panel.visible = false
+	settings_panel.anchor_top = 0.0
+	settings_panel.anchor_bottom = 0.0
+	settings_panel.anchor_left = 0.0
+	settings_panel.anchor_right = 0.0
+	settings_panel.offset_left = 0
+	settings_panel.offset_top = 292
+	settings_panel.offset_right = SETTINGS_PANEL_WIDTH
+	settings_panel.offset_bottom = 530
+	parent.add_child(settings_panel)
+
+	var box := _panel_box(settings_panel)
+	box.add_child(_new_title("Timer Settings"))
+	box.add_child(_new_muted_label("Focus duration"))
+	_build_duration_adjuster(box, true)
+	box.add_child(_new_muted_label("Break duration"))
+	_build_duration_adjuster(box, false)
+
+	var auto_label := _new_muted_label("Auto restart: off")
+	box.add_child(auto_label)
+	var alarm_label := _new_muted_label("Alarm: soft bell")
+	box.add_child(alarm_label)
+
+
+func _build_duration_adjuster(parent: VBoxContainer, focus: bool) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	parent.add_child(row)
+
+	var minus_button := Button.new()
+	minus_button.text = "-"
+	minus_button.custom_minimum_size = Vector2(42, 32)
+	minus_button.pressed.connect(_adjust_duration_minutes.bind(-5) if focus else _adjust_break_duration_minutes.bind(-5))
+	row.add_child(minus_button)
+
+	var value_label := _new_muted_label("")
+	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	value_label.custom_minimum_size = Vector2(92, 32)
+	row.add_child(value_label)
+	if focus:
+		duration_value_label = value_label
+	else:
+		break_duration_value_label = value_label
+
+	var plus_button := Button.new()
+	plus_button.text = "+"
+	plus_button.custom_minimum_size = Vector2(42, 32)
+	plus_button.pressed.connect(_adjust_duration_minutes.bind(5) if focus else _adjust_break_duration_minutes.bind(5))
+	row.add_child(plus_button)
+
+	if focus:
+		for minutes in [15, 25, 45]:
+			var preset := Button.new()
+			preset.text = "%d" % minutes
+			preset.custom_minimum_size = Vector2(46, 32)
+			preset.pressed.connect(_set_duration_minutes.bind(minutes))
+			row.add_child(preset)
+
+
+func _build_bottom_bar(parent: Control) -> void:
+	var bar := PanelContainer.new()
+	bar.anchor_left = 0.0
+	bar.anchor_top = 1.0
+	bar.anchor_right = 1.0
+	bar.anchor_bottom = 1.0
+	bar.offset_left = 0
+	bar.offset_top = -50
+	bar.offset_right = 0
+	bar.offset_bottom = 0
+	bar.add_theme_stylebox_override("panel", _new_panel_style(0.64))
+	parent.add_child(bar)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 14)
+	margin.add_theme_constant_override("margin_right", 14)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	bar.add_child(margin)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	margin.add_child(row)
+
+	var menu_button := Button.new()
+	menu_button.text = "List"
+	menu_button.custom_minimum_size = Vector2(58, 32)
+	menu_button.pressed.connect(_toggle_music_list)
+	row.add_child(menu_button)
+
+	track_label = _new_muted_label("No music loaded")
+	track_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(track_label)
+
+	var prev_button := Button.new()
+	prev_button.text = "Prev"
+	prev_button.custom_minimum_size = Vector2(58, 32)
+	prev_button.pressed.connect(_play_previous_music)
+	row.add_child(prev_button)
+
+	play_button = Button.new()
+	play_button.text = "Play"
+	play_button.custom_minimum_size = Vector2(58, 32)
+	play_button.pressed.connect(_toggle_music_playback)
+	row.add_child(play_button)
+
+	var next_button := Button.new()
+	next_button.text = "Next"
+	next_button.custom_minimum_size = Vector2(58, 32)
+	next_button.pressed.connect(_play_next_music)
+	row.add_child(next_button)
+
+	loop_button = Button.new()
+	loop_button.text = "Loop Off"
+	loop_button.custom_minimum_size = Vector2(82, 32)
+	loop_button.pressed.connect(_toggle_music_loop)
+	row.add_child(loop_button)
+
+	volume_slider = HSlider.new()
+	volume_slider.min_value = 0
+	volume_slider.max_value = 1
+	volume_slider.step = 0.01
+	volume_slider.value = 0.7
+	volume_slider.custom_minimum_size = Vector2(130, 32)
+	volume_slider.value_changed.connect(_on_volume_changed)
+	row.add_child(volume_slider)
+
+	var ambience := Button.new()
+	ambience.text = "Ambience"
+	ambience.custom_minimum_size = Vector2(100, 32)
+	row.add_child(ambience)
+
 	stats_label = _new_muted_label("")
-	box.add_child(stats_label)
+	stats_label.visible = false
+	row.add_child(stats_label)
+
+	music_list_panel = _new_panel()
+	music_list_panel.visible = false
+	music_list_panel.anchor_left = 0.0
+	music_list_panel.anchor_top = 1.0
+	music_list_panel.anchor_right = 0.0
+	music_list_panel.anchor_bottom = 1.0
+	music_list_panel.offset_left = 0
+	music_list_panel.offset_top = -332
+	music_list_panel.offset_right = 430
+	music_list_panel.offset_bottom = -58
+	parent.add_child(music_list_panel)
+	var list_box := _panel_box(music_list_panel)
+	list_box.add_child(_new_title("Music"))
+	music_list = VBoxContainer.new()
+	music_list.add_theme_constant_override("separation", 6)
+	list_box.add_child(music_list)
 
 
 func _new_panel() -> PanelContainer:
 	var panel := PanelContainer.new()
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.add_theme_stylebox_override("panel", _new_panel_style(0.62))
+	return panel
+
+
+func _new_panel_style(alpha: float) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.055, 0.06, 0.068, 0.62)
+	style.bg_color = Color(0.055, 0.06, 0.068, alpha)
 	style.border_color = Color(1, 1, 1, 0.14)
 	style.set_border_width_all(1)
 	style.corner_radius_top_left = 8
 	style.corner_radius_top_right = 8
 	style.corner_radius_bottom_left = 8
 	style.corner_radius_bottom_right = 8
-	panel.add_theme_stylebox_override("panel", style)
-	return panel
+	return style
 
 
 func _panel_box(panel: PanelContainer) -> VBoxContainer:
@@ -368,6 +552,15 @@ func _new_title(text: String) -> Label:
 	return label
 
 
+func _new_icon_button(text: String, tip: String) -> Button:
+	var button := Button.new()
+	button.text = text
+	button.tooltip_text = tip
+	button.custom_minimum_size = Vector2(42, 32)
+	button.focus_mode = Control.FOCUS_NONE
+	return button
+
+
 func _new_muted_label(text: String) -> Label:
 	var label := Label.new()
 	label.text = text
@@ -376,7 +569,159 @@ func _new_muted_label(text: String) -> Label:
 	return label
 
 
-func _on_start_pressed() -> void:
+func _build_audio_player() -> void:
+	music_player = AudioStreamPlayer.new()
+	music_player.name = "MusicPlayer"
+	music_player.volume_db = linear_to_db(float(volume_slider.value))
+	music_player.finished.connect(_on_music_finished)
+	add_child(music_player)
+
+
+func _scan_music_files() -> void:
+	music_files.clear()
+	var dir := DirAccess.open(MUSIC_ROOT)
+	if dir != null:
+		for file_name in dir.get_files():
+			var ext := file_name.get_extension().to_lower()
+			if ext == "ogg" or ext == "mp3" or ext == "wav":
+				music_files.append("%s/%s" % [MUSIC_ROOT, file_name])
+	music_files.sort()
+	_refresh_music_list()
+	if music_files.is_empty():
+		track_label.text = "Add .ogg, .mp3, or .wav files to res://assets/music"
+	else:
+		current_music_index = 0
+		_update_track_label()
+
+
+func _refresh_music_list() -> void:
+	if music_list == null:
+		return
+	for child in music_list.get_children():
+		child.queue_free()
+	if music_files.is_empty():
+		music_list.add_child(_new_muted_label("No music files found."))
+		return
+	for i in range(music_files.size()):
+		var button := Button.new()
+		button.text = _music_display_name(music_files[i])
+		button.tooltip_text = music_files[i]
+		button.custom_minimum_size = Vector2(0, 32)
+		button.pressed.connect(_select_music.bind(i))
+		music_list.add_child(button)
+
+
+func _toggle_music_list() -> void:
+	music_list_panel.visible = not music_list_panel.visible
+
+
+func _select_music(index: int) -> void:
+	if index < 0 or index >= music_files.size():
+		return
+	current_music_index = index
+	_play_current_music()
+	music_list_panel.visible = false
+
+
+func _toggle_music_playback() -> void:
+	if music_files.is_empty():
+		return
+	if current_music_index < 0:
+		current_music_index = 0
+	if music_player.playing:
+		music_player.stream_paused = true
+		play_button.text = "Play"
+	elif music_player.stream != null and music_player.stream_paused:
+		music_player.stream_paused = false
+		play_button.text = "Pause"
+	else:
+		_play_current_music()
+
+
+func _play_current_music() -> void:
+	if current_music_index < 0 or current_music_index >= music_files.size():
+		return
+	var music_path := music_files[current_music_index]
+	var stream := load(music_path)
+	if stream == null:
+		stream = _load_music_from_file(music_path)
+	if stream == null:
+		track_label.text = "Could not load: %s" % _music_display_name(music_path)
+		return
+	music_player.stream = stream
+	music_player.stream_paused = false
+	music_player.play()
+	play_button.text = "Pause"
+	_update_track_label()
+
+
+func _load_music_from_file(path: String):
+	var ext := path.get_extension().to_lower()
+	if ext == "mp3" and ClassDB.class_exists("AudioStreamMP3"):
+		var bytes := FileAccess.get_file_as_bytes(path)
+		if bytes.is_empty():
+			return null
+		var stream := AudioStreamMP3.new()
+		stream.data = bytes
+		return stream
+	return null
+
+
+func _play_previous_music() -> void:
+	if music_files.is_empty():
+		return
+	current_music_index = (current_music_index - 1 + music_files.size()) % music_files.size()
+	_play_current_music()
+
+
+func _play_next_music() -> void:
+	if music_files.is_empty():
+		return
+	current_music_index = (current_music_index + 1) % music_files.size()
+	_play_current_music()
+
+
+func _toggle_music_loop() -> void:
+	music_loop = not music_loop
+	loop_button.text = "Loop On" if music_loop else "Loop Off"
+
+
+func _on_volume_changed(value: float) -> void:
+	if music_player != null:
+		music_player.volume_db = linear_to_db(max(value, 0.001))
+
+
+func _on_music_finished() -> void:
+	if music_loop:
+		_play_current_music()
+	else:
+		_play_next_music()
+
+
+func _update_track_label() -> void:
+	if current_music_index >= 0 and current_music_index < music_files.size():
+		track_label.text = _music_display_name(music_files[current_music_index])
+
+
+func _music_display_name(path: String) -> String:
+	return path.get_file().get_basename()
+
+
+func _on_primary_timer_pressed() -> void:
+	if app_state == "paused":
+		app_state = "running"
+		message_label.text = "Back in focus"
+		_refresh_all()
+		return
+	if app_state == "running":
+		app_state = "paused"
+		message_label.text = "Paused"
+		_refresh_all()
+		return
+	_start_focus_session()
+
+
+func _start_focus_session() -> void:
 	if app_state == "running":
 		return
 	session_mode = "focus"
@@ -393,18 +738,6 @@ func _on_start_pressed() -> void:
 	_refresh_all()
 
 
-func _on_pause_pressed() -> void:
-	if app_state == "running":
-		app_state = "paused"
-		pause_button.text = "Resume"
-		message_label.text = "Paused"
-	elif app_state == "paused":
-		app_state = "running"
-		pause_button.text = "Pause"
-		message_label.text = "Back in focus"
-	_refresh_all()
-
-
 func _on_end_pressed() -> void:
 	if app_state == "running" or app_state == "paused":
 		var ratio := elapsed_sec / float(max(planned_duration_sec, 1))
@@ -416,11 +749,12 @@ func _on_end_pressed() -> void:
 
 func _on_break_pressed() -> void:
 	session_mode = "short_break"
-	planned_duration_sec = 5 * 60
+	planned_duration_sec = break_duration_minutes * 60
 	elapsed_sec = 0.0
 	active_task_id = ""
 	app_state = "running"
 	message_label.text = "Take a short break."
+	_dismiss_result_panel()
 	_refresh_all()
 
 
@@ -443,6 +777,7 @@ func _finish_session(status: String) -> void:
 	sessions.append(session)
 	_update_stats(status, actual_sec)
 	app_state = status
+	result_dismissed = false
 	selected_context.mood = "good" if status == "completed" else "troubled"
 	_load_spine_background(_select_spine_variant())
 	_save_game()
@@ -509,7 +844,7 @@ func _bond_required_for_next_level() -> int:
 
 
 func _on_add_task_pressed() -> void:
-	_create_task(task_input.text)
+	_create_task("Type Here")
 
 
 func _on_task_submitted(text: String) -> void:
@@ -532,7 +867,6 @@ func _create_task(title: String) -> void:
 		"completed_at": ""
 	}
 	tasks.append(task)
-	task_input.text = ""
 	_save_game()
 	_refresh_all()
 
@@ -574,11 +908,10 @@ func _complete_task(task_id: String) -> void:
 
 
 func _selected_task_id() -> String:
-	var index := task_select.selected
-	if index < 0:
-		return ""
-	var metadata = task_select.get_item_metadata(index)
-	return str(metadata)
+	for task in tasks:
+		if task.status == "todo" or task.status == "in_progress":
+			return str(task.task_id)
+	return ""
 
 
 func _refresh_all() -> void:
@@ -592,7 +925,12 @@ func _refresh_timer_ui() -> void:
 	var remaining: int = max(planned_duration_sec - int(elapsed_sec), 0)
 	timer_label.text = _format_time(remaining)
 	progress_bar.value = 100.0 * elapsed_sec / float(max(planned_duration_sec, 1))
-	duration_value_label.text = "%d min" % duration_minutes
+	if duration_value_label != null:
+		duration_value_label.text = "%d min" % duration_minutes
+	if break_duration_value_label != null:
+		break_duration_value_label.text = "%d min" % break_duration_minutes
+	if break_time_label != null:
+		break_time_label.text = "Break %s" % _format_time(break_duration_minutes * 60)
 	var mode_text := "Focus" if session_mode == "focus" else "Short Break"
 	phase_label.text = "%s - %s" % [mode_text, app_state.capitalize()]
 	task_label.text = "Task: %s" % _task_title(active_task_id) if active_task_id != "" else "Task: none"
@@ -600,14 +938,28 @@ func _refresh_timer_ui() -> void:
 
 func _refresh_controls() -> void:
 	var can_configure := app_state != "running" and app_state != "paused"
-	task_select.disabled = not can_configure
-	start_button.disabled = app_state == "running"
-	pause_button.disabled = app_state != "running" and app_state != "paused"
-	end_button.disabled = app_state != "running" and app_state != "paused"
-	pause_button.text = "Resume" if app_state == "paused" else "Pause"
-	result_panel.visible = app_state == "completed" or app_state == "partial" or app_state == "abandoned"
+	primary_timer_button.disabled = false
+	if app_state == "running":
+		primary_timer_button.text = "Pause"
+	elif app_state == "paused":
+		primary_timer_button.text = "Resume"
+	else:
+		primary_timer_button.text = "Start"
+	reset_button.disabled = app_state != "running" and app_state != "paused"
+	var show_result := app_state == "completed" or app_state == "partial" or app_state == "abandoned"
+	show_result = show_result and not result_dismissed
+	result_panel.visible = show_result
+	result_dismiss_layer.visible = show_result
 	mark_task_done_button.disabled = active_task_id == "" or _task_status(active_task_id) == "done"
 	break_button.disabled = app_state == "abandoned"
+
+
+func _dismiss_result_panel() -> void:
+	result_dismissed = true
+	if result_panel != null:
+		result_panel.visible = false
+	if result_dismiss_layer != null:
+		result_dismiss_layer.visible = false
 
 
 func _set_duration_minutes(minutes: int) -> void:
@@ -622,54 +974,126 @@ func _adjust_duration_minutes(delta_minutes: int) -> void:
 	_set_duration_minutes(duration_minutes + delta_minutes)
 
 
-func _refresh_tasks_ui() -> void:
-	task_select.clear()
-	task_select.add_item("No task")
-	task_select.set_item_metadata(0, "")
-	var item_index := 1
-	for task in tasks:
-		if task.status == "todo" or task.status == "in_progress":
-			task_select.add_item(task.title)
-			task_select.set_item_metadata(item_index, task.task_id)
-			if task.task_id == active_task_id:
-				task_select.select(item_index)
-			item_index += 1
+func _adjust_break_duration_minutes(delta_minutes: int) -> void:
+	if app_state == "running" or app_state == "paused":
+		return
+	break_duration_minutes = clamp(break_duration_minutes + delta_minutes, 1, 60)
+	_refresh_timer_ui()
 
+
+func _toggle_settings_panel() -> void:
+	settings_panel.visible = not settings_panel.visible
+
+
+func _toggle_stats_message() -> void:
+	stats_label.visible = not stats_label.visible
+
+
+func _refresh_tasks_ui() -> void:
 	for child in task_list.get_children():
 		child.queue_free()
 
+	var shown := 0
 	for task in tasks:
 		if task.status == "archived":
 			continue
+		if shown >= 5:
+			break
+		shown += 1
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 6)
+		row.custom_minimum_size = Vector2(TASK_ITEM_WIDTH + 64, 0)
 		task_list.add_child(row)
 
-		var title := Label.new()
-		title.text = "%s  [%s]" % [task.title, task.status]
-		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		title.clip_text = true
-		row.add_child(title)
+		var checkbox := CheckBox.new()
+		checkbox.button_pressed = task.status == "done"
+		checkbox.disabled = task.status == "done"
+		checkbox.toggled.connect(_on_task_checkbox_toggled.bind(task.task_id))
+		row.add_child(checkbox)
 
-		var done := Button.new()
-		done.text = "Done"
-		done.custom_minimum_size = Vector2(54, 30)
-		done.disabled = task.status == "done"
-		done.pressed.connect(_complete_task.bind(task.task_id))
-		row.add_child(done)
+		var title_panel := PanelContainer.new()
+		title_panel.custom_minimum_size = Vector2(TASK_ITEM_WIDTH, 0)
+		title_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		title_panel.add_theme_stylebox_override("panel", _new_panel_style(0.72))
+		row.add_child(title_panel)
+
+		var title_margin := MarginContainer.new()
+		title_margin.add_theme_constant_override("margin_left", 10)
+		title_margin.add_theme_constant_override("margin_right", 10)
+		title_margin.add_theme_constant_override("margin_top", 4)
+		title_margin.add_theme_constant_override("margin_bottom", 4)
+		title_panel.add_child(title_margin)
+
+		var title_edit := LineEdit.new()
+		var full_title := str(task.get("title", "Untitled"))
+		title_edit.text = _task_display_title(full_title)
+		title_edit.tooltip_text = full_title
+		title_edit.custom_minimum_size = Vector2(TASK_ITEM_WIDTH - 22, 30)
+		title_edit.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		title_edit.expand_to_text_length = false
+		title_edit.focus_entered.connect(_prepare_task_edit.bind(title_edit, task.task_id))
+		title_edit.text_submitted.connect(_rename_task_submitted.bind(title_edit, task.task_id))
+		title_edit.focus_exited.connect(_rename_task_from_edit.bind(title_edit, task.task_id))
+		title_margin.add_child(title_edit)
 
 		var archive := Button.new()
-		archive.text = "Archive"
-		archive.custom_minimum_size = Vector2(70, 30)
+		archive.text = "x"
+		archive.custom_minimum_size = Vector2(32, 30)
 		archive.pressed.connect(_archive_task.bind(task.task_id))
 		row.add_child(archive)
 
 
+func _on_task_checkbox_toggled(pressed: bool, task_id: String) -> void:
+	if pressed:
+		_complete_task(task_id)
+
+
+func _rename_task_from_edit(edit: LineEdit, task_id: String) -> void:
+	var saved_title := _rename_task(edit.text, task_id)
+	edit.text = _task_display_title(saved_title)
+	edit.tooltip_text = saved_title
+
+
+func _rename_task_submitted(new_title: String, edit: LineEdit, task_id: String) -> void:
+	var saved_title := _rename_task(new_title, task_id)
+	edit.text = _task_display_title(saved_title)
+	edit.tooltip_text = saved_title
+
+
+func _prepare_task_edit(edit: LineEdit, task_id: String) -> void:
+	var full_title := _task_title(task_id)
+	edit.text = full_title
+	edit.tooltip_text = full_title
+	edit.caret_column = edit.text.length()
+
+
+func _rename_task(new_title: String, task_id: String) -> String:
+	new_title = new_title.strip_edges()
+	if new_title == "":
+		new_title = "Type Here"
+	for task in tasks:
+		if task.task_id == task_id:
+			task.title = new_title
+			task.updated_at = Time.get_datetime_string_from_system(false, true)
+			_save_game()
+			return new_title
+	return new_title
+
+
+func _task_display_title(title: String) -> String:
+	const MAX_TASK_DISPLAY_CHARS := 24
+	if title.length() <= MAX_TASK_DISPLAY_CHARS:
+		return title
+	return "%s..." % title.substr(0, MAX_TASK_DISPLAY_CHARS - 3)
+
+
 func _refresh_progress_ui() -> void:
-	fp_label.text = "Focus Points: %d" % currencies.focus_points
-	level_label.text = "Level %d  XP %d / %d" % [level_progress.focus_level, level_progress.focus_xp, _xp_required_for_next_level()]
-	bond_label.text = "Bond Lv.%d  %d / %d" % [bond_progress.bond_level, bond_progress.bond_points_current, _bond_required_for_next_level()]
+	fp_label.text = "FP"
+	fp_label.tooltip_text = "Focus Points: %d" % currencies.focus_points
+	level_label.text = "LV"
+	level_label.tooltip_text = "Level %d  XP %d / %d" % [level_progress.focus_level, level_progress.focus_xp, _xp_required_for_next_level()]
+	bond_label.text = "BD"
+	bond_label.tooltip_text = "Bond Lv.%d  %d / %d" % [bond_progress.bond_level, bond_progress.bond_points_current, _bond_required_for_next_level()]
 	stats_label.text = "Completed: %d\nPartial: %d\nFocus minutes: %d\nTasks done: %d" % [
 		daily_stats.completed_sessions,
 		daily_stats.partial_sessions,

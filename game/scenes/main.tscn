@@ -1,7 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://pomodoro_main"]
+[gd_scene load_steps=2 format=3 uid="uid://tdgfe08o84oj"]
 
 [ext_resource type="Script" path="res://scripts/main_game.gd" id="1_main"]
 
 [node name="PomodoroMain" type="Node"]
 script = ExtResource("1_main")
-
