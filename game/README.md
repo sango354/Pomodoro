@@ -64,3 +64,9 @@ The MVP game scene currently covers the M1 loop from the product spec:
 - Classify results as completed, partial, or abandoned.
 - Grant Focus Points, XP, and Bond when rewardable.
 - Save local tasks, sessions, progress, and stats to `user://save.json`.
+
+For handoff status and current implementation notes, see:
+
+```text
+E:\Pomodoro\docs\product-spec\engineering\current-progress.md
+```
