@@ -20,7 +20,7 @@ func _ready() -> void:
 	print("Atlas path exists: ", FileAccess.file_exists(atlas_path))
 	print_spine_sprite_methods()
 
-	if not ClassDB.class_exists("SpineSprite"):
+	if not ClassDB.class_exists("SpineSprite") or not ClassDB.class_exists("SpineSkeletonDataResource"):
 		push_error("spine-godot runtime is not available in this Godot executable.")
 		return
 
@@ -33,13 +33,19 @@ func _ready() -> void:
 		push_error("Spine resources were not imported correctly.")
 		return
 
-	var skeleton_data_res := SpineSkeletonDataResource.new()
-	skeleton_data_res.skeleton_file_res = skeleton_res
-	skeleton_data_res.atlas_res = atlas_res
+	var skeleton_data_res := ClassDB.instantiate("SpineSkeletonDataResource") as Resource
+	if skeleton_data_res == null:
+		push_error("Unable to instantiate Spine skeleton data resource.")
+		return
+	skeleton_data_res.set("skeleton_file_res", skeleton_res)
+	skeleton_data_res.set("atlas_res", atlas_res)
 
-	var sprite := SpineSprite.new()
+	var sprite := ClassDB.instantiate("SpineSprite") as Node
+	if sprite == null:
+		push_error("Unable to instantiate Spine sprite.")
+		return
 	sprite.name = "SpineBackground"
-	sprite.skeleton_data_res = skeleton_data_res
+	sprite.set("skeleton_data_res", skeleton_data_res)
 	add_child(sprite)
 	print("SpineSprite instantiated: ", sprite != null)
 	print_spine_debug_info(sprite)
@@ -54,7 +60,13 @@ func _ready() -> void:
 
 func print_spine_debug_info(sprite: Node) -> void:
 	var skeleton = sprite.get_skeleton()
+	if skeleton == null:
+		push_warning("Spine skeleton is not available yet; skipping debug info.")
+		return
 	var skeleton_data = skeleton.get_data()
+	if skeleton_data == null:
+		push_warning("Spine skeleton data is not available yet; skipping debug info.")
+		return
 	var animation_names: Array[String] = []
 	for animation in skeleton_data.get_animations():
 		animation_names.append(animation.get_name())
@@ -63,7 +75,13 @@ func print_spine_debug_info(sprite: Node) -> void:
 
 func _play_first_animation(sprite: Node) -> void:
 	var skeleton = sprite.get_skeleton()
+	if skeleton == null:
+		push_warning("Spine skeleton is not available yet; skipping animation playback.")
+		return
 	var skeleton_data = skeleton.get_data()
+	if skeleton_data == null:
+		push_warning("Spine skeleton data is not available yet; skipping animation playback.")
+		return
 	var animations: Array = skeleton_data.get_animations()
 	if animations.is_empty():
 		push_warning("No animations found in Spine skeleton.")
@@ -75,6 +93,9 @@ func _play_first_animation(sprite: Node) -> void:
 			animation_name = DEFAULT_ANIMATION
 			break
 	var animation_state = sprite.get_animation_state()
+	if animation_state == null:
+		push_warning("Spine animation state is not available yet; skipping animation playback.")
+		return
 	animation_state.set_animation(animation_name, true, 0)
 	print("Playing loop animation: ", animation_name)
 
@@ -89,6 +110,11 @@ func _fit_spine_to_viewport() -> void:
 		viewport_size = TARGET_VIEWPORT_SIZE
 
 	var skeleton = sprite.get_skeleton()
+	if skeleton == null:
+		push_warning("Spine skeleton is not available yet; using provisional fit.")
+		sprite.scale = Vector2.ONE * 0.55
+		sprite.position = Vector2(215, 30)
+		return
 	skeleton.update_world_transform()
 
 	if not sprite.has_method("_edit_get_rect"):

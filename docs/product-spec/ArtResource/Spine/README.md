@@ -42,7 +42,7 @@ source files without artist confirmation.
 Installed local validation editor:
 
 ```text
-E:\Pomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe
 ```
 
 This is the official Spine-enabled Godot `4.1.3.stable.custom_build` editor

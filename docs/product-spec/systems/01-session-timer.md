@@ -63,6 +63,14 @@ Session 計時器是產品的主行為系統。它必須讓使用者快速進入
 7. 系統判定結果
 8. 系統顯示回饋畫面與下一步操作
 
+### 6.1 目前 Godot 原型流程
+
+- Focus 倒數完成後，一律進入短休息倒數。
+- Auto restart 只控制短休息完成後是否自動開始下一輪 Focus。
+- Auto restart 關閉時，短休息完成後停在 idle。
+- Reset 會將 timer 回到 Focus idle，並使用目前 Settings 中的 Focus duration。
+- 開始 Focus 時，若 Timer Settings 視窗開啟，會自動關閉該視窗。
+
 ## 7. 規則
 
 ### 7.1 預設時長
@@ -85,6 +93,14 @@ Session 計時器是產品的主行為系統。它必須讓使用者快速進入
 - 是否具備獎勵資格，除完成狀態外，還需通過通用設定中的最小可得獎 session 長度門檻
 - 最小可得獎 session 長度應由通用設定資料提供，例如 `app_configs.min_rewardable_session_sec`
 
+### 7.4 Timer Settings 原型規則
+
+- Focus duration 以 1 分鐘為調整級距。
+- Break duration 以 1 分鐘為調整級距。
+- Auto restart 使用開關控制，左側為 off，右側為 on。
+- Alarm 使用開關控制，左側為 off，右側為 on。
+- Alarm 目前連到靜音暫代檔，正式音效待補。
+
 ## 8. 狀態
 
 - idle
@@ -105,11 +121,16 @@ Session 計時器是產品的主行為系統。它必須讓使用者快速進入
 
 ### 9.2 Session 畫面
 
-- 剩餘時間
+- Focus 剩餘時間
+- Break 剩餘時間
 - 暫停 / 繼續 / 結束控制
 - 當前任務標籤
 - 音樂與環境音控制
 - 角色動畫狀態
+
+目前 Godot 原型中的 timer rail 不顯示任務標籤與狀態訊息；任務仍在
+左上 Tasks 區域管理。Focus 與 Break 時間各自顯示，正在倒數者為白色，
+未在倒數者為灰色 `#808080`。
 
 ### 9.3 結算畫面
 
