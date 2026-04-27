@@ -50,6 +50,16 @@
 | CI-006 | 角色支援依時間 / 天氣切換反應 | P1 |
 | CI-007 | 提示頻率需受限制，避免打擾 | P0 |
 
+### 5.1 目前 Godot 原型狀態
+
+- Break countdown 開始時會顯示一個 companion break panel。
+- Panel 目前顯示純文字休息互動台詞。
+- 台詞資料來源為 `game/data/dialogue_defs.json` 的 `break_interaction` 陣列。
+- Panel 支援 `Next` 切換下一句與 `Skip` 隱藏面板。
+- Skip 只隱藏互動面板，不會停止 break 倒數。
+- 目前尚未依 Bond、時間、天氣做篩選；資料欄位已預留
+  `bond_requirement` 與 `context_requirement`。
+
 ## 6. 規則
 
 - 專注中的提示最多每 8 到 12 分鐘一次

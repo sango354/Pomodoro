@@ -1,0 +1,32 @@
+{
+	"break_interaction": [
+		{
+			"dialogue_id": "break_001",
+			"text_key": "dialogue.break_001",
+			"text": "Nice work. Look away from the screen and let your eyes rest for a moment.",
+			"bond_requirement": 0,
+			"context_requirement": "any"
+		},
+		{
+			"dialogue_id": "break_002",
+			"text_key": "dialogue.break_002",
+			"text": "Take a slow breath. You have already moved the day forward.",
+			"bond_requirement": 0,
+			"context_requirement": "any"
+		},
+		{
+			"dialogue_id": "break_003",
+			"text_key": "dialogue.break_003",
+			"text": "Stretch your shoulders before the next round. I will keep the room quiet.",
+			"bond_requirement": 0,
+			"context_requirement": "any"
+		},
+		{
+			"dialogue_id": "break_004",
+			"text_key": "dialogue.break_004",
+			"text": "If you need water, this is the right time.",
+			"bond_requirement": 0,
+			"context_requirement": "any"
+		}
+	]
+}
