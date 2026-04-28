@@ -1,7 +1,6 @@
 extends Node
 
 const SaveDataService = preload("res://scripts/save_data_service.gd")
-const TaskService = preload("res://scripts/task_service.gd")
 const ProgressionService = preload("res://scripts/progression_service.gd")
 const SpineBackgroundController = preload("res://scripts/spine_background_controller.gd")
 const MusicPlayerController = preload("res://scripts/music_player_controller.gd")
@@ -11,11 +10,14 @@ const TimerSettingsController = preload("res://scripts/timer_settings_controller
 const TimerSessionService = preload("res://scripts/timer_session_service.gd")
 const LocalizationService = preload("res://scripts/localization_service.gd")
 const OptionPanelController = preload("res://scripts/option_panel_controller.gd")
+const TaskPanelController = preload("res://scripts/task_panel_controller.gd")
+const ResultPanelController = preload("res://scripts/result_panel_controller.gd")
+const SessionRewardCoordinator = preload("res://scripts/session_reward_coordinator.gd")
+const BreakMediaController = preload("res://scripts/break_media_controller.gd")
 
 const SAVE_PATH := "user://save.json"
 const ALARM_SOUND_PATH := "res://assets/sfx/alarm_placeholder.wav"
-const TASK_PANEL_WIDTH := 430
-const TASK_ITEM_WIDTH := 258
+const DEFAULT_BREAK_MEDIA_PATH := "res://assets/videos/break/video.mp4"
 const SETTINGS_PANEL_WIDTH := 264
 const TIMER_RAIL_WIDTH := 190
 const MIN_REWARDABLE_SESSION_SEC := 300
@@ -24,6 +26,9 @@ const BASE_BOND := 10
 const BASE_XP := 30
 const TASK_BONUS_FOCUS_POINTS := 8
 const TASK_BONUS_XP := 10
+const AMBIENT_PROMPT_FOCUS_INTERVAL_SEC := 8 * 60
+const AMBIENT_PROMPT_IDLE_INTERVAL_SEC := 3 * 60
+const AMBIENT_PROMPT_VISIBLE_SEC := 8.0
 
 var app_state := "idle"
 var session_mode := "focus"
@@ -67,6 +72,9 @@ var spine_background: Node
 var timer_rail: Node
 var localizer
 var option_controller: Node
+var task_controller: Node
+var result_controller: Node
+var break_media_controller: Node
 
 var root_2d: Node2D
 var ui_layer: CanvasLayer
@@ -81,22 +89,18 @@ var break_duration_minutes := 5
 var auto_restart_enabled := false
 var alarm_enabled := false
 var timer_settings: Node
-var task_list: VBoxContainer
 var saved_music_path := ""
 var music_loop := false
 var music_volume := 0.7
 var music_controller: Node
 var companion_controller: Node
 var alarm_player: AudioStreamPlayer
-var result_dismiss_layer: Button
-var result_panel: PanelContainer
-var result_title: Label
-var result_rewards: Label
-var mark_task_done_button: Button
-var break_button: Button
 var language_code := "en"
-var tasks_title_label: Label
-var add_task_button: Button
+var break_media_enabled := false
+var break_media_path := DEFAULT_BREAK_MEDIA_PATH
+var interaction_history: Array = []
+var ambient_prompt_elapsed_sec := 0.0
+var ambient_prompt_visible_sec := 0.0
 var unlocks_label: Button
 var stats_button: Button
 
@@ -111,6 +115,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_update_ambient_prompt(delta)
 	if app_state != "running":
 		return
 
@@ -174,12 +179,17 @@ func _build_scene() -> void:
 
 	option_controller = OptionPanelController.new()
 	add_child(option_controller)
-	option_controller.setup(layers, localizer)
+	option_controller.setup(layers, localizer, break_media_enabled)
 	option_controller.language_previous_pressed.connect(_on_previous_language_pressed)
 	option_controller.language_next_pressed.connect(_on_next_language_pressed)
+	option_controller.break_media_pressed.connect(_on_break_media_toggled)
 
 	_build_top_bar(layers)
-	_build_task_panel(layers)
+	task_controller = TaskPanelController.new()
+	add_child(task_controller)
+	task_controller.setup(layers, tasks, localizer)
+	task_controller.tasks_changed.connect(_on_tasks_changed)
+	task_controller.task_completed.connect(_on_task_completed)
 	timer_rail = TimerRailController.new()
 	add_child(timer_rail)
 	timer_rail.setup(layers, localizer)
@@ -202,11 +212,23 @@ func _build_scene() -> void:
 	timer_settings.break_duration_delta_requested.connect(_adjust_break_duration_minutes)
 	timer_settings.auto_restart_pressed.connect(_on_auto_restart_toggled)
 	timer_settings.alarm_pressed.connect(_on_alarm_toggled)
-	_build_result_dismiss_layer(layers)
-	_build_result_panel(layers)
+	result_controller = ResultPanelController.new()
+	add_child(result_controller)
+	result_controller.setup(layers, localizer)
+	result_controller.mark_task_done_pressed.connect(_on_mark_bound_task_done)
+	result_controller.break_pressed.connect(_on_break_pressed)
 	companion_controller = CompanionPanelController.new()
 	add_child(companion_controller)
 	companion_controller.setup(layers, localizer)
+	companion_controller.break_interaction_viewed.connect(_on_break_interaction_viewed)
+	companion_controller.break_interaction_skipped.connect(_on_break_interaction_skipped)
+	companion_controller.break_interaction_advanced.connect(_on_break_interaction_advanced)
+	companion_controller.ambient_prompt_shown.connect(_on_ambient_prompt_shown)
+	companion_controller.ambient_prompt_dismissed.connect(_on_ambient_prompt_dismissed)
+	break_media_controller = BreakMediaController.new()
+	add_child(break_media_controller)
+	break_media_controller.setup(layers, break_media_enabled, break_media_path)
+	break_media_controller.playback_failed.connect(_on_break_media_failed)
 	_build_stats_overlay(layers)
 	music_controller = MusicPlayerController.new()
 	add_child(music_controller)
@@ -266,52 +288,6 @@ func _build_top_bar(parent: Control) -> void:
 	option_controller.refresh_text()
 
 
-func _build_result_panel(parent: Control) -> void:
-	result_panel = _new_panel()
-	result_panel.anchor_left = 0.0
-	result_panel.anchor_top = 1.0
-	result_panel.anchor_right = 0.0
-	result_panel.anchor_bottom = 1.0
-	result_panel.offset_left = 0
-	result_panel.offset_top = -260
-	result_panel.offset_right = 430
-	result_panel.offset_bottom = -82
-	parent.add_child(result_panel)
-	var box := _panel_box(result_panel)
-	result_title = _new_title(localizer.translate("result.title"))
-	box.add_child(result_title)
-	result_rewards = _new_muted_label("")
-	box.add_child(result_rewards)
-
-	var buttons := HBoxContainer.new()
-	buttons.add_theme_constant_override("separation", 8)
-	box.add_child(buttons)
-
-	mark_task_done_button = Button.new()
-	mark_task_done_button.text = localizer.translate("result.mark_task_done")
-	mark_task_done_button.custom_minimum_size = Vector2(126, 30)
-	mark_task_done_button.pressed.connect(_on_mark_bound_task_done)
-	buttons.add_child(mark_task_done_button)
-
-	break_button = Button.new()
-	break_button.text = localizer.translate("result.start_break")
-	break_button.custom_minimum_size = Vector2(104, 30)
-	break_button.pressed.connect(_on_break_pressed)
-	buttons.add_child(break_button)
-
-
-func _build_result_dismiss_layer(parent: Control) -> void:
-	result_dismiss_layer = Button.new()
-	result_dismiss_layer.name = "ResultDismissLayer"
-	result_dismiss_layer.flat = true
-	result_dismiss_layer.visible = false
-	result_dismiss_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
-	result_dismiss_layer.text = ""
-	result_dismiss_layer.focus_mode = Control.FOCUS_NONE
-	result_dismiss_layer.pressed.connect(_dismiss_result_panel)
-	parent.add_child(result_dismiss_layer)
-
-
 func _build_stats_overlay(parent: Control) -> void:
 	stats_label = _new_muted_label("")
 	stats_label.visible = false
@@ -324,44 +300,6 @@ func _build_stats_overlay(parent: Control) -> void:
 	stats_label.offset_right = 0
 	stats_label.offset_bottom = -58
 	parent.add_child(stats_label)
-
-
-func _build_task_panel(parent: Control) -> void:
-	var box := VBoxContainer.new()
-	box.anchor_left = 0.0
-	box.anchor_top = 0.0
-	box.anchor_right = 0.0
-	box.anchor_bottom = 0.0
-	box.offset_left = 0
-	box.offset_top = 0
-	box.offset_right = TASK_PANEL_WIDTH
-	box.offset_bottom = 284
-	box.add_theme_constant_override("separation", 8)
-	parent.add_child(box)
-
-	var header := HBoxContainer.new()
-	header.add_theme_constant_override("separation", 8)
-	box.add_child(header)
-
-	var title := _new_title(localizer.translate("tasks.title"))
-	tasks_title_label = title
-	title.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	title.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
-	title.add_theme_constant_override("shadow_offset_x", 2)
-	title.add_theme_constant_override("shadow_offset_y", 2)
-	header.add_child(title)
-
-	var add_button := Button.new()
-	add_button.text = "+"
-	add_button.tooltip_text = localizer.translate("tasks.add")
-	add_button.custom_minimum_size = Vector2(34, 32)
-	add_button.pressed.connect(_on_add_task_pressed)
-	header.add_child(add_button)
-	add_task_button = add_button
-
-	task_list = VBoxContainer.new()
-	task_list.add_theme_constant_override("separation", 6)
-	box.add_child(task_list)
 
 
 func _new_panel() -> PanelContainer:
@@ -458,6 +396,8 @@ func _start_focus_session() -> void:
 	if app_state == "running":
 		return
 	_hide_break_interaction()
+	_hide_ambient_prompt()
+	_stop_break_media()
 	if timer_settings != null and timer_settings.has_method("hide"):
 		timer_settings.hide()
 	var next_state := TimerSessionService.start_focus(duration_minutes, _selected_task_id())
@@ -478,6 +418,8 @@ func _on_reset_pressed() -> void:
 	result_dismissed = true
 	_dismiss_result_panel()
 	_hide_break_interaction()
+	_hide_ambient_prompt()
+	_stop_break_media()
 	_refresh_all()
 
 
@@ -487,14 +429,18 @@ func _on_break_pressed() -> void:
 
 
 func _start_break_countdown() -> void:
+	_hide_ambient_prompt()
 	_apply_timer_state(TimerSessionService.start_break(break_duration_minutes))
-	_show_break_interaction()
+	if not _start_break_media():
+		_show_break_interaction()
 	_refresh_all()
 
 
 func _finish_break() -> void:
 	_play_alarm()
 	_hide_break_interaction()
+	_hide_ambient_prompt()
+	_stop_break_media()
 	if auto_restart_enabled:
 		app_state = "idle"
 		_start_focus_session()
@@ -505,12 +451,76 @@ func _finish_break() -> void:
 
 func _show_break_interaction() -> void:
 	if companion_controller != null and companion_controller.has_method("show_break_interaction"):
-		companion_controller.show_break_interaction()
+		companion_controller.show_break_interaction(
+			int(bond_progress.get("bond_level", 1)),
+			selected_context,
+			interaction_history
+		)
 
 
 func _hide_break_interaction() -> void:
 	if companion_controller != null and companion_controller.has_method("hide_break_interaction"):
 		companion_controller.hide_break_interaction()
+
+
+func _show_ambient_prompt() -> void:
+	if companion_controller == null or not companion_controller.has_method("show_ambient_prompt"):
+		return
+	companion_controller.show_ambient_prompt(
+		int(bond_progress.get("bond_level", 1)),
+		selected_context,
+		interaction_history
+	)
+	ambient_prompt_visible_sec = 0.0
+
+
+func _hide_ambient_prompt(emit_dismissed: bool = false) -> void:
+	if companion_controller != null and companion_controller.has_method("hide_ambient_prompt"):
+		companion_controller.hide_ambient_prompt(emit_dismissed)
+	ambient_prompt_visible_sec = 0.0
+
+
+func _update_ambient_prompt(delta: float) -> void:
+	if _is_ambient_prompt_visible():
+		ambient_prompt_visible_sec += delta
+		if ambient_prompt_visible_sec >= AMBIENT_PROMPT_VISIBLE_SEC:
+			_hide_ambient_prompt()
+		return
+	if not _ambient_prompt_allowed():
+		ambient_prompt_elapsed_sec = 0.0
+		return
+	ambient_prompt_elapsed_sec += delta
+	var interval := AMBIENT_PROMPT_FOCUS_INTERVAL_SEC if app_state == "running" else AMBIENT_PROMPT_IDLE_INTERVAL_SEC
+	if ambient_prompt_elapsed_sec >= interval:
+		ambient_prompt_elapsed_sec = 0.0
+		_show_ambient_prompt()
+
+
+func _ambient_prompt_allowed() -> bool:
+	if session_mode == "short_break":
+		return false
+	if app_state != "idle" and not (app_state == "running" and session_mode == "focus"):
+		return false
+	if result_controller != null and result_controller.has_method("is_result_visible") and result_controller.is_result_visible():
+		return false
+	return true
+
+
+func _is_ambient_prompt_visible() -> bool:
+	if companion_controller == null or not companion_controller.has_method("is_ambient_prompt_visible"):
+		return false
+	return companion_controller.is_ambient_prompt_visible()
+
+
+func _start_break_media() -> bool:
+	if break_media_controller == null or not break_media_controller.has_method("play_break_media"):
+		return false
+	return break_media_controller.play_break_media()
+
+
+func _stop_break_media() -> void:
+	if break_media_controller != null and break_media_controller.has_method("stop_break_media"):
+		break_media_controller.stop_break_media()
 
 
 func _apply_timer_state(next_state: Dictionary) -> void:
@@ -535,7 +545,13 @@ func _apply_timer_state(next_state: Dictionary) -> void:
 
 func _finish_session(status: String, start_break_after: bool = false) -> void:
 	var actual_sec := int(round(elapsed_sec))
+	var previous_bond_level := int(bond_progress.get("bond_level", 1))
 	var rewards := _grant_rewards(status, actual_sec)
+	var current_bond_level := int(bond_progress.get("bond_level", 1))
+	var reward_text := _reward_summary(rewards)
+	if current_bond_level > previous_bond_level:
+		reward_text += "\n%s" % _bond_level_up_summary(current_bond_level)
+		_record_interaction_event("bond_level_up", "bond_level_%d" % current_bond_level)
 	var session := {
 		"session_id": "session_%s" % Time.get_unix_time_from_system(),
 		"user_id": "local_user",
@@ -560,14 +576,19 @@ func _finish_session(status: String, start_break_after: bool = false) -> void:
 		return
 	app_state = status
 	result_dismissed = false
-	result_title.text = _status_title(status)
-	result_rewards.text = _reward_summary(rewards)
+	if result_controller != null and result_controller.has_method("show_result"):
+		result_controller.show_result(
+			status,
+			reward_text,
+			active_task_id != "" and _task_status(active_task_id) != "done",
+			status != "abandoned"
+		)
 	message_label.text = localizer.translate("timer.message_session_logged")
 	_refresh_all()
 
 
 func _grant_rewards(status: String, actual_sec: int) -> Dictionary:
-	return ProgressionService.grant_session_rewards(
+	return SessionRewardCoordinator.grant_session_rewards(
 		session_mode,
 		status,
 		actual_sec,
@@ -598,57 +619,43 @@ func _bond_required_for_next_level() -> int:
 	return ProgressionService.bond_required_for_next_level(bond_progress)
 
 
-func _on_add_task_pressed() -> void:
-	_create_task(localizer.translate("tasks.default_title"))
-
-
-func _on_task_submitted(text: String) -> void:
-	_create_task(text)
-
-
-func _create_task(title: String) -> void:
-	var task := TaskService.create_task(tasks, title)
-	if task.is_empty():
-		return
-	tasks.append(task)
-	_save_game()
-	_refresh_all()
-
-
 func _on_mark_bound_task_done() -> void:
-	if active_task_id == "":
-		return
-	if _set_task_status(active_task_id, "done"):
-		currencies.focus_points += TASK_BONUS_FOCUS_POINTS
-		_add_xp(TASK_BONUS_XP)
-		daily_stats.tasks_completed += 1
-		result_rewards.text += "\n%s" % localizer.trf("result.task_bonus", {
-			"focus_points": TASK_BONUS_FOCUS_POINTS,
-			"xp": TASK_BONUS_XP
-		})
+	var result := SessionRewardCoordinator.apply_task_completion_bonus(
+		tasks,
+		active_task_id,
+		currencies,
+		level_progress,
+		daily_stats,
+		TASK_BONUS_FOCUS_POINTS,
+		TASK_BONUS_XP,
+		localizer
+	)
+	if bool(result.get("changed", false)):
+		if result_controller != null and result_controller.has_method("append_reward_line"):
+			result_controller.append_reward_line(str(result.get("summary", "")))
 		_save_game()
 		_refresh_all()
 
 
 func _set_task_status(task_id: String, status: String) -> bool:
-	return TaskService.set_task_status(tasks, task_id, status)
+	if task_controller != null and task_controller.has_method("set_task_status"):
+		return task_controller.set_task_status(task_id, status)
+	return false
 
 
-func _archive_task(task_id: String) -> void:
-	if _set_task_status(task_id, "archived"):
-		_save_game()
-		_refresh_all()
+func _on_tasks_changed() -> void:
+	_save_game()
+	_refresh_all()
 
 
-func _complete_task(task_id: String) -> void:
-	if _set_task_status(task_id, "done"):
-		daily_stats.tasks_completed += 1
-		_save_game()
-		_refresh_all()
+func _on_task_completed(_task_id: String) -> void:
+	daily_stats.tasks_completed += 1
 
 
 func _selected_task_id() -> String:
-	return TaskService.selected_task_id(tasks)
+	if task_controller != null and task_controller.has_method("selected_task_id"):
+		return task_controller.selected_task_id()
+	return ""
 
 
 func _refresh_all() -> void:
@@ -675,20 +682,14 @@ func _refresh_timer_ui() -> void:
 func _refresh_controls() -> void:
 	if timer_rail != null and timer_rail.has_method("refresh_controls"):
 		timer_rail.refresh_controls(app_state)
-	var show_result := app_state == "completed" or app_state == "partial" or app_state == "abandoned"
-	show_result = show_result and not result_dismissed
-	result_panel.visible = show_result
-	result_dismiss_layer.visible = show_result
-	mark_task_done_button.disabled = active_task_id == "" or _task_status(active_task_id) == "done"
-	break_button.disabled = app_state == "abandoned"
+	if result_controller != null and result_controller.has_method("refresh_controls"):
+		result_controller.refresh_controls(app_state, active_task_id, _task_status(active_task_id) == "done")
 
 
 func _dismiss_result_panel() -> void:
 	result_dismissed = true
-	if result_panel != null:
-		result_panel.visible = false
-	if result_dismiss_layer != null:
-		result_dismiss_layer.visible = false
+	if result_controller != null and result_controller.has_method("hide_result"):
+		result_controller.hide_result()
 
 
 func _set_duration_minutes(minutes: int) -> void:
@@ -744,20 +745,27 @@ func _on_next_language_pressed() -> void:
 	_save_game()
 
 
-func _refresh_localized_text() -> void:
-	if tasks_title_label != null:
-		tasks_title_label.text = localizer.translate("tasks.title")
-	if add_task_button != null:
-		add_task_button.tooltip_text = localizer.translate("tasks.add")
-	if mark_task_done_button != null:
-		mark_task_done_button.text = localizer.translate("result.mark_task_done")
-	if break_button != null:
-		break_button.text = localizer.translate("result.start_break")
-	if result_title != null:
-		if app_state == "completed" or app_state == "partial" or app_state == "abandoned":
-			result_title.text = _status_title(app_state)
+func _on_break_media_toggled() -> void:
+	break_media_enabled = not break_media_enabled
+	if option_controller != null and option_controller.has_method("refresh_break_media"):
+		option_controller.refresh_break_media(break_media_enabled)
+	if break_media_controller != null and break_media_controller.has_method("set_enabled"):
+		break_media_controller.set_enabled(break_media_enabled)
+	if session_mode == "short_break" and app_state == "running":
+		if break_media_enabled:
+			_hide_break_interaction()
+			if not _start_break_media():
+				_show_break_interaction()
 		else:
-			result_title.text = localizer.translate("result.title")
+			_show_break_interaction()
+	_save_game()
+
+
+func _refresh_localized_text() -> void:
+	if task_controller != null and task_controller.has_method("set_localizer"):
+		task_controller.set_localizer(localizer)
+	if result_controller != null and result_controller.has_method("set_localizer"):
+		result_controller.set_localizer(localizer)
 	if timer_rail != null and timer_rail.has_method("set_localizer"):
 		timer_rail.set_localizer(localizer)
 	if timer_settings != null and timer_settings.has_method("set_localizer"):
@@ -769,6 +777,43 @@ func _refresh_localized_text() -> void:
 	if option_controller != null and option_controller.has_method("refresh_text"):
 		option_controller.refresh_text()
 	_refresh_all()
+
+
+func _on_break_interaction_viewed(dialogue_id: String) -> void:
+	_record_interaction_event("break_interaction_viewed", dialogue_id)
+
+
+func _on_break_interaction_skipped(dialogue_id: String) -> void:
+	_record_interaction_event("break_interaction_skipped", dialogue_id)
+
+
+func _on_break_interaction_advanced(from_id: String, to_id: String) -> void:
+	_record_interaction_event("break_interaction_advanced", "%s>%s" % [from_id, to_id])
+
+
+func _on_ambient_prompt_shown(dialogue_id: String) -> void:
+	_record_interaction_event("ambient_prompt_shown", dialogue_id)
+
+
+func _on_ambient_prompt_dismissed(dialogue_id: String) -> void:
+	_record_interaction_event("ambient_prompt_dismissed", dialogue_id)
+
+
+func _on_break_media_failed(_path: String) -> void:
+	if session_mode == "short_break" and app_state == "running":
+		_show_break_interaction()
+
+
+func _record_interaction_event(event_type: String, dialogue_id: String) -> void:
+	interaction_history.append({
+		"event_type": event_type,
+		"dialogue_id": dialogue_id,
+		"created_at": Time.get_datetime_string_from_system(false, true),
+		"context_id": _context_id()
+	})
+	if interaction_history.size() > 200:
+		interaction_history.pop_front()
+	_save_game()
 
 
 func _play_alarm() -> void:
@@ -783,111 +828,8 @@ func _toggle_stats_message() -> void:
 
 
 func _refresh_tasks_ui() -> void:
-	for child in task_list.get_children():
-		child.queue_free()
-
-	var shown := 0
-	for task in tasks:
-		if task.status == "archived":
-			continue
-		if shown >= 5:
-			break
-		shown += 1
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 6)
-		row.custom_minimum_size = Vector2(TASK_ITEM_WIDTH + 64, 0)
-		task_list.add_child(row)
-
-		var checkbox := CheckBox.new()
-		checkbox.button_pressed = task.status == "done"
-		checkbox.disabled = task.status == "done"
-		checkbox.toggled.connect(_on_task_checkbox_toggled.bind(task.task_id))
-		row.add_child(checkbox)
-
-		var title_panel := PanelContainer.new()
-		title_panel.custom_minimum_size = Vector2(TASK_ITEM_WIDTH, 0)
-		title_panel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		title_panel.add_theme_stylebox_override("panel", _new_panel_style(0.72))
-		row.add_child(title_panel)
-
-		var title_margin := MarginContainer.new()
-		title_margin.add_theme_constant_override("margin_left", 10)
-		title_margin.add_theme_constant_override("margin_right", 10)
-		title_margin.add_theme_constant_override("margin_top", 4)
-		title_margin.add_theme_constant_override("margin_bottom", 4)
-		title_panel.add_child(title_margin)
-
-		var title_edit := LineEdit.new()
-		var full_title := str(task.get("title", "Untitled"))
-		title_edit.text = full_title
-		title_edit.tooltip_text = full_title
-		title_edit.custom_minimum_size = Vector2(TASK_ITEM_WIDTH - 22, 30)
-		title_edit.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		title_edit.expand_to_text_length = false
-		title_edit.add_theme_stylebox_override("normal", _new_task_edit_style(false))
-		title_edit.add_theme_stylebox_override("focus", _new_task_edit_style(true))
-		title_edit.focus_entered.connect(_prepare_task_edit.bind(title_edit, task.task_id))
-		title_edit.text_submitted.connect(_rename_task_submitted.bind(title_edit, task.task_id))
-		title_edit.focus_exited.connect(_rename_task_from_edit.bind(title_edit, task.task_id))
-		title_margin.add_child(title_edit)
-
-		var archive := Button.new()
-		archive.text = "x"
-		archive.tooltip_text = localizer.translate("tasks.archive")
-		archive.custom_minimum_size = Vector2(32, 30)
-		archive.pressed.connect(_archive_task.bind(task.task_id))
-		row.add_child(archive)
-
-
-func _on_task_checkbox_toggled(pressed: bool, task_id: String) -> void:
-	if pressed:
-		_complete_task(task_id)
-
-
-func _rename_task_from_edit(edit: LineEdit, task_id: String) -> void:
-	var saved_title := _rename_task(edit.text, task_id)
-	edit.text = saved_title
-	edit.tooltip_text = saved_title
-
-
-func _rename_task_submitted(new_title: String, edit: LineEdit, task_id: String) -> void:
-	var saved_title := _rename_task(new_title, task_id)
-	edit.text = saved_title
-	edit.tooltip_text = saved_title
-
-
-func _prepare_task_edit(edit: LineEdit, task_id: String) -> void:
-	var full_title := _task_title(task_id)
-	edit.text = full_title
-	edit.tooltip_text = full_title
-	edit.caret_column = edit.text.length()
-
-
-func _rename_task(new_title: String, task_id: String) -> String:
-	var saved_title: String = TaskService.rename_task(tasks, new_title, task_id, localizer.translate("tasks.default_title"))
-	_save_game()
-	return saved_title
-
-
-func _task_display_title(title: String) -> String:
-	const MAX_TASK_DISPLAY_CHARS := 24
-	if title.length() <= MAX_TASK_DISPLAY_CHARS:
-		return title
-	return "%s..." % title.substr(0, MAX_TASK_DISPLAY_CHARS - 3)
-
-
-func _new_task_edit_style(focused: bool) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.055, 0.06, 0.068, 0.72)
-	style.border_color = Color(1, 1, 1, 0.78) if focused else Color(1, 1, 1, 0.0)
-	style.set_border_width_all(2 if focused else 0)
-	style.corner_radius_top_left = 4
-	style.corner_radius_top_right = 4
-	style.corner_radius_bottom_left = 4
-	style.corner_radius_bottom_right = 4
-	style.content_margin_left = 8
-	style.content_margin_right = 8
-	return style
+	if task_controller != null and task_controller.has_method("refresh_tasks"):
+		task_controller.refresh_tasks()
 
 
 func _refresh_progress_ui() -> void:
@@ -914,15 +856,7 @@ func _refresh_progress_ui() -> void:
 
 
 func _update_stats(status: String, actual_sec: int) -> void:
-	if session_mode != "focus":
-		return
-	var minutes := int(round(actual_sec / 60.0))
-	if status == "completed":
-		daily_stats.completed_sessions += 1
-		daily_stats.focus_minutes_completed += minutes
-	elif status == "partial":
-		daily_stats.partial_sessions += 1
-		daily_stats.focus_minutes_partial += minutes
+	SessionRewardCoordinator.update_focus_stats(daily_stats, session_mode, status, actual_sec)
 
 
 func _format_time(seconds: int) -> String:
@@ -936,21 +870,19 @@ func _status_title(status: String) -> String:
 
 
 func _reward_summary(rewards: Dictionary) -> String:
-	if not bool(rewards.get("rewardable", false)):
-		return localizer.translate("result.no_reward")
-	return localizer.trf("result.reward_summary", {
-		"focus_points": int(rewards.get("focus_points", 0)),
-		"xp": int(rewards.get("xp", 0)),
-		"bond": int(rewards.get("bond", 0))
-	})
+	return SessionRewardCoordinator.reward_summary(localizer, rewards)
 
 
-func _task_title(task_id: String) -> String:
-	return TaskService.task_title(tasks, task_id)
+func _bond_level_up_summary(level: int) -> String:
+	if localizer != null:
+		return localizer.trf("result.bond_level_up", {"level": level})
+	return "Bond Level Up: Lv.%d" % level
 
 
 func _task_status(task_id: String) -> String:
-	return TaskService.task_status(tasks, task_id)
+	if task_controller != null and task_controller.has_method("task_status"):
+		return task_controller.task_status(task_id)
+	return ""
 
 
 func _apply_time_context() -> void:
@@ -977,6 +909,7 @@ func _load_save() -> void:
 	level_progress = parsed.get("level_progress", level_progress)
 	bond_progress = parsed.get("bond_progress", bond_progress)
 	daily_stats = parsed.get("daily_stats", daily_stats)
+	interaction_history = parsed.get("interaction_history", interaction_history)
 	var timer_settings = parsed.get("timer_settings", {})
 	if typeof(timer_settings) == TYPE_DICTIONARY:
 		duration_minutes = int(timer_settings.get("focus_minutes", duration_minutes))
@@ -991,6 +924,8 @@ func _load_save() -> void:
 	var app_settings = parsed.get("app_settings", {})
 	if typeof(app_settings) == TYPE_DICTIONARY:
 		language_code = str(app_settings.get("language", language_code))
+		break_media_enabled = bool(app_settings.get("break_media_enabled", break_media_enabled))
+		break_media_path = str(app_settings.get("break_media_path", break_media_path))
 
 
 func _save_game() -> void:
@@ -1008,6 +943,7 @@ func _save_game() -> void:
 		"level_progress": level_progress,
 		"bond_progress": bond_progress,
 		"daily_stats": daily_stats,
+		"interaction_history": interaction_history,
 		"timer_settings": {
 			"focus_minutes": duration_minutes,
 			"break_minutes": break_duration_minutes,
@@ -1016,7 +952,9 @@ func _save_game() -> void:
 		},
 		"music_state": current_music_state,
 		"app_settings": {
-			"language": language_code
+			"language": language_code,
+			"break_media_enabled": break_media_enabled,
+			"break_media_path": break_media_path
 		}
 	}
 	SaveDataService.save_payload(SAVE_PATH, payload)

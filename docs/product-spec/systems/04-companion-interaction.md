@@ -18,6 +18,7 @@
 - 專注時的待機存在
 - 低頻環境反應
 - 休息互動片段
+- Break 期間播放指定本機路徑影片
 - Bond 成長
 - 對時間 / 天氣的情境反應
 
@@ -35,6 +36,7 @@
 | ambient idle | 專注時的存在感與待機表現 |
 | light prompt | 長時間 session 中低頻文字或動作反應 |
 | break interaction | session 結束後的互動片段 |
+| break media | 休息期間播放指定本機路徑的短影片，可由 Options 開關 |
 | bond event | 關係里程碑解鎖的特殊互動 |
 | context reaction | 對白天 / 夜晚 / 天氣的不同反應 |
 
@@ -49,6 +51,8 @@
 | CI-005 | Bond 里程碑可解鎖對話與事件 | P1 |
 | CI-006 | 角色支援依時間 / 天氣切換反應 | P1 |
 | CI-007 | 提示頻率需受限制，避免打擾 | P0 |
+| CI-008 | Break 期間可播放指定本機路徑影片作為休息陪伴媒體 | P1 |
+| CI-009 | 使用者可在 Options 中開關 Break 影片播放 | P1 |
 
 ### 5.1 目前 Godot 原型狀態
 
@@ -57,14 +61,24 @@
 - 台詞資料來源為 `game/data/dialogue_defs.json` 的 `break_interaction` 陣列。
 - Panel 支援 `Next` 切換下一句與 `Skip` 隱藏面板。
 - Skip 只隱藏互動面板，不會停止 break 倒數。
-- 目前尚未依 Bond、時間、天氣做篩選；資料欄位已預留
-  `bond_requirement` 與 `context_requirement`。
+- Break dialogue 會依 Bond 與目前 context 篩選，支援
+  `bond_requirement`、`context_requirement`、`weight` 與 `is_active`。
+- Break panel 會發出 viewed、skipped 與 advanced 事件，原型目前記錄到本地
+  `interaction_history`。
+- Break media 已有原型：Break countdown 期間會在 Options 開啟時嘗試播放指定路徑影片；
+  影片播放完一次後會自動關閉；影片不存在或載入失敗時會回退到純文字 Break interaction。
+- 目前預設影片資產為 `res://assets/videos/break/video.mp4`。
 
 ## 6. 規則
 
 - 專注中的提示最多每 8 到 12 分鐘一次
 - 提示不可遮擋計時器控制
 - 休息互動是主要情感回饋入口
+- Break 影片僅在 short break / long break 期間播放，不應在 focus 期間自動播放
+- Break 影片播放完一次後應停止並隱藏，不循環播放
+- Break 結束、使用者跳過休息互動、或使用者關閉 Break 影片選項時，影片應停止或隱藏
+- 指定影片路徑不存在、格式不支援、或載入失敗時，系統需回退到純文字休息互動，不中斷倒數
+- Break media 路徑目前接受 `.ogv` 與 `.mp4`；實際能否播放仍取決於 Godot runtime / importer 支援
 - Bond 進度應鼓勵穩定使用，而不是短期刷值
 
 ## 7. 狀態模型
@@ -97,6 +111,7 @@
 
 - 角色需可見但不干擾
 - 休息互動需可略過
+- Break 影片需可由 Options 關閉；關閉後不應佔用主要 UI 空間
 - Bond 升級需有清楚提示
 - 互動紀錄檔可留到 MVP 後再做
 
@@ -113,3 +128,41 @@
 - 成長與回饋系統
 - 情境 / 內容系統
 - Session 結算畫面
+
+## 12. Current Prototype Rules
+
+- Break dialogue is loaded from `game/data/dialogue_defs.json`.
+- Break dialogue selection filters by Bond level, context, active state, and
+  cooldown.
+- Ambient dialogue is loaded from the same file under the `ambient` section and
+  uses the same Bond level, context, active state, cooldown, and weight rules.
+- Ambient prompts appear during idle/focus at low frequency, can be dismissed,
+  and auto-hide after a short duration. They do not appear during Break.
+- Cooldown is evaluated from local `interaction_history` viewed events. If every
+  matching dialogue is cooling down, the system falls back to the matching pool
+  so the Break panel still has content.
+- Break Next records `break_interaction_advanced` with the previous and next
+  dialogue IDs and avoids repeating the same dialogue when another valid line
+  exists.
+- Bond level-up records `bond_level_up` in `interaction_history` and appends a
+  line to the session result summary.
+- Break video is controlled by Options, plays once, closes automatically, and
+  falls back to Break dialogue if playback fails.
+- Runtime accepts `.ogv` and `.mp4` paths. In the current Godot Spine build,
+  `.mp4` uses a same-name `.ogv` sidecar fallback for playback.
+
+Future table-control fields:
+
+- Dialogue: `dialogue_id`, `interaction_type`, `text_key`,
+  `bond_requirement`, `context_requirement`, `cooldown_minutes`, `weight`,
+  `is_active`.
+- Break media: `media_id`, `path`, `enabled`, `bond_requirement`,
+  `context_requirement`, `play_once`, `fallback_behavior`.
+
+Remote handoff note:
+
+- Minimal ambient prompt is implemented. When resuming work on another machine,
+  first run the project in Godot windowed mode and verify ambient prompt timing
+  and placement. Confirm the prompt does not cover Tasks, the timer rail, the
+  music bar, Break dialogue, or Break video UI before tuning cadence or adding
+  more content.

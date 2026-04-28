@@ -39,6 +39,33 @@
 | `timezone` | string | 用於任務刷新與統計 |
 | `settings_json` | json | 使用者偏好設定 |
 
+目前本地原型的 `settings_json` / `app_settings` 可包含：
+
+```json
+{
+  "language": "en",
+  "break_media_enabled": false,
+  "break_media_path": "res://assets/videos/break/video.mp4"
+}
+```
+
+`break_media_enabled` 控制 Break 期間是否播放指定影片；`break_media_path`
+為影片資源路徑。若路徑不存在或格式不支援，應回退到純文字 Break interaction。
+
+Prototype table-control notes:
+
+- Break dialogue fields that must remain data-driven for later spreadsheet
+  control: `dialogue_id`, `interaction_type`, `text_key`, `bond_requirement`,
+  `context_requirement_json`, `cooldown_minutes`, `weight`, and `is_active`.
+- Break media fields that must remain data-driven for later spreadsheet
+  control: `media_id`, `path`, `enabled`, `bond_requirement`,
+  `context_requirement_json`, `play_once`, and `fallback_behavior`.
+- Break and bond interaction history currently persists locally in
+  `interaction_history`. Event types currently include
+  `break_interaction_viewed`, `break_interaction_skipped`,
+  `break_interaction_advanced`, `ambient_prompt_shown`,
+  `ambient_prompt_dismissed`, and `bond_level_up`.
+
 ### 3.2 `sessions`
 
 | 欄位 | 型別 | 說明 |

@@ -1,6 +1,6 @@
 # System 07: Localization and Options
 
-Last updated: 2026-04-27
+Last updated: 2026-04-28
 
 This document records the current localization and options-menu implementation
 for handoff between machines.
@@ -10,6 +10,10 @@ for handoff between machines.
 The game now supports a lightweight scripted localization layer for UI text and
 break companion dialogue. The first Options panel is implemented in the
 top-right HUD and currently exposes language switching.
+
+Options also includes a Break media switch. When enabled, the Break countdown
+may play a configured local video file as companion/rest media. When disabled,
+Break uses the current text-only companion panel.
 
 ## Localization Table
 
@@ -91,6 +95,7 @@ game/scripts/option_panel_controller.gd
 - Display the Options panel.
 - Display the current language name.
 - Emit previous/next language requests.
+- Display and emit Break media switch requests.
 
 ## Saved State
 
@@ -105,7 +110,9 @@ Payload path:
 ```json
 {
   "app_settings": {
-    "language": "en"
+    "language": "en",
+    "break_media_enabled": false,
+    "break_media_path": "res://assets/videos/break/video.mp4"
   }
 }
 ```
@@ -127,6 +134,7 @@ en, zh_TW, zh_CN, ja, ko, fr, de, it, ru, es_ES, pt_BR
   - Next language arrow
 - Switching language updates visible labels/tooltips immediately.
 - The selected language is saved immediately.
+- Break media playback switch updates immediately and is saved immediately.
 
 ## Localized Areas
 
@@ -143,6 +151,7 @@ Currently wired:
 - Break companion dialogue through `text_key`
 - Compact stats overlay labels
 - Option button and language panel
+- Break media option label and switch tooltip
 
 ## Dialogue Integration
 
@@ -176,6 +185,44 @@ Runtime behavior:
 - Non-English/non-Traditional-Chinese columns still need translation.
 - Long translated strings may need layout tuning.
 - Options panel currently only supports language switching.
+- Break media path selection is not exposed in UI yet; the runtime uses
+  `app_settings.break_media_path`.
+- No production video asset is committed yet, so the default path falls back to
+  text-only Break interaction until an `.ogv` asset is supplied.
+
+## Break Media Option
+
+Target payload:
+
+```json
+{
+  "app_settings": {
+    "break_media_enabled": true,
+    "break_media_path": "res://assets/videos/break/video.mp4"
+  }
+}
+```
+
+Rules:
+
+- Default `break_media_enabled` is `false`; the packaged prototype video path is
+  `res://assets/videos/break/video.mp4`.
+- The configured path may be `res://` for packaged content or an allowed local
+  file path for development builds.
+- If the path is empty, missing, or unsupported, the game falls back to the
+  existing Break companion panel.
+- Runtime accepts `.ogv` and `.mp4` paths. `.ogv` is validated in this Godot
+  build; `.mp4` depends on the runtime/importer support available on the target
+  build.
+- Break media plays once and then closes automatically.
+- The Options panel currently exposes the on/off switch; path selection can be
+  added later if needed.
+
+Validation:
+
+```powershell
+E:\Pomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\Pomodoro\game --script res://scripts/break_media_probe.gd
+```
 
 ## Validation
 

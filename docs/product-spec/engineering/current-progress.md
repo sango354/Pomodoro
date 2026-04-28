@@ -1,6 +1,6 @@
 # Current Development Progress
 
-Last updated: 2026-04-27
+Last updated: 2026-04-28
 
 This document records the current implementation state so work can continue
 from another machine without relying on chat history.
@@ -13,6 +13,11 @@ from another machine without relying on chat history.
 - Latest localization/options spec:
   `docs/product-spec/systems/07-localization-and-options.md`
 - Spine-enabled Godot editor expected locally:
+
+Project root paths differ between development machines. Existing examples may
+use `E:\ProjectPomodoro`; the current checkout may instead be `E:\Pomodoro`.
+Use the same relative paths under the repository root when moving between
+machines.
 
 ```powershell
 E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe
@@ -90,6 +95,10 @@ Implemented:
   - `timer_settings_controller.gd`
   - `localization_service.gd`
   - `option_panel_controller.gd`
+  - `task_panel_controller.gd`
+  - `result_panel_controller.gd`
+  - `session_reward_coordinator.gd`
+  - `break_media_controller.gd`
 - Localization table created at `game/data/localization.csv`.
   - Columns are open for English, Traditional Chinese, Simplified Chinese,
     Japanese, Korean, French, German, Italian, Russian, Spanish-Spain, and
@@ -101,10 +110,38 @@ Implemented:
 - To edit UI text, update `game/data/localization.csv` and restart the game.
 - Break dialogue entries in `game/data/dialogue_defs.json` now include
   `text_key` values that resolve through the localization table.
+- Break dialogue runtime control fields that should later be pulled into table
+  control are `dialogue_id`, `interaction_type`, `text_key`,
+  `bond_requirement`, `context_requirement`, `cooldown_minutes`, `weight`, and
+  `is_active`.
+- Break media runtime control fields that should later remain data-driven are
+  `media_id`, `path`, `enabled`, `bond_requirement`, `context_requirement`,
+  playback mode, and fallback behavior.
 - M2 companion interaction has a first break-panel prototype:
   - Break countdown shows a companion dialogue panel.
   - Dialogue content is loaded from `game/data/dialogue_defs.json`.
+  - Dialogue selection now filters by Bond and current context.
+  - Dialogue entries support `bond_requirement`, `context_requirement`,
+    `cooldown_minutes`, `weight`, and `is_active`.
+  - Dialogue cooldowns are enforced from local `interaction_history`; if every
+    matching line is still cooling down, Break falls back to the matching pool
+    instead of showing no dialogue.
   - Break panel supports cycling to the next line and skipping the panel.
+  - Break panel emits viewed, skipped, and advanced events. Advanced selection
+    avoids choosing the same dialogue again when another valid line exists.
+  - Interaction events are saved locally in `interaction_history`.
+  - Bond level-up is recorded as an interaction event and shown in the session
+    result summary.
+  - Ambient companion prompts now appear at low frequency during idle/focus.
+    They reuse the same Bond/context/cooldown/weight dialogue selection path as
+    Break dialogue.
+  - Ambient prompt events are saved as `ambient_prompt_shown` and
+    `ambient_prompt_dismissed`.
+  - Options can toggle Break media playback during Break countdown.
+  - Break media uses `app_settings.break_media_enabled` and
+    `app_settings.break_media_path`.
+  - If the configured video is missing or unsupported, Break falls back to the
+    text companion panel without interrupting the timer.
 - Music folder scanning from `res://assets/music`.
 - MP3 fallback loading via `AudioStreamMP3` when imported resources are unavailable.
 
@@ -120,6 +157,7 @@ Implemented:
 - Options panel:
   - Currently contains language switching with previous/next arrow buttons.
   - Language switching updates the main UI labels/tooltips immediately.
+  - Contains a Break Video switch for Break media playback.
 - Top-left: Tasks.
   - Title and `+` button are aligned.
   - No global task input field.
@@ -140,12 +178,28 @@ Implemented:
 - Break companion panel:
   - Appears when break countdown starts.
   - Displays data-driven break dialogue.
+  - Dialogue is filtered by Bond and context.
   - Can be skipped without stopping the break timer.
+- Break media:
+  - If enabled and the configured path loads, a `VideoStreamPlayer` appears
+    during Break countdown.
+  - The video plays once, then closes automatically.
+  - Runtime accepts `.ogv` and `.mp4` paths; `.ogv` is validated in the current
+    Godot Spine build, while `.mp4` depends on runtime/importer support.
+  - If disabled or loading fails, the text Break companion panel is shown.
+  - A default prototype video asset exists at
+    `res://assets/videos/break/video.mp4`.
 - Bottom: music player bar.
   - Left: music list button and current track title.
   - Middle-left: previous, play/pause, next, loop, and volume slider.
   - Right: ambience button.
 - Center: reserved for Spine background and character.
+- Ambient companion prompt:
+  - Appears as a small, dismissible companion text panel during idle/focus.
+  - Current prototype cadence is every 3 minutes while idle and every 8 minutes
+    during focus.
+  - Prompt auto-hides after 8 seconds.
+  - It does not appear during Break countdown.
 
 ## Music Assets
 
@@ -203,6 +257,10 @@ Current state:
   `user://save.json`.
 - The top-right `OP` button opens the Options panel.
 - Options currently contain language previous/next switching only.
+- Options currently contain language previous/next switching and Break Video
+  on/off.
+- Break media playback during Break countdown is implemented behind the Break
+  Video switch. The default path is `res://assets/videos/break/video.mp4`.
 
 When changing visible text:
 
@@ -237,8 +295,8 @@ re-exported from Spine 4.1.x with premultiplied alpha disabled.
   companion panel, Spine background, save data, task, and progression logic have
   been split out of `game/scripts/main_game.gd`.
 - Remaining `main_game.gd` responsibilities are still broad: scene assembly,
-  session completion/reward coordination, result popup, task list UI, and
-  high-level controller wiring.
+  session flow coordination, progress HUD, save/load, and high-level controller
+  wiring.
 - Task editing uses a display truncation helper instead of a native LineEdit
   ellipsis mode because Godot 4.1 `LineEdit` does not expose
   `text_overrun_behavior`.
@@ -252,6 +310,10 @@ re-exported from Spine 4.1.x with premultiplied alpha disabled.
 - `ST` only toggles a compact stats text display.
 - No real inventory, unlock, mission, achievement, or companion dialogue system
   is implemented yet.
+- Break media playback has a simple prototype `.ogv` video asset. A final
+  production video can replace `game/assets/videos/break/video.mp4` or use a
+  supported `.mp4` path if the target Godot build supports it.
+- Break media path selection is not exposed in Options yet.
 - No export presets are configured.
 - Music playback should still be manually tested with real local audio files
   after pulling on another machine.
@@ -261,19 +323,27 @@ re-exported from Spine 4.1.x with premultiplied alpha disabled.
 
 ## Next Recommended Work
 
+If work resumes on another machine and the next step is unclear, start from the
+ambient prompt QA pass. The minimal ambient prompt implementation is already in
+place: it appears during idle/focus, uses the shared Bond/context/cooldown/weight
+dialogue selector, records `ambient_prompt_shown` /
+`ambient_prompt_dismissed`, can be dismissed, auto-hides after 8 seconds, and
+does not appear during Break. The recommended next action is to run the project
+in the Godot windowed editor/player and manually verify ambient prompt position
+and cadence, confirming it does not cover Tasks, the timer rail, the music bar,
+Break dialogue, or Break video UI.
+
 1. Manually verify the refactored UI in the Godot editor, especially timer rail,
    bottom music controls, and the break companion panel.
-2. Continue splitting `main_game.gd`:
-   - task list controller
-   - result panel controller
-   - session result/reward coordinator
-3. Expand M2 companion interaction:
-   - add context/Bond filtering for dialogue entries
-   - emit viewed/skipped events
-   - add more break interaction content
-4. Add lightweight content data files for unlocks and music metadata.
-5. Fill remaining localization columns and review UI fit for each language.
-6. Add manual QA checklist for:
+2. Continue M2 companion interaction:
+   - manually verify ambient prompt timing and placement in the Godot editor
+   - decide whether ambient prompt cadence should become an Options setting
+   - replace the prototype Break video with production art if needed
+   - manually verify Break Video playback with a supported Godot video format
+   - add optional Break media path selection later if needed
+3. Add lightweight content data files for unlocks and music metadata.
+4. Fill remaining localization columns and review UI fit for each language.
+5. Add manual QA checklist for:
    - session start/pause/resume/reset
    - completed/partial/abandoned rewards
    - task rename persistence
@@ -303,10 +373,46 @@ re-exported from Spine 4.1.x with premultiplied alpha disabled.
 - Added `game/scripts/option_panel_controller.gd` with language previous/next
   controls.
 - Added localization keys to break dialogue data.
+- Split task list UI into `game/scripts/task_panel_controller.gd`.
+- Split result popup UI into `game/scripts/result_panel_controller.gd`.
+- Split session reward/stat summary coordination into
+  `game/scripts/session_reward_coordinator.gd`.
+- Added Break media playback requirement to the system specs. This is not yet
+  implemented in runtime.
 - Headless validation passed:
 
 ```powershell
 E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --quit
+```
+
+2026-04-28:
+
+- Added Bond/context filtering for Break dialogue.
+- Expanded Break dialogue content to 20 entries with English and Traditional
+  Chinese localization keys.
+- Added Break interaction viewed/skipped/advanced signals.
+- Added local `interaction_history` persistence for Break interaction events.
+- Enforced Break dialogue cooldowns from `interaction_history`.
+- Updated Break Next behavior so it avoids repeating the same dialogue when a
+  different eligible line exists.
+- Added Bond level-up result text and `bond_level_up` interaction event.
+- Added low-frequency ambient companion prompts for idle/focus.
+- Added ambient dialogue content, localization keys, and
+  `ambient_prompt_shown` / `ambient_prompt_dismissed` events.
+- Added `game/scripts/break_media_controller.gd`.
+- Added Break Video switch to Options.
+- Added `app_settings.break_media_enabled` and
+  `app_settings.break_media_path` persistence.
+- Added prototype Break video asset at `game/assets/videos/break/video.mp4`.
+- Added `game/scripts/break_media_probe.gd` for video resource validation.
+- Break media attempts playback during Break countdown, closes after one play,
+  and falls back to text interaction when the configured video is missing or
+  unsupported.
+- Headless validation passed on the current `E:\Pomodoro` checkout:
+
+```powershell
+E:\Pomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\Pomodoro\game --quit
+E:\Pomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\Pomodoro\game --script res://scripts/break_media_probe.gd
 ```
 
 ## Git Notes
@@ -314,7 +420,7 @@ E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless
 Latest pushed commit known from this work session:
 
 ```text
-28cb1a5 Add Godot pomodoro prototype with Spine assets
+94add43 新增功能並拆分code
 ```
 
 There may be local changes after that commit, especially in:
@@ -322,6 +428,8 @@ There may be local changes after that commit, especially in:
 - `game/scripts/main_game.gd`
 - `game/scripts/localization_service.gd`
 - `game/scripts/option_panel_controller.gd`
+- `game/scripts/break_media_controller.gd`
+- `game/scripts/break_media_probe.gd`
 - `game/data/localization.csv`
 - `game/data/dialogue_defs.json`
 - `game/assets/music/`

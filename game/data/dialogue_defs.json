@@ -5,28 +5,282 @@
 			"text_key": "dialogue.break_001",
 			"text": "Nice work. Look away from the screen and let your eyes rest for a moment.",
 			"bond_requirement": 0,
-			"context_requirement": "any"
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 3,
+			"is_active": true
 		},
 		{
 			"dialogue_id": "break_002",
 			"text_key": "dialogue.break_002",
 			"text": "Take a slow breath. You have already moved the day forward.",
 			"bond_requirement": 0,
-			"context_requirement": "any"
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 3,
+			"is_active": true
 		},
 		{
 			"dialogue_id": "break_003",
 			"text_key": "dialogue.break_003",
 			"text": "Stretch your shoulders before the next round. I will keep the room quiet.",
 			"bond_requirement": 0,
-			"context_requirement": "any"
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
 		},
 		{
 			"dialogue_id": "break_004",
 			"text_key": "dialogue.break_004",
-			"text": "If you need water, this is the right time.",
+			"text": "If you need water this is the right time.",
 			"bond_requirement": 0,
-			"context_requirement": "any"
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_005",
+			"text_key": "dialogue.break_005",
+			"text": "Relax your jaw and let your hands rest.",
+			"bond_requirement": 0,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_006",
+			"text_key": "dialogue.break_006",
+			"text": "Blink a few times and soften your focus.",
+			"bond_requirement": 0,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_007",
+			"text_key": "dialogue.break_007",
+			"text": "You kept the promise to yourself for this round.",
+			"bond_requirement": 0,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_008",
+			"text_key": "dialogue.break_008",
+			"text": "Let the room stay quiet for a little longer.",
+			"bond_requirement": 0,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_009",
+			"text_key": "dialogue.break_009",
+			"text": "A small pause can make the next start easier.",
+			"bond_requirement": 0,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_010",
+			"text_key": "dialogue.break_010",
+			"text": "Stand up if you can and let your back reset.",
+			"bond_requirement": 0,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_011",
+			"text_key": "dialogue.break_011",
+			"text": "The daylight is still with us. Take it in for a moment.",
+			"bond_requirement": 0,
+			"context_requirement": {"time": "day"},
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_012",
+			"text_key": "dialogue.break_012",
+			"text": "The evening light is softer now. Slow down with it.",
+			"bond_requirement": 0,
+			"context_requirement": {"time": "sunfall"},
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_013",
+			"text_key": "dialogue.break_013",
+			"text": "It is late. Keep this break gentle.",
+			"bond_requirement": 0,
+			"context_requirement": {"time": "night"},
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_014",
+			"text_key": "dialogue.break_014",
+			"text": "The cloudy room feels calm enough for a quiet reset.",
+			"bond_requirement": 0,
+			"context_requirement": {"weather": "rain"},
+			"cooldown_minutes": 0,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_015",
+			"text_key": "dialogue.break_015",
+			"text": "That was a steady round. I noticed.",
+			"bond_requirement": 2,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_016",
+			"text_key": "dialogue.break_016",
+			"text": "You are getting better at returning to the work.",
+			"bond_requirement": 2,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_017",
+			"text_key": "dialogue.break_017",
+			"text": "I will keep watch while you rest your eyes.",
+			"bond_requirement": 3,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_018",
+			"text_key": "dialogue.break_018",
+			"text": "You do not have to rush back. The next step can wait a minute.",
+			"bond_requirement": 3,
+			"context_requirement": "any",
+			"cooldown_minutes": 0,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_019",
+			"text_key": "dialogue.break_019",
+			"text": "Even a difficult round still counts as showing up.",
+			"bond_requirement": 0,
+			"context_requirement": {"mood": "troubled"},
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "break_020",
+			"text_key": "dialogue.break_020",
+			"text": "That went well. Let the good feeling settle before the next one.",
+			"bond_requirement": 0,
+			"context_requirement": {"mood": "good"},
+			"cooldown_minutes": 0,
+			"weight": 2,
+			"is_active": true
+		}
+	],
+	"ambient": [
+		{
+			"dialogue_id": "ambient_001",
+			"text_key": "dialogue.ambient_001",
+			"text": "I am here. Keep an easy rhythm.",
+			"bond_requirement": 0,
+			"context_requirement": "any",
+			"cooldown_minutes": 8,
+			"weight": 3,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "ambient_002",
+			"text_key": "dialogue.ambient_002",
+			"text": "One calm step at a time.",
+			"bond_requirement": 0,
+			"context_requirement": "any",
+			"cooldown_minutes": 8,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "ambient_003",
+			"text_key": "dialogue.ambient_003",
+			"text": "The timer is moving. You only need to stay with this moment.",
+			"bond_requirement": 0,
+			"context_requirement": "any",
+			"cooldown_minutes": 8,
+			"weight": 2,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "ambient_004",
+			"text_key": "dialogue.ambient_004",
+			"text": "The room is quiet enough for the next few minutes.",
+			"bond_requirement": 0,
+			"context_requirement": {"time": "day"},
+			"cooldown_minutes": 8,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "ambient_005",
+			"text_key": "dialogue.ambient_005",
+			"text": "Evening work can stay gentle.",
+			"bond_requirement": 0,
+			"context_requirement": {"time": "sunfall"},
+			"cooldown_minutes": 8,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "ambient_006",
+			"text_key": "dialogue.ambient_006",
+			"text": "It is late. Keep the pace kind.",
+			"bond_requirement": 0,
+			"context_requirement": {"time": "night"},
+			"cooldown_minutes": 8,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "ambient_007",
+			"text_key": "dialogue.ambient_007",
+			"text": "You are settling into this well.",
+			"bond_requirement": 2,
+			"context_requirement": "any",
+			"cooldown_minutes": 10,
+			"weight": 1,
+			"is_active": true
+		},
+		{
+			"dialogue_id": "ambient_008",
+			"text_key": "dialogue.ambient_008",
+			"text": "I will keep the space steady while you work.",
+			"bond_requirement": 3,
+			"context_requirement": "any",
+			"cooldown_minutes": 10,
+			"weight": 1,
+			"is_active": true
 		}
 	]
 }

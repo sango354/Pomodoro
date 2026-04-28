@@ -2,22 +2,28 @@ extends Node
 
 signal language_previous_pressed
 signal language_next_pressed
+signal break_media_pressed
 
 var localizer
 var option_button: Button
 var option_panel: PanelContainer
 var language_title: Label
 var language_value: Label
+var break_media_label: Label
+var break_media_toggle: Button
+var break_media_enabled := false
 
 
-func setup(parent: Control, localization_service) -> Button:
+func setup(parent: Control, localization_service, media_enabled: bool = false) -> Button:
 	localizer = localization_service
+	break_media_enabled = media_enabled
 	_build_option_panel(parent)
 	refresh_text()
 	return option_button
 
 
 func toggle_visible() -> void:
+	_raise_option_panel()
 	option_panel.visible = not option_panel.visible
 
 
@@ -31,12 +37,37 @@ func refresh_text() -> void:
 		language_title.text = localizer.translate("option.language")
 	if language_value != null:
 		language_value.text = localizer.language_name()
+	if break_media_label != null:
+		break_media_label.text = localizer.translate("option.break_media")
+	refresh_break_media(break_media_enabled)
+
+
+func refresh_break_media(enabled: bool) -> void:
+	break_media_enabled = enabled
+	if break_media_toggle == null:
+		return
+	break_media_toggle.tooltip_text = localizer.translate("settings.on") if enabled else localizer.translate("settings.off")
+	break_media_toggle.add_theme_stylebox_override("normal", _new_switch_style(enabled))
+	break_media_toggle.add_theme_stylebox_override("hover", _new_switch_style(enabled))
+	break_media_toggle.add_theme_stylebox_override("pressed", _new_switch_style(enabled))
+	var knob := break_media_toggle.get_node_or_null("SwitchKnob") as Control
+	if knob == null:
+		return
+	knob.anchor_top = 0.5
+	knob.anchor_bottom = 0.5
+	knob.anchor_left = 1.0 if enabled else 0.0
+	knob.anchor_right = 1.0 if enabled else 0.0
+	knob.offset_left = -24 if enabled else 4
+	knob.offset_right = -4 if enabled else 24
+	knob.offset_top = -10
+	knob.offset_bottom = 10
 
 
 func _build_option_panel(parent: Control) -> void:
 	option_panel = _new_panel()
 	option_panel.name = "OptionPanel"
 	option_panel.visible = false
+	option_panel.z_index = 100
 	option_panel.anchor_left = 1.0
 	option_panel.anchor_top = 0.0
 	option_panel.anchor_right = 1.0
@@ -44,8 +75,9 @@ func _build_option_panel(parent: Control) -> void:
 	option_panel.offset_left = -330
 	option_panel.offset_top = 54
 	option_panel.offset_right = 0
-	option_panel.offset_bottom = 148
+	option_panel.offset_bottom = 204
 	parent.add_child(option_panel)
+	_raise_option_panel()
 
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", 16)
@@ -81,6 +113,28 @@ func _build_option_panel(parent: Control) -> void:
 	var next := _new_arrow_button(">")
 	next.pressed.connect(func(): language_next_pressed.emit())
 	row.add_child(next)
+
+	var media_row := HBoxContainer.new()
+	media_row.add_theme_constant_override("separation", 12)
+	box.add_child(media_row)
+
+	break_media_label = Label.new()
+	break_media_label.custom_minimum_size = Vector2(210, 0)
+	break_media_label.add_theme_color_override("font_color", Color(0.95, 0.0, 1.0, 1.0))
+	media_row.add_child(break_media_label)
+
+	break_media_toggle = Button.new()
+	break_media_toggle.text = ""
+	break_media_toggle.custom_minimum_size = Vector2(54, 30)
+	break_media_toggle.focus_mode = Control.FOCUS_NONE
+	break_media_toggle.pressed.connect(func(): break_media_pressed.emit())
+	var knob := Panel.new()
+	knob.name = "SwitchKnob"
+	knob.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	knob.add_theme_stylebox_override("panel", _new_switch_knob_style())
+	break_media_toggle.add_child(knob)
+	media_row.add_child(break_media_toggle)
+	refresh_break_media(break_media_enabled)
 
 
 func create_top_bar_button() -> Button:
@@ -121,4 +175,34 @@ func _new_panel_style(alpha: float) -> StyleBoxFlat:
 	style.corner_radius_top_right = 8
 	style.corner_radius_bottom_left = 8
 	style.corner_radius_bottom_right = 8
+	return style
+
+
+func _raise_option_panel() -> void:
+	if option_panel == null:
+		return
+	var parent := option_panel.get_parent()
+	if parent != null:
+		parent.move_child(option_panel, parent.get_child_count() - 1)
+
+
+func _new_switch_style(enabled: bool) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.18, 0.11, 0.24, 0.85) if enabled else Color(0.08, 0.1, 0.18, 0.78)
+	style.border_color = Color(1, 1, 1, 0.82)
+	style.set_border_width_all(1)
+	style.corner_radius_top_left = 15
+	style.corner_radius_top_right = 15
+	style.corner_radius_bottom_left = 15
+	style.corner_radius_bottom_right = 15
+	return style
+
+
+func _new_switch_knob_style() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.92, 0.94, 0.98, 1.0)
+	style.corner_radius_top_left = 10
+	style.corner_radius_top_right = 10
+	style.corner_radius_bottom_left = 10
+	style.corner_radius_bottom_right = 10
 	return style
