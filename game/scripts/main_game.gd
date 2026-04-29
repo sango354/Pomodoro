@@ -20,6 +20,8 @@ const ALARM_SOUND_PATH := "res://assets/sfx/alarm_placeholder.wav"
 const DEFAULT_BREAK_MEDIA_PATH := "res://assets/videos/break/video.mp4"
 const SETTINGS_PANEL_WIDTH := 264
 const TIMER_RAIL_WIDTH := 190
+const DEFAULT_FOCUS_MINUTES := 5
+const DEFAULT_BREAK_MINUTES := 5
 const MIN_REWARDABLE_SESSION_SEC := 300
 const BASE_FOCUS_POINTS := 20
 const BASE_BOND := 10
@@ -28,12 +30,13 @@ const TASK_BONUS_FOCUS_POINTS := 8
 const TASK_BONUS_XP := 10
 const AMBIENT_PROMPT_FOCUS_INTERVAL_SEC := 8 * 60
 const AMBIENT_PROMPT_IDLE_INTERVAL_SEC := 3 * 60
+const AMBIENT_PROMPT_INITIAL_IDLE_SEC := 20.0
 const AMBIENT_PROMPT_VISIBLE_SEC := 8.0
 
 var app_state := "idle"
 var session_mode := "focus"
 var result_dismissed := false
-var planned_duration_sec := 25 * 60
+var planned_duration_sec := DEFAULT_FOCUS_MINUTES * 60
 var elapsed_sec := 0.0
 var session_started_at := ""
 var active_task_id := ""
@@ -84,8 +87,8 @@ var fp_label: Button
 var level_label: Button
 var bond_label: Button
 var stats_label: Label
-var duration_minutes := 25
-var break_duration_minutes := 5
+var duration_minutes := DEFAULT_FOCUS_MINUTES
+var break_duration_minutes := DEFAULT_BREAK_MINUTES
 var auto_restart_enabled := false
 var alarm_enabled := false
 var timer_settings: Node
@@ -101,6 +104,7 @@ var break_media_path := DEFAULT_BREAK_MEDIA_PATH
 var interaction_history: Array = []
 var ambient_prompt_elapsed_sec := 0.0
 var ambient_prompt_visible_sec := 0.0
+var ambient_prompt_has_shown := false
 var unlocks_label: Button
 var stats_button: Button
 
@@ -491,8 +495,11 @@ func _update_ambient_prompt(delta: float) -> void:
 		return
 	ambient_prompt_elapsed_sec += delta
 	var interval := AMBIENT_PROMPT_FOCUS_INTERVAL_SEC if app_state == "running" else AMBIENT_PROMPT_IDLE_INTERVAL_SEC
+	if app_state == "idle" and not ambient_prompt_has_shown:
+		interval = AMBIENT_PROMPT_INITIAL_IDLE_SEC
 	if ambient_prompt_elapsed_sec >= interval:
 		ambient_prompt_elapsed_sec = 0.0
+		ambient_prompt_has_shown = true
 		_show_ambient_prompt()
 
 
@@ -749,15 +756,9 @@ func _on_break_media_toggled() -> void:
 	break_media_enabled = not break_media_enabled
 	if option_controller != null and option_controller.has_method("refresh_break_media"):
 		option_controller.refresh_break_media(break_media_enabled)
-	if break_media_controller != null and break_media_controller.has_method("set_enabled"):
+	var is_break_running := session_mode == "short_break" and app_state == "running"
+	if not is_break_running and break_media_controller != null and break_media_controller.has_method("set_enabled"):
 		break_media_controller.set_enabled(break_media_enabled)
-	if session_mode == "short_break" and app_state == "running":
-		if break_media_enabled:
-			_hide_break_interaction()
-			if not _start_break_media():
-				_show_break_interaction()
-		else:
-			_show_break_interaction()
 	_save_game()
 
 
@@ -916,6 +917,7 @@ func _load_save() -> void:
 		break_duration_minutes = int(timer_settings.get("break_minutes", break_duration_minutes))
 		auto_restart_enabled = bool(timer_settings.get("auto_restart", auto_restart_enabled))
 		alarm_enabled = bool(timer_settings.get("alarm", alarm_enabled))
+	planned_duration_sec = duration_minutes * 60
 	var music_state = parsed.get("music_state", {})
 	if typeof(music_state) == TYPE_DICTIONARY:
 		saved_music_path = str(music_state.get("current_path", saved_music_path))

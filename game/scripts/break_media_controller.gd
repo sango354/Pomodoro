@@ -17,8 +17,6 @@ func setup(parent: Control, enabled: bool, path: String) -> void:
 
 func set_enabled(enabled: bool) -> void:
 	break_media_enabled = enabled
-	if not break_media_enabled:
-		stop_break_media()
 
 
 func set_media_path(path: String) -> void:

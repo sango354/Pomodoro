@@ -58,6 +58,10 @@ Implemented:
   returns the timer to idle.
 - Timer settings panel for focus duration, break duration, auto restart, and
   alarm.
+- Default focus duration is 5 minutes. Timer Settings and the right-side timer
+  rail both read from the same `duration_minutes` value after save data loads.
+- Existing local save data can still override the default focus duration through
+  `timer_settings.focus_minutes`.
 - Focus and break duration controls step by one minute.
 - Auto restart and alarm use switch-style controls with `on` / `off` tooltips.
 - Focus completion always starts the break countdown. Auto restart only controls
@@ -196,8 +200,10 @@ Implemented:
 - Center: reserved for Spine background and character.
 - Ambient companion prompt:
   - Appears as a small, dismissible companion text panel during idle/focus.
-  - Current prototype cadence is every 3 minutes while idle and every 8 minutes
-    during focus.
+  - First idle prompt appears after about 20 seconds so the feature is visible
+    during QA.
+  - After the first idle prompt, cadence is every 3 minutes while idle and every
+    8 minutes during focus.
   - Prompt auto-hides after 8 seconds.
   - It does not appear during Break countdown.
 
@@ -261,6 +267,9 @@ Current state:
   on/off.
 - Break media playback during Break countdown is implemented behind the Break
   Video switch. The default path is `res://assets/videos/break/video.mp4`.
+- Changing the Break Video switch during an active Break countdown only updates
+  the saved setting. It does not start or stop the currently active Break media
+  or text Break panel.
 
 When changing visible text:
 
@@ -336,7 +345,9 @@ Break dialogue, or Break video UI.
 1. Manually verify the refactored UI in the Godot editor, especially timer rail,
    bottom music controls, and the break companion panel.
 2. Continue M2 companion interaction:
-   - manually verify ambient prompt timing and placement in the Godot editor
+  - manually verify ambient prompt timing and placement in the Godot editor
+   - confirm the first idle prompt appears around 20 seconds after startup, then
+     returns to low-frequency idle cadence
    - decide whether ambient prompt cadence should become an Options setting
    - replace the prototype Break video with production art if needed
    - manually verify Break Video playback with a supported Godot video format
@@ -408,6 +419,9 @@ E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless
 - Break media attempts playback during Break countdown, closes after one play,
   and falls back to text interaction when the configured video is missing or
   unsupported.
+- Updated Break Video option behavior: toggling it during an active Break no
+  longer starts or stops Break media immediately. The setting applies from the
+  next Break.
 - Headless validation passed on the current `E:\Pomodoro` checkout:
 
 ```powershell
@@ -450,8 +464,29 @@ Files that are expected to exist locally for the current prototype:
 - `game/scripts/timer_settings_controller.gd`
 - `game/scripts/localization_service.gd`
 - `game/scripts/option_panel_controller.gd`
+- `game/scripts/task_panel_controller.gd`
+- `game/scripts/result_panel_controller.gd`
+- `game/scripts/session_reward_coordinator.gd`
+- `game/scripts/break_media_controller.gd`
+- `game/scripts/break_media_probe.gd`
 - `game/data/dialogue_defs.json`
 - `game/data/localization.csv`
+- `game/assets/videos/break/video.mp4`
+- `game/assets/videos/break/video.ogv`
+
+2026-04-29 remote-work check on `E:\ProjectPomodoro`:
+
+- Confirmed the current checkout contains the 2026-04-28 M2 companion and Break
+  media work.
+- Confirmed `game/assets/videos/break/video.mp4` and
+  `game/assets/videos/break/video.ogv` both exist locally.
+- Headless validation passed:
+
+```powershell
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --quit
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game res://scenes/spine_background_probe.tscn --quit
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/break_media_probe.gd
+```
 
 Before moving machines, run:
 

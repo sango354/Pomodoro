@@ -7,6 +7,8 @@ signal settings_pressed
 const ICON_RESET_PATH := "res://assets/icons/reset.png"
 const ICON_SETTINGS_PATH := "res://assets/icons/settings.png"
 const TIMER_RAIL_WIDTH := 190
+const DEFAULT_FOCUS_MINUTES := 5
+const DEFAULT_BREAK_MINUTES := 5
 const TIMER_RUNNING_COLOR := Color(1, 1, 1, 1)
 const TIMER_INACTIVE_COLOR := Color(0.5, 0.5, 0.5, 1)
 
@@ -19,10 +21,10 @@ var settings_button: BaseButton
 var localizer
 var _last_app_state := "idle"
 var _last_session_mode := "focus"
-var _last_planned_duration_sec := 25 * 60
+var _last_planned_duration_sec := DEFAULT_FOCUS_MINUTES * 60
 var _last_elapsed_sec := 0.0
-var _last_duration_minutes := 25
-var _last_break_duration_minutes := 5
+var _last_duration_minutes := DEFAULT_FOCUS_MINUTES
+var _last_break_duration_minutes := DEFAULT_BREAK_MINUTES
 
 
 func setup(parent: Control, localization_service = null) -> void:
@@ -119,12 +121,12 @@ func _build_timer_rail(parent: Control) -> void:
 	box.add_child(phase_label)
 
 	timer_label = Label.new()
-	timer_label.text = "25:00"
+	timer_label.text = _format_time(DEFAULT_FOCUS_MINUTES * 60)
 	timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	timer_label.add_theme_font_size_override("font_size", 42)
 	box.add_child(timer_label)
 
-	break_time_label = _new_muted_label(_trf("timer.break_label", {"time": "05:00"}))
+	break_time_label = _new_muted_label(_trf("timer.break_label", {"time": _format_time(DEFAULT_BREAK_MINUTES * 60)}))
 	break_time_label.name = "BreakLabel"
 	break_time_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(break_time_label)

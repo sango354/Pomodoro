@@ -134,7 +134,9 @@ en, zh_TW, zh_CN, ja, ko, fr, de, it, ru, es_ES, pt_BR
   - Next language arrow
 - Switching language updates visible labels/tooltips immediately.
 - The selected language is saved immediately.
-- Break media playback switch updates immediately and is saved immediately.
+- Break media playback switch updates the saved setting immediately.
+- During an active Break countdown, changing the Break media switch must not
+  start or stop Break media. The new value applies from the next Break.
 
 ## Localized Areas
 
@@ -215,6 +217,9 @@ Rules:
   build; `.mp4` depends on the runtime/importer support available on the target
   build.
 - Break media plays once and then closes automatically.
+- During an active Break countdown, the Break media switch only changes the
+  saved setting. It must not interrupt currently playing media, start media that
+  was not already playing, or close the text Break companion panel.
 - The Options panel currently exposes the on/off switch; path selection can be
   added later if needed.
 

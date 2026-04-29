@@ -67,6 +67,8 @@ The MVP game scene currently covers the M1 loop from the product spec:
 - Automatically enter break countdown after each completed focus session.
 - Start the next focus session after break only when Auto restart is enabled.
 - Show a first-pass companion break interaction panel during break countdown.
+- Show low-frequency ambient companion prompts during idle/focus.
+- Optionally play Break media during break countdown when Break Video is enabled.
 - Save local tasks, sessions, progress, stats, timer settings, and music state
   to `user://save.json`.
 - Play music from `res://assets/music`, restoring the last played track when
@@ -84,13 +86,17 @@ Current UI implementation notes:
 - Loop off is represented by a gray overlay on the loop icon.
 - Break interaction dialogue is loaded from `res://data/dialogue_defs.json`.
 - Localized UI text is loaded from `res://data/localization.csv`.
-- The top-right Option button opens a panel with language switching.
-- The saved game payload includes `app_settings.language`.
+- The top-right Option button opens a panel with language switching and Break
+  Video on/off.
+- The saved game payload includes `app_settings.language`,
+  `app_settings.break_media_enabled`, and `app_settings.break_media_path`.
+- Break media assets currently exist under `res://assets/videos/break/`.
 - Core logic and UI controllers have started moving out of `main_game.gd` into
   focused scripts under `res://scripts/`, including save data, tasks,
   progression, Spine background, timer session state, timer rail, timer
   settings, music player, companion dialogue, break companion panel,
-  localization, and option panel controllers.
+  localization, option panel, task panel, result panel, session reward, and
+  break media controllers.
 
 For handoff status and current implementation notes, see:
 
@@ -111,4 +117,9 @@ game/data/localization.csv
 game/data/dialogue_defs.json
 game/scripts/localization_service.gd
 game/scripts/option_panel_controller.gd
+game/scripts/task_panel_controller.gd
+game/scripts/result_panel_controller.gd
+game/scripts/session_reward_coordinator.gd
+game/scripts/break_media_controller.gd
+game/scripts/break_media_probe.gd
 ```
