@@ -1,18 +1,29 @@
 extends Node
 
+const ContentUnlockService = preload("res://scripts/content_unlock_service.gd")
+
 const ASSET_ROOT := "res://assets/spine/backgrounds"
 const TARGET_VIEWPORT_SIZE := Vector2(1152, 648)
 
 var root_2d: Node2D
 var selected_context := {}
+var background_defs: Array = []
+var unlocked_content: Array = []
 var spine_sprite: Node = null
 var current_spine_variant := ""
 
 
-func setup(world_root: Node2D, context: Dictionary) -> void:
+func setup(world_root: Node2D, context: Dictionary, content_defs: Array = [], content_unlocks: Array = []) -> void:
 	root_2d = world_root
 	selected_context = context
+	background_defs = content_defs
+	unlocked_content = content_unlocks
 	get_viewport().size_changed.connect(fit_to_viewport)
+
+
+func set_content_state(content_defs: Array, content_unlocks: Array) -> void:
+	background_defs = content_defs
+	unlocked_content = content_unlocks
 
 
 func load_selected_background() -> void:
@@ -108,6 +119,9 @@ func fit_to_viewport() -> void:
 
 
 func select_variant() -> String:
+	if not background_defs.is_empty():
+		return ContentUnlockService.background_variant_for_context(selected_context, background_defs, unlocked_content)
+
 	var mood := str(selected_context.mood)
 	var time := str(selected_context.time)
 	if mood == "normal":

@@ -1,6 +1,6 @@
 # Current Development Progress
 
-Last updated: 2026-04-28
+Last updated: 2026-04-29
 
 This document records the current implementation state so work can continue
 from another machine without relying on chat history.
@@ -12,6 +12,8 @@ from another machine without relying on chat history.
 - Spine probe scene kept for validation: `res://scenes/spine_background_probe.tscn`
 - Latest localization/options spec:
   `docs/product-spec/systems/07-localization-and-options.md`
+- Manual QA checklist:
+  `docs/product-spec/engineering/manual-qa-checklist.md`
 - Spine-enabled Godot editor expected locally:
 
 Project root paths differ between development machines. Existing examples may
@@ -121,6 +123,8 @@ Implemented:
 - Break media runtime control fields that should later remain data-driven are
   `media_id`, `path`, `enabled`, `bond_requirement`, `context_requirement`,
   playback mode, and fallback behavior.
+- Companion dialogue data has a spreadsheet-ready copy at
+  `docs/product-spec/data/csv/dialogue_defs.csv`.
 - M2 companion interaction has a first break-panel prototype:
   - Break countdown shows a companion dialogue panel.
   - Dialogue content is loaded from `game/data/dialogue_defs.json`.
@@ -202,8 +206,13 @@ Implemented:
   - Appears as a small, dismissible companion text panel during idle/focus.
   - First idle prompt appears after about 20 seconds so the feature is visible
     during QA.
-  - After the first idle prompt, cadence is every 3 minutes while idle and every
-    8 minutes during focus.
+  - Ambient Prompt frequency is set from Options with a single cycle button.
+  - `Low`: first idle prompt 20 seconds, later idle prompts 90 seconds, focus
+    prompts 8 minutes.
+  - `Normal`: first idle prompt 20 seconds, later idle prompts 3 minutes, focus
+    prompts 8 minutes.
+  - `Off`: hides any current prompt and prevents future idle/focus ambient
+    prompts.
   - Prompt auto-hides after 8 seconds.
   - It does not appear during Break countdown.
 
@@ -265,6 +274,8 @@ Current state:
 - Options currently contain language previous/next switching only.
 - Options currently contain language previous/next switching and Break Video
   on/off.
+- Options also contain an Ambient Prompt frequency cycle button:
+  `Normal` -> `Low` -> `Off` -> `Normal`.
 - Break media playback during Break countdown is implemented behind the Break
   Video switch. The default path is `res://assets/videos/break/video.mp4`.
 - Changing the Break Video switch during an active Break countdown only updates
@@ -345,10 +356,9 @@ Break dialogue, or Break video UI.
 1. Manually verify the refactored UI in the Godot editor, especially timer rail,
    bottom music controls, and the break companion panel.
 2. Continue M2 companion interaction:
-  - manually verify ambient prompt timing and placement in the Godot editor
+   - manually verify ambient prompt timing and placement in the Godot editor
    - confirm the first idle prompt appears around 20 seconds after startup, then
      returns to low-frequency idle cadence
-   - decide whether ambient prompt cadence should become an Options setting
    - replace the prototype Break video with production art if needed
    - manually verify Break Video playback with a supported Godot video format
    - add optional Break media path selection later if needed
@@ -364,7 +374,77 @@ Break dialogue, or Break video UI.
    - break panel show/next/skip behavior
    - auto restart after break completion
 
+Deferred from the 2026-04-29 planning pass:
+
+- Break Video path setting is intentionally not implemented yet.
+- Music autoplay setting is not implemented yet.
+- Alarm sound selection is not implemented yet.
+- Unlocks/content panel remains placeholder.
+- Music metadata table remains future work.
+
 ## Latest Validation
+
+2026-04-29:
+
+- Enhanced the session result popup from prototype reward text into a structured
+  summary:
+  - focus duration
+  - actual duration
+  - reward summary
+  - Bond level-up summary when applicable
+  - next suggested action
+- Added data-driven result summary layout at
+  `game/data/reward_summary_defs.json`.
+- Added the unlock/content skeleton for background Spine variants:
+  - runtime data: `game/data/background_defs.json`
+  - spreadsheet copy: `docs/product-spec/data/csv/background_defs.csv`
+  - unlock service: `game/scripts/content_unlock_service.gd`
+- Added a top-right Store button (`SH`) and store popup controller at
+  `game/scripts/store_panel_controller.gd`.
+- Store popup lists background unlock items by name and Focus Point cost.
+- Locked store items open a purchase confirmation dialog.
+- Clicking outside the purchase confirmation cancels the confirmation.
+- Purchased unlocks are saved in `user://save.json` under
+  `unlocked_content`.
+- Background Spine selection now respects unlock state. If the contextual
+  background is locked, the runtime falls back to an unlocked normal background.
+- Default unlocked backgrounds:
+  - Normal Day
+  - Normal Night
+  - Normal Sunset
+  - Normal Cloudy
+- Purchasable background placeholders:
+  - Good Day / Night / Sunset
+  - Troubled Day / Night / Sunset
+- Added localization keys for Store, background item names, and structured
+  result summary lines.
+- Updated Ambient Prompt option cycling to include `Off`.
+- Completed focus sessions now show the Result Panel while Break countdown
+  starts automatically.
+- Headless validation passed:
+
+```powershell
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --quit
+```
+
+Remaining recommended next items:
+
+1. Manually QA the Store popup in the Godot window:
+   - top-right Store button opens/closes the panel
+   - confirmation dialog appears for locked items
+   - clicking outside the confirmation cancels it
+   - purchase deducts Focus Points and persists after restart
+   - locked contextual backgrounds fall back to normal backgrounds
+   - purchased contextual backgrounds can display when the context matches
+2. Replace store item name placeholders with thumbnails when final art is ready.
+3. Add a real inventory/equipment flow if users should manually select unlocked
+   backgrounds instead of automatic context-based selection.
+4. Add automated probes for content unlock data integrity.
+5. Continue deferred items from the planning pass:
+   - Break Video path setting
+   - music autoplay setting
+   - alarm sound selection
+   - music metadata table
 
 2026-04-27:
 
@@ -422,6 +502,13 @@ E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless
 - Updated Break Video option behavior: toggling it during an active Break no
   longer starts or stops Break media immediately. The setting applies from the
   next Break.
+- Added `docs/product-spec/engineering/manual-qa-checklist.md`.
+- Added Ambient Prompt frequency option with Low/Normal cycle behavior.
+- Filled `docs/product-spec/data/csv/dialogue_defs.csv` with the current Break
+  and Ambient companion dialogue runtime data.
+- Updated `game/scripts/break_media_probe.gd` to inherit `SceneTree`, so the
+  documented `--script res://scripts/break_media_probe.gd` validation command
+  no longer opens an alert dialog.
 - Headless validation passed on the current `E:\Pomodoro` checkout:
 
 ```powershell

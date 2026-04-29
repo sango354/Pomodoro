@@ -96,6 +96,7 @@ game/scripts/option_panel_controller.gd
 - Display the current language name.
 - Emit previous/next language requests.
 - Display and emit Break media switch requests.
+- Display and emit Ambient Prompt frequency cycle requests.
 
 ## Saved State
 
@@ -112,7 +113,8 @@ Payload path:
   "app_settings": {
     "language": "en",
     "break_media_enabled": false,
-    "break_media_path": "res://assets/videos/break/video.mp4"
+    "break_media_path": "res://assets/videos/break/video.mp4",
+    "ambient_prompt_frequency": "normal"
   }
 }
 ```
@@ -137,6 +139,8 @@ en, zh_TW, zh_CN, ja, ko, fr, de, it, ru, es_ES, pt_BR
 - Break media playback switch updates the saved setting immediately.
 - During an active Break countdown, changing the Break media switch must not
   start or stop Break media. The new value applies from the next Break.
+- Ambient Prompt frequency cycles between `low` and `normal` and is saved
+  immediately.
 
 ## Localized Areas
 
@@ -154,6 +158,7 @@ Currently wired:
 - Compact stats overlay labels
 - Option button and language panel
 - Break media option label and switch tooltip
+- Ambient Prompt option label and frequency button
 
 ## Dialogue Integration
 
@@ -180,17 +185,60 @@ Runtime behavior:
 - `text_key` is used for localized text when present.
 - `text` remains as fallback/source content.
 
+Spreadsheet-ready companion dialogue data:
+
+```text
+docs/product-spec/data/csv/dialogue_defs.csv
+```
+
+Current columns:
+
+```text
+dialogue_id,character_id,interaction_type,text_key,text,bond_requirement,context_requirement_json,cooldown_minutes,weight,is_active
+```
+
+The CSV currently mirrors the runtime Break and Ambient dialogue entries in
+`game/data/dialogue_defs.json`.
+
 ## Known Gaps
 
 - No hot reload for `localization.csv`; restart the game after CSV edits.
 - UI has only been headless-validated. Manual visual review is still required.
 - Non-English/non-Traditional-Chinese columns still need translation.
 - Long translated strings may need layout tuning.
-- Options panel currently only supports language switching.
+- Options panel currently supports language switching, Break media on/off, and
+  Ambient Prompt Low/Normal frequency.
 - Break media path selection is not exposed in UI yet; the runtime uses
   `app_settings.break_media_path`.
 - No production video asset is committed yet, so the default path falls back to
   text-only Break interaction until an `.ogv` asset is supplied.
+
+## Ambient Prompt Option
+
+Payload:
+
+```json
+{
+  "app_settings": {
+    "ambient_prompt_frequency": "normal"
+  }
+}
+```
+
+Values:
+
+- `low`: first idle prompt 20 seconds, later idle prompts 90 seconds, focus
+  prompts 8 minutes.
+- `normal`: first idle prompt 20 seconds, later idle prompts 3 minutes, focus
+  prompts 8 minutes.
+
+Rules:
+
+- The Options panel exposes this as a single button that cycles
+  `Low -> Normal -> Low`.
+- There is no Off state in the current implementation.
+- Frequency changes reset the current ambient prompt timer and apply immediately.
+- Ambient prompts still do not appear during Break countdown.
 
 ## Break Media Option
 

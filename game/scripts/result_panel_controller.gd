@@ -55,8 +55,7 @@ func hide_result() -> void:
 
 
 func refresh_controls(app_state: String, active_task_id: String, active_task_done: bool) -> void:
-	var show_result := app_state == "completed" or app_state == "partial" or app_state == "abandoned"
-	show_result = show_result and not result_dismissed
+	var show_result := current_status != "" and not result_dismissed
 	if result_panel != null:
 		result_panel.visible = show_result
 	if result_dismiss_layer != null:
@@ -64,7 +63,11 @@ func refresh_controls(app_state: String, active_task_id: String, active_task_don
 	if mark_task_done_button != null:
 		mark_task_done_button.disabled = active_task_id == "" or active_task_done
 	if break_button != null:
-		break_button.disabled = app_state == "abandoned"
+		break_button.disabled = app_state == "running" or current_status == "abandoned"
+
+
+func is_result_visible() -> bool:
+	return result_panel != null and result_panel.visible
 
 
 func append_reward_line(text: String) -> void:
@@ -79,7 +82,7 @@ func _build_result_panel(parent: Control) -> void:
 	result_panel.anchor_right = 0.0
 	result_panel.anchor_bottom = 1.0
 	result_panel.offset_left = 0
-	result_panel.offset_top = -260
+	result_panel.offset_top = -300
 	result_panel.offset_right = 430
 	result_panel.offset_bottom = -82
 	parent.add_child(result_panel)

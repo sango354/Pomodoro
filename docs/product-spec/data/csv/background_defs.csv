@@ -1,0 +1,11 @@
+content_id,display_name_key,spine_variant,default_unlocked,cost_focus_points,mood,time,weather
+bg_normal_day,content.bg_normal_day,LofiBG_01_Nomal_Day,true,0,normal,day,clear
+bg_normal_night,content.bg_normal_night,LofiBG_01_Nomal_Night,true,0,normal,night,clear
+bg_normal_sunfall,content.bg_normal_sunfall,LofiBG_01_Nomal_Sunfall,true,0,normal,sunfall,clear
+bg_normal_cloudy,content.bg_normal_cloudy,LofiBG_01_Nomal_Cloudy,true,0,normal,day,rain
+bg_good_day,content.bg_good_day,LofiBG_01_Good_Day,false,60,good,day,clear
+bg_good_night,content.bg_good_night,LofiBG_01_Good_Night,false,60,good,night,clear
+bg_good_sunfall,content.bg_good_sunfall,LofiBG_01_Good_Sunfall,false,60,good,sunfall,clear
+bg_troubled_day,content.bg_troubled_day,LofiBG_01_Troubled_Day,false,80,troubled,day,clear
+bg_troubled_night,content.bg_troubled_night,LofiBG_01_Troubled_Night,false,80,troubled,night,clear
+bg_troubled_sunfall,content.bg_troubled_sunfall,LofiBG_01_Troubled_Sunfall,false,80,troubled,sunfall,clear

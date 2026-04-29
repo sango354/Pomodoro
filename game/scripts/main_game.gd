@@ -14,6 +14,8 @@ const TaskPanelController = preload("res://scripts/task_panel_controller.gd")
 const ResultPanelController = preload("res://scripts/result_panel_controller.gd")
 const SessionRewardCoordinator = preload("res://scripts/session_reward_coordinator.gd")
 const BreakMediaController = preload("res://scripts/break_media_controller.gd")
+const ContentUnlockService = preload("res://scripts/content_unlock_service.gd")
+const StorePanelController = preload("res://scripts/store_panel_controller.gd")
 
 const SAVE_PATH := "user://save.json"
 const ALARM_SOUND_PATH := "res://assets/sfx/alarm_placeholder.wav"
@@ -28,9 +30,13 @@ const BASE_BOND := 10
 const BASE_XP := 30
 const TASK_BONUS_FOCUS_POINTS := 8
 const TASK_BONUS_XP := 10
+const AMBIENT_PROMPT_LOW := "low"
+const AMBIENT_PROMPT_NORMAL := "normal"
+const AMBIENT_PROMPT_OFF := "off"
+const AMBIENT_PROMPT_INITIAL_IDLE_SEC := 20
+const AMBIENT_PROMPT_LOW_IDLE_INTERVAL_SEC := 90
+const AMBIENT_PROMPT_NORMAL_IDLE_INTERVAL_SEC := 3 * 60
 const AMBIENT_PROMPT_FOCUS_INTERVAL_SEC := 8 * 60
-const AMBIENT_PROMPT_IDLE_INTERVAL_SEC := 3 * 60
-const AMBIENT_PROMPT_INITIAL_IDLE_SEC := 20.0
 const AMBIENT_PROMPT_VISIBLE_SEC := 8.0
 
 var app_state := "idle"
@@ -78,6 +84,7 @@ var option_controller: Node
 var task_controller: Node
 var result_controller: Node
 var break_media_controller: Node
+var store_controller: Node
 
 var root_2d: Node2D
 var ui_layer: CanvasLayer
@@ -101,16 +108,21 @@ var alarm_player: AudioStreamPlayer
 var language_code := "en"
 var break_media_enabled := false
 var break_media_path := DEFAULT_BREAK_MEDIA_PATH
+var ambient_prompt_frequency := AMBIENT_PROMPT_NORMAL
 var interaction_history: Array = []
+var background_defs: Array = []
+var unlocked_content: Array = []
 var ambient_prompt_elapsed_sec := 0.0
 var ambient_prompt_visible_sec := 0.0
 var ambient_prompt_has_shown := false
 var unlocks_label: Button
+var store_button: Button
 var stats_button: Button
 
 
 func _ready() -> void:
 	_load_save()
+	background_defs = ContentUnlockService.load_background_defs()
 	localizer = LocalizationService.new(language_code)
 	_apply_time_context()
 	_build_scene()
@@ -147,7 +159,7 @@ func _build_scene() -> void:
 
 	spine_background = SpineBackgroundController.new()
 	add_child(spine_background)
-	spine_background.setup(root_2d, selected_context)
+	spine_background.setup(root_2d, selected_context, background_defs, unlocked_content)
 
 	ui_layer = CanvasLayer.new()
 	ui_layer.name = "UI"
@@ -183,16 +195,22 @@ func _build_scene() -> void:
 
 	option_controller = OptionPanelController.new()
 	add_child(option_controller)
-	option_controller.setup(layers, localizer, break_media_enabled)
+	option_controller.setup(layers, localizer, break_media_enabled, ambient_prompt_frequency)
 	option_controller.language_previous_pressed.connect(_on_previous_language_pressed)
 	option_controller.language_next_pressed.connect(_on_next_language_pressed)
 	option_controller.break_media_pressed.connect(_on_break_media_toggled)
+	option_controller.ambient_prompt_pressed.connect(_on_ambient_prompt_frequency_pressed)
 
 	_build_top_bar(layers)
+	store_controller = StorePanelController.new()
+	add_child(store_controller)
+	store_controller.setup(layers, localizer)
+	store_controller.purchase_requested.connect(_on_store_purchase_requested)
 	task_controller = TaskPanelController.new()
 	add_child(task_controller)
 	task_controller.setup(layers, tasks, localizer)
 	task_controller.tasks_changed.connect(_on_tasks_changed)
+	task_controller.task_renamed.connect(_on_task_renamed)
 	task_controller.task_completed.connect(_on_task_completed)
 	timer_rail = TimerRailController.new()
 	add_child(timer_rail)
@@ -281,6 +299,11 @@ func _build_top_bar(parent: Control) -> void:
 	var unlocks := _new_icon_button("UL", "Unlocks")
 	unlocks_label = unlocks
 	row.add_child(unlocks)
+
+	var shop := _new_icon_button("SH", "Store")
+	store_button = shop
+	shop.pressed.connect(_toggle_store_panel)
+	row.add_child(shop)
 
 	var stats := _new_icon_button("ST", "Stats")
 	stats_button = stats
@@ -399,6 +422,7 @@ func _on_primary_timer_pressed() -> void:
 func _start_focus_session() -> void:
 	if app_state == "running":
 		return
+	_dismiss_result_panel()
 	_hide_break_interaction()
 	_hide_ambient_prompt()
 	_stop_break_media()
@@ -494,7 +518,7 @@ func _update_ambient_prompt(delta: float) -> void:
 		ambient_prompt_elapsed_sec = 0.0
 		return
 	ambient_prompt_elapsed_sec += delta
-	var interval := AMBIENT_PROMPT_FOCUS_INTERVAL_SEC if app_state == "running" else AMBIENT_PROMPT_IDLE_INTERVAL_SEC
+	var interval := _ambient_prompt_interval_sec()
 	if app_state == "idle" and not ambient_prompt_has_shown:
 		interval = AMBIENT_PROMPT_INITIAL_IDLE_SEC
 	if ambient_prompt_elapsed_sec >= interval:
@@ -504,6 +528,8 @@ func _update_ambient_prompt(delta: float) -> void:
 
 
 func _ambient_prompt_allowed() -> bool:
+	if ambient_prompt_frequency == AMBIENT_PROMPT_OFF:
+		return false
 	if session_mode == "short_break":
 		return false
 	if app_state != "idle" and not (app_state == "running" and session_mode == "focus"):
@@ -511,6 +537,12 @@ func _ambient_prompt_allowed() -> bool:
 	if result_controller != null and result_controller.has_method("is_result_visible") and result_controller.is_result_visible():
 		return false
 	return true
+
+
+func _ambient_prompt_interval_sec() -> int:
+	if app_state == "running":
+		return AMBIENT_PROMPT_FOCUS_INTERVAL_SEC
+	return AMBIENT_PROMPT_LOW_IDLE_INTERVAL_SEC if ambient_prompt_frequency == AMBIENT_PROMPT_LOW else AMBIENT_PROMPT_NORMAL_IDLE_INTERVAL_SEC
 
 
 func _is_ambient_prompt_visible() -> bool:
@@ -555,9 +587,9 @@ func _finish_session(status: String, start_break_after: bool = false) -> void:
 	var previous_bond_level := int(bond_progress.get("bond_level", 1))
 	var rewards := _grant_rewards(status, actual_sec)
 	var current_bond_level := int(bond_progress.get("bond_level", 1))
-	var reward_text := _reward_summary(rewards)
+	var bond_level_up_text := ""
 	if current_bond_level > previous_bond_level:
-		reward_text += "\n%s" % _bond_level_up_summary(current_bond_level)
+		bond_level_up_text = _bond_level_up_summary(current_bond_level)
 		_record_interaction_event("bond_level_up", "bond_level_%d" % current_bond_level)
 	var session := {
 		"session_id": "session_%s" % Time.get_unix_time_from_system(),
@@ -578,18 +610,11 @@ func _finish_session(status: String, start_break_after: bool = false) -> void:
 	spine_background.load_selected_background()
 	_save_game()
 	_play_alarm()
+	_show_result_panel(status, actual_sec, rewards, bond_level_up_text, not start_break_after)
 	if start_break_after:
 		_start_break_countdown()
 		return
 	app_state = status
-	result_dismissed = false
-	if result_controller != null and result_controller.has_method("show_result"):
-		result_controller.show_result(
-			status,
-			reward_text,
-			active_task_id != "" and _task_status(active_task_id) != "done",
-			status != "abandoned"
-		)
 	message_label.text = localizer.translate("timer.message_session_logged")
 	_refresh_all()
 
@@ -607,6 +632,19 @@ func _grant_rewards(status: String, actual_sec: int) -> Dictionary:
 		BASE_FOCUS_POINTS,
 		BASE_BOND,
 		BASE_XP
+	)
+
+
+func _show_result_panel(status: String, actual_sec: int, rewards: Dictionary, bond_level_up_text: String, can_start_break: bool) -> void:
+	result_dismissed = false
+	if result_controller == null or not result_controller.has_method("show_result"):
+		return
+	var reward_text := _result_summary(status, actual_sec, rewards, bond_level_up_text)
+	result_controller.show_result(
+		status,
+		reward_text,
+		active_task_id != "" and _task_status(active_task_id) != "done",
+		can_start_break and status != "abandoned"
 	)
 
 
@@ -653,6 +691,10 @@ func _set_task_status(task_id: String, status: String) -> bool:
 func _on_tasks_changed() -> void:
 	_save_game()
 	_refresh_all()
+
+
+func _on_task_renamed() -> void:
+	_save_game()
 
 
 func _on_task_completed(_task_id: String) -> void:
@@ -762,6 +804,21 @@ func _on_break_media_toggled() -> void:
 	_save_game()
 
 
+func _on_ambient_prompt_frequency_pressed() -> void:
+	if ambient_prompt_frequency == AMBIENT_PROMPT_NORMAL:
+		ambient_prompt_frequency = AMBIENT_PROMPT_LOW
+	elif ambient_prompt_frequency == AMBIENT_PROMPT_LOW:
+		ambient_prompt_frequency = AMBIENT_PROMPT_OFF
+	else:
+		ambient_prompt_frequency = AMBIENT_PROMPT_NORMAL
+	ambient_prompt_elapsed_sec = 0.0
+	if ambient_prompt_frequency == AMBIENT_PROMPT_OFF:
+		_hide_ambient_prompt(true)
+	if option_controller != null and option_controller.has_method("refresh_ambient_prompt"):
+		option_controller.refresh_ambient_prompt(ambient_prompt_frequency)
+	_save_game()
+
+
 func _refresh_localized_text() -> void:
 	if task_controller != null and task_controller.has_method("set_localizer"):
 		task_controller.set_localizer(localizer)
@@ -777,6 +834,8 @@ func _refresh_localized_text() -> void:
 		music_controller.set_localizer(localizer)
 	if option_controller != null and option_controller.has_method("refresh_text"):
 		option_controller.refresh_text()
+	if store_controller != null and store_controller.has_method("set_localizer"):
+		store_controller.set_localizer(localizer)
 	_refresh_all()
 
 
@@ -828,6 +887,43 @@ func _toggle_stats_message() -> void:
 	stats_label.visible = not stats_label.visible
 
 
+func _toggle_store_panel() -> void:
+	if store_controller == null:
+		return
+	if store_controller.has_method("is_store_visible") and store_controller.is_store_visible():
+		store_controller.hide_store()
+		return
+	store_controller.show_store(_store_items())
+
+
+func _store_items() -> Array:
+	return ContentUnlockService.store_items(background_defs, unlocked_content, localizer)
+
+
+func _on_store_purchase_requested(content_id: String) -> void:
+	var result := ContentUnlockService.purchase_background(content_id, background_defs, unlocked_content, currencies)
+	if bool(result.get("changed", false)):
+		_record_interaction_event("background_unlocked", content_id)
+		_save_game()
+		_refresh_progress_ui()
+		if spine_background != null and spine_background.has_method("set_content_state"):
+			spine_background.set_content_state(background_defs, unlocked_content)
+			spine_background.load_selected_background()
+		if store_controller != null:
+			store_controller.refresh_items(_store_items())
+			store_controller.show_status(localizer.translate("store.purchase_success"))
+		return
+	if store_controller == null:
+		return
+	var status := str(result.get("status", ""))
+	if status == "insufficient":
+		store_controller.show_status(localizer.trf("store.insufficient", {"focus_points": int(result.get("cost_focus_points", 0))}))
+	elif status == "already_unlocked":
+		store_controller.show_status(localizer.translate("store.already_unlocked"))
+	else:
+		store_controller.show_status(localizer.translate("store.purchase_failed"))
+
+
 func _refresh_tasks_ui() -> void:
 	if task_controller != null and task_controller.has_method("refresh_tasks"):
 		task_controller.refresh_tasks()
@@ -842,6 +938,9 @@ func _refresh_progress_ui() -> void:
 	bond_label.tooltip_text = "%s Lv.%d  %d / %d" % [localizer.translate("top.bond"), bond_progress.bond_level, bond_progress.bond_points_current, _bond_required_for_next_level()]
 	if unlocks_label != null:
 		unlocks_label.tooltip_text = localizer.translate("top.unlocks")
+	if store_button != null:
+		store_button.text = "SH"
+		store_button.tooltip_text = localizer.translate("store.title")
 	if stats_button != null:
 		stats_button.tooltip_text = localizer.translate("top.stats")
 	stats_label.text = "%s: %d\n%s: %d\n%s: %d\n%s: %d" % [
@@ -872,6 +971,23 @@ func _status_title(status: String) -> String:
 
 func _reward_summary(rewards: Dictionary) -> String:
 	return SessionRewardCoordinator.reward_summary(localizer, rewards)
+
+
+func _result_summary(status: String, actual_sec: int, rewards: Dictionary, bond_level_up_text: String) -> String:
+	return SessionRewardCoordinator.result_summary(
+		localizer,
+		planned_duration_sec,
+		actual_sec,
+		rewards,
+		bond_level_up_text,
+		_result_next_action_key(status)
+	)
+
+
+func _result_next_action_key(status: String) -> String:
+	if status == "abandoned":
+		return "result.next_action_retry"
+	return "result.next_action_break"
 
 
 func _bond_level_up_summary(level: int) -> String:
@@ -911,6 +1027,7 @@ func _load_save() -> void:
 	bond_progress = parsed.get("bond_progress", bond_progress)
 	daily_stats = parsed.get("daily_stats", daily_stats)
 	interaction_history = parsed.get("interaction_history", interaction_history)
+	unlocked_content = parsed.get("unlocked_content", unlocked_content)
 	var timer_settings = parsed.get("timer_settings", {})
 	if typeof(timer_settings) == TYPE_DICTIONARY:
 		duration_minutes = int(timer_settings.get("focus_minutes", duration_minutes))
@@ -928,6 +1045,9 @@ func _load_save() -> void:
 		language_code = str(app_settings.get("language", language_code))
 		break_media_enabled = bool(app_settings.get("break_media_enabled", break_media_enabled))
 		break_media_path = str(app_settings.get("break_media_path", break_media_path))
+		ambient_prompt_frequency = str(app_settings.get("ambient_prompt_frequency", ambient_prompt_frequency))
+		if ambient_prompt_frequency != AMBIENT_PROMPT_LOW and ambient_prompt_frequency != AMBIENT_PROMPT_NORMAL and ambient_prompt_frequency != AMBIENT_PROMPT_OFF:
+			ambient_prompt_frequency = AMBIENT_PROMPT_NORMAL
 
 
 func _save_game() -> void:
@@ -946,6 +1066,7 @@ func _save_game() -> void:
 		"bond_progress": bond_progress,
 		"daily_stats": daily_stats,
 		"interaction_history": interaction_history,
+		"unlocked_content": unlocked_content,
 		"timer_settings": {
 			"focus_minutes": duration_minutes,
 			"break_minutes": break_duration_minutes,
@@ -956,7 +1077,8 @@ func _save_game() -> void:
 		"app_settings": {
 			"language": language_code,
 			"break_media_enabled": break_media_enabled,
-			"break_media_path": break_media_path
+			"break_media_path": break_media_path,
+			"ambient_prompt_frequency": ambient_prompt_frequency
 		}
 	}
 	SaveDataService.save_payload(SAVE_PATH, payload)

@@ -1,6 +1,7 @@
 extends Node
 
 signal tasks_changed
+signal task_renamed
 signal task_completed(task_id: String)
 
 const TaskService = preload("res://scripts/task_service.gd")
@@ -13,6 +14,7 @@ var task_list: VBoxContainer
 var tasks_title_label: Label
 var add_task_button: Button
 var localizer
+var active_task_edit: LineEdit = null
 
 
 func setup(parent: Control, task_data: Array, localization_service = null) -> void:
@@ -173,24 +175,37 @@ func _rename_task_from_edit(edit: LineEdit, task_id: String) -> void:
 	var saved_title := _rename_task(edit.text, task_id)
 	edit.text = saved_title
 	edit.tooltip_text = saved_title
+	if active_task_edit == edit:
+		active_task_edit = null
 
 
 func _rename_task_submitted(new_title: String, edit: LineEdit, task_id: String) -> void:
 	var saved_title := _rename_task(new_title, task_id)
 	edit.text = saved_title
 	edit.tooltip_text = saved_title
+	edit.release_focus()
 
 
 func _prepare_task_edit(edit: LineEdit, task_id: String) -> void:
+	active_task_edit = edit
 	var full_title := task_title(task_id)
 	edit.text = full_title
 	edit.tooltip_text = full_title
 	edit.caret_column = edit.text.length()
 
 
+func _input(event: InputEvent) -> void:
+	if active_task_edit == null:
+		return
+	if event is InputEventMouseButton and event.pressed:
+		if active_task_edit.get_global_rect().has_point(event.position):
+			return
+		active_task_edit.release_focus()
+
+
 func _rename_task(new_title: String, task_id: String) -> String:
 	var saved_title: String = TaskService.rename_task(tasks, new_title, task_id, _tr("tasks.default_title"))
-	tasks_changed.emit()
+	task_renamed.emit()
 	return saved_title
 
 

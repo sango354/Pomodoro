@@ -3,6 +3,7 @@ extends Node
 signal language_previous_pressed
 signal language_next_pressed
 signal break_media_pressed
+signal ambient_prompt_pressed
 
 var localizer
 var option_button: Button
@@ -12,11 +13,15 @@ var language_value: Label
 var break_media_label: Label
 var break_media_toggle: Button
 var break_media_enabled := false
+var ambient_prompt_label: Label
+var ambient_prompt_button: Button
+var ambient_prompt_frequency := "normal"
 
 
-func setup(parent: Control, localization_service, media_enabled: bool = false) -> Button:
+func setup(parent: Control, localization_service, media_enabled: bool = false, ambient_frequency: String = "normal") -> Button:
 	localizer = localization_service
 	break_media_enabled = media_enabled
+	ambient_prompt_frequency = ambient_frequency
 	_build_option_panel(parent)
 	refresh_text()
 	return option_button
@@ -39,6 +44,9 @@ func refresh_text() -> void:
 		language_value.text = localizer.language_name()
 	if break_media_label != null:
 		break_media_label.text = localizer.translate("option.break_media")
+	if ambient_prompt_label != null:
+		ambient_prompt_label.text = localizer.translate("option.ambient_prompt")
+	refresh_ambient_prompt(ambient_prompt_frequency)
 	refresh_break_media(break_media_enabled)
 
 
@@ -63,6 +71,14 @@ func refresh_break_media(enabled: bool) -> void:
 	knob.offset_bottom = 10
 
 
+func refresh_ambient_prompt(frequency: String) -> void:
+	ambient_prompt_frequency = frequency
+	if ambient_prompt_button == null:
+		return
+	ambient_prompt_button.text = localizer.translate("option.ambient_%s" % ambient_prompt_frequency)
+	ambient_prompt_button.tooltip_text = localizer.translate("option.ambient_prompt")
+
+
 func _build_option_panel(parent: Control) -> void:
 	option_panel = _new_panel()
 	option_panel.name = "OptionPanel"
@@ -75,7 +91,7 @@ func _build_option_panel(parent: Control) -> void:
 	option_panel.offset_left = -330
 	option_panel.offset_top = 54
 	option_panel.offset_right = 0
-	option_panel.offset_bottom = 204
+	option_panel.offset_bottom = 246
 	parent.add_child(option_panel)
 	_raise_option_panel()
 
@@ -135,6 +151,22 @@ func _build_option_panel(parent: Control) -> void:
 	break_media_toggle.add_child(knob)
 	media_row.add_child(break_media_toggle)
 	refresh_break_media(break_media_enabled)
+
+	var ambient_row := HBoxContainer.new()
+	ambient_row.add_theme_constant_override("separation", 12)
+	box.add_child(ambient_row)
+
+	ambient_prompt_label = Label.new()
+	ambient_prompt_label.custom_minimum_size = Vector2(210, 0)
+	ambient_prompt_label.add_theme_color_override("font_color", Color(0.95, 0.0, 1.0, 1.0))
+	ambient_row.add_child(ambient_prompt_label)
+
+	ambient_prompt_button = Button.new()
+	ambient_prompt_button.custom_minimum_size = Vector2(82, 30)
+	ambient_prompt_button.focus_mode = Control.FOCUS_NONE
+	ambient_prompt_button.pressed.connect(func(): ambient_prompt_pressed.emit())
+	ambient_row.add_child(ambient_prompt_button)
+	refresh_ambient_prompt(ambient_prompt_frequency)
 
 
 func create_top_bar_button() -> Button:

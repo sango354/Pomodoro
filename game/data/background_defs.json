@@ -1,0 +1,124 @@
+{
+	"backgrounds": [
+		{
+			"content_id": "bg_normal_day",
+			"display_name_key": "content.bg_normal_day",
+			"spine_variant": "LofiBG_01_Nomal_Day",
+			"default_unlocked": true,
+			"cost_focus_points": 0,
+			"context_requirement": {
+				"mood": "normal",
+				"time": "day",
+				"weather": "clear"
+			}
+		},
+		{
+			"content_id": "bg_normal_night",
+			"display_name_key": "content.bg_normal_night",
+			"spine_variant": "LofiBG_01_Nomal_Night",
+			"default_unlocked": true,
+			"cost_focus_points": 0,
+			"context_requirement": {
+				"mood": "normal",
+				"time": "night",
+				"weather": "clear"
+			}
+		},
+		{
+			"content_id": "bg_normal_sunfall",
+			"display_name_key": "content.bg_normal_sunfall",
+			"spine_variant": "LofiBG_01_Nomal_Sunfall",
+			"default_unlocked": true,
+			"cost_focus_points": 0,
+			"context_requirement": {
+				"mood": "normal",
+				"time": "sunfall",
+				"weather": "clear"
+			}
+		},
+		{
+			"content_id": "bg_normal_cloudy",
+			"display_name_key": "content.bg_normal_cloudy",
+			"spine_variant": "LofiBG_01_Nomal_Cloudy",
+			"default_unlocked": true,
+			"cost_focus_points": 0,
+			"context_requirement": {
+				"mood": "normal",
+				"time": "day",
+				"weather": "rain"
+			}
+		},
+		{
+			"content_id": "bg_good_day",
+			"display_name_key": "content.bg_good_day",
+			"spine_variant": "LofiBG_01_Good_Day",
+			"default_unlocked": false,
+			"cost_focus_points": 60,
+			"context_requirement": {
+				"mood": "good",
+				"time": "day",
+				"weather": "clear"
+			}
+		},
+		{
+			"content_id": "bg_good_night",
+			"display_name_key": "content.bg_good_night",
+			"spine_variant": "LofiBG_01_Good_Night",
+			"default_unlocked": false,
+			"cost_focus_points": 60,
+			"context_requirement": {
+				"mood": "good",
+				"time": "night",
+				"weather": "clear"
+			}
+		},
+		{
+			"content_id": "bg_good_sunfall",
+			"display_name_key": "content.bg_good_sunfall",
+			"spine_variant": "LofiBG_01_Good_Sunfall",
+			"default_unlocked": false,
+			"cost_focus_points": 60,
+			"context_requirement": {
+				"mood": "good",
+				"time": "sunfall",
+				"weather": "clear"
+			}
+		},
+		{
+			"content_id": "bg_troubled_day",
+			"display_name_key": "content.bg_troubled_day",
+			"spine_variant": "LofiBG_01_Troubled_Day",
+			"default_unlocked": false,
+			"cost_focus_points": 80,
+			"context_requirement": {
+				"mood": "troubled",
+				"time": "day",
+				"weather": "clear"
+			}
+		},
+		{
+			"content_id": "bg_troubled_night",
+			"display_name_key": "content.bg_troubled_night",
+			"spine_variant": "LofiBG_01_Troubled_Night",
+			"default_unlocked": false,
+			"cost_focus_points": 80,
+			"context_requirement": {
+				"mood": "troubled",
+				"time": "night",
+				"weather": "clear"
+			}
+		},
+		{
+			"content_id": "bg_troubled_sunfall",
+			"display_name_key": "content.bg_troubled_sunfall",
+			"spine_variant": "LofiBG_01_Troubled_Sunfall",
+			"default_unlocked": false,
+			"cost_focus_points": 80,
+			"context_requirement": {
+				"mood": "troubled",
+				"time": "sunfall",
+				"weather": "clear"
+			}
+		}
+	]
+}

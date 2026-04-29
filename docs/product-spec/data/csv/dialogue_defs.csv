@@ -1,0 +1,29 @@
+dialogue_id,character_id,interaction_type,text_key,text,bond_requirement,context_requirement_json,cooldown_minutes,weight,is_active
+break_001,companion_01,break_interaction,dialogue.break_001,"Nice work. Look away from the screen and let your eyes rest for a moment.",0,"any",0,3,true
+break_002,companion_01,break_interaction,dialogue.break_002,"Take a slow breath. You have already moved the day forward.",0,"any",0,3,true
+break_003,companion_01,break_interaction,dialogue.break_003,"Stretch your shoulders before the next round. I will keep the room quiet.",0,"any",0,2,true
+break_004,companion_01,break_interaction,dialogue.break_004,"If you need water this is the right time.",0,"any",0,2,true
+break_005,companion_01,break_interaction,dialogue.break_005,"Relax your jaw and let your hands rest.",0,"any",0,2,true
+break_006,companion_01,break_interaction,dialogue.break_006,"Blink a few times and soften your focus.",0,"any",0,2,true
+break_007,companion_01,break_interaction,dialogue.break_007,"You kept the promise to yourself for this round.",0,"any",0,2,true
+break_008,companion_01,break_interaction,dialogue.break_008,"Let the room stay quiet for a little longer.",0,"any",0,1,true
+break_009,companion_01,break_interaction,dialogue.break_009,"A small pause can make the next start easier.",0,"any",0,1,true
+break_010,companion_01,break_interaction,dialogue.break_010,"Stand up if you can and let your back reset.",0,"any",0,1,true
+break_011,companion_01,break_interaction,dialogue.break_011,"The daylight is still with us. Take it in for a moment.",0,"{""time"":""day""}",0,2,true
+break_012,companion_01,break_interaction,dialogue.break_012,"The evening light is softer now. Slow down with it.",0,"{""time"":""sunfall""}",0,2,true
+break_013,companion_01,break_interaction,dialogue.break_013,"It is late. Keep this break gentle.",0,"{""time"":""night""}",0,2,true
+break_014,companion_01,break_interaction,dialogue.break_014,"The cloudy room feels calm enough for a quiet reset.",0,"{""weather"":""rain""}",0,1,true
+break_015,companion_01,break_interaction,dialogue.break_015,"That was a steady round. I noticed.",2,"any",0,1,true
+break_016,companion_01,break_interaction,dialogue.break_016,"You are getting better at returning to the work.",2,"any",0,1,true
+break_017,companion_01,break_interaction,dialogue.break_017,"I will keep watch while you rest your eyes.",3,"any",0,1,true
+break_018,companion_01,break_interaction,dialogue.break_018,"You do not have to rush back. The next step can wait a minute.",3,"any",0,1,true
+break_019,companion_01,break_interaction,dialogue.break_019,"Even a difficult round still counts as showing up.",0,"{""mood"":""troubled""}",0,2,true
+break_020,companion_01,break_interaction,dialogue.break_020,"That went well. Let the good feeling settle before the next one.",0,"{""mood"":""good""}",0,2,true
+ambient_001,companion_01,ambient,dialogue.ambient_001,"I am here. Keep an easy rhythm.",0,"any",8,3,true
+ambient_002,companion_01,ambient,dialogue.ambient_002,"One calm step at a time.",0,"any",8,2,true
+ambient_003,companion_01,ambient,dialogue.ambient_003,"The timer is moving. You only need to stay with this moment.",0,"any",8,2,true
+ambient_004,companion_01,ambient,dialogue.ambient_004,"The room is quiet enough for the next few minutes.",0,"{""time"":""day""}",8,1,true
+ambient_005,companion_01,ambient,dialogue.ambient_005,"Evening work can stay gentle.",0,"{""time"":""sunfall""}",8,1,true
+ambient_006,companion_01,ambient,dialogue.ambient_006,"It is late. Keep the pace kind.",0,"{""time"":""night""}",8,1,true
+ambient_007,companion_01,ambient,dialogue.ambient_007,"You are settling into this well.",2,"any",10,1,true
+ambient_008,companion_01,ambient,dialogue.ambient_008,"I will keep the space steady while you work.",3,"any",10,1,true

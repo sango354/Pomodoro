@@ -1,9 +1,9 @@
-extends Node
+extends SceneTree
 
 const BREAK_MEDIA_PATH := "res://assets/videos/break/video.mp4"
 
 
-func _ready() -> void:
+func _initialize() -> void:
 	var stream = ResourceLoader.load(BREAK_MEDIA_PATH) if ResourceLoader.exists(BREAK_MEDIA_PATH) else null
 	var exists := ResourceLoader.exists(BREAK_MEDIA_PATH) or FileAccess.file_exists(BREAK_MEDIA_PATH)
 	var global_path := ProjectSettings.globalize_path(BREAK_MEDIA_PATH)
@@ -21,7 +21,7 @@ func _ready() -> void:
 	print("Break media loaded: %s" % (stream != null))
 	if stream != null:
 		print("Break media class: %s" % stream.get_class())
-	get_tree().quit(0 if stream != null else 1)
+	quit(0 if stream != null else 1)
 
 
 func _sidecar_ogv_path(path: String) -> String:

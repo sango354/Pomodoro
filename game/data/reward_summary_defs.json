@@ -1,0 +1,25 @@
+{
+	"result_summary": [
+		{
+			"field": "focus_duration",
+			"text_key": "result.focus_duration"
+		},
+		{
+			"field": "actual_duration",
+			"text_key": "result.actual_duration"
+		},
+		{
+			"field": "rewards",
+			"text_key": "result.rewards"
+		},
+		{
+			"field": "bond_level_up",
+			"text_key": "result.bond_level_up_line",
+			"optional": true
+		},
+		{
+			"field": "next_action",
+			"text_key": "result.next_action"
+		}
+	]
+}

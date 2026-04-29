@@ -64,6 +64,7 @@ The MVP game scene currently covers the M1 loop from the product spec:
 - Bind one local task to the current session.
 - Classify results as completed, partial, or abandoned.
 - Grant Focus Points, XP, and Bond when rewardable.
+- Show a structured result summary from `res://data/reward_summary_defs.json`.
 - Automatically enter break countdown after each completed focus session.
 - Start the next focus session after break only when Auto restart is enabled.
 - Show a first-pass companion break interaction panel during break countdown.
@@ -73,6 +74,7 @@ The MVP game scene currently covers the M1 loop from the product spec:
   to `user://save.json`.
 - Play music from `res://assets/music`, restoring the last played track when
   possible.
+- Open a top-right Store panel for background Spine unlock placeholders.
 
 Current UI implementation notes:
 
@@ -87,10 +89,14 @@ Current UI implementation notes:
 - Break interaction dialogue is loaded from `res://data/dialogue_defs.json`.
 - Localized UI text is loaded from `res://data/localization.csv`.
 - The top-right Option button opens a panel with language switching and Break
-  Video on/off.
+  Video on/off plus Ambient Prompt Low/Normal frequency.
 - The saved game payload includes `app_settings.language`,
-  `app_settings.break_media_enabled`, and `app_settings.break_media_path`.
+  `app_settings.break_media_enabled`, `app_settings.break_media_path`, and
+  `app_settings.ambient_prompt_frequency`.
 - Break media assets currently exist under `res://assets/videos/break/`.
+- Background unlock content is defined in `res://data/background_defs.json`.
+- Purchased background unlocks are saved in `user://save.json` under
+  `unlocked_content`.
 - Core logic and UI controllers have started moving out of `main_game.gd` into
   focused scripts under `res://scripts/`, including save data, tasks,
   progression, Spine background, timer session state, timer rail, timer
@@ -110,11 +116,19 @@ Localization/options details are documented in:
 E:\ProjectPomodoro\docs\product-spec\systems\07-localization-and-options.md
 ```
 
+Manual QA steps are documented in:
+
+```text
+E:\ProjectPomodoro\docs\product-spec\engineering\manual-qa-checklist.md
+```
+
 For another machine, verify these local files exist after sync:
 
 ```text
 game/data/localization.csv
 game/data/dialogue_defs.json
+game/data/background_defs.json
+game/data/reward_summary_defs.json
 game/scripts/localization_service.gd
 game/scripts/option_panel_controller.gd
 game/scripts/task_panel_controller.gd
@@ -122,4 +136,6 @@ game/scripts/result_panel_controller.gd
 game/scripts/session_reward_coordinator.gd
 game/scripts/break_media_controller.gd
 game/scripts/break_media_probe.gd
+game/scripts/content_unlock_service.gd
+game/scripts/store_panel_controller.gd
 ```

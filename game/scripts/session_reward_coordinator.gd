@@ -2,6 +2,7 @@ extends RefCounted
 
 const ProgressionService = preload("res://scripts/progression_service.gd")
 const TaskService = preload("res://scripts/task_service.gd")
+const RESULT_SUMMARY_DEFS_PATH := "res://data/reward_summary_defs.json"
 
 
 static func grant_session_rewards(
@@ -84,3 +85,68 @@ static func reward_summary(localizer, rewards: Dictionary) -> String:
 		int(rewards.get("xp", 0)),
 		int(rewards.get("bond", 0))
 	]
+
+
+static func result_summary(
+	localizer,
+	planned_duration_sec: int,
+	actual_sec: int,
+	rewards: Dictionary,
+	bond_level_up_text: String,
+	next_action_key: String
+) -> String:
+	var values := {
+		"focus_duration": {"minutes": _minutes(planned_duration_sec)},
+		"actual_duration": {"minutes": _minutes(actual_sec)},
+		"rewards": {"summary": reward_summary(localizer, rewards)},
+		"bond_level_up": {"summary": bond_level_up_text},
+		"next_action": {"action": _tr(localizer, next_action_key)}
+	}
+	var lines := []
+	for definition in _result_summary_defs():
+		if typeof(definition) != TYPE_DICTIONARY:
+			continue
+		var field := str(definition.get("field", ""))
+		if bool(definition.get("optional", false)) and field == "bond_level_up" and bond_level_up_text == "":
+			continue
+		var text_key := str(definition.get("text_key", ""))
+		lines.append(_trf(localizer, text_key, values.get(field, {})))
+	return "\n".join(lines)
+
+
+static func _result_summary_defs() -> Array:
+	var file := FileAccess.open(RESULT_SUMMARY_DEFS_PATH, FileAccess.READ)
+	if file == null:
+		return [
+			{"field": "focus_duration", "text_key": "result.focus_duration"},
+			{"field": "actual_duration", "text_key": "result.actual_duration"},
+			{"field": "rewards", "text_key": "result.rewards"},
+			{"field": "bond_level_up", "text_key": "result.bond_level_up_line", "optional": true},
+			{"field": "next_action", "text_key": "result.next_action"}
+		]
+	var parsed = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return []
+	var result_summary = parsed.get("result_summary", [])
+	if typeof(result_summary) != TYPE_ARRAY:
+		return []
+	return result_summary
+
+
+static func _minutes(seconds: int) -> int:
+	return int(round(seconds / 60.0))
+
+
+static func _tr(localizer, key: String) -> String:
+	if localizer != null:
+		return localizer.translate(key)
+	return key
+
+
+static func _trf(localizer, key: String, values: Dictionary) -> String:
+	if localizer != null:
+		return localizer.trf(key, values)
+	var text := key
+	for value_key in values.keys():
+		text = text.replace("{%s}" % str(value_key), str(values[value_key]))
+	return text
