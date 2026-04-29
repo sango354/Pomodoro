@@ -90,6 +90,8 @@ var root_2d: Node2D
 var ui_layer: CanvasLayer
 var app_container: Control
 var message_label: Label
+var top_bar: Control
+var bottom_mode_controls: Control
 var fp_label: Button
 var level_label: Button
 var bond_label: Button
@@ -118,6 +120,10 @@ var ambient_prompt_has_shown := false
 var unlocks_label: Button
 var store_button: Button
 var stats_button: Button
+var simple_mode_enabled := false
+var tasks_ui_visible := true
+var timer_ui_visible := true
+var manual_time_state := "day"
 
 
 func _ready() -> void:
@@ -125,6 +131,7 @@ func _ready() -> void:
 	background_defs = ContentUnlockService.load_background_defs()
 	localizer = LocalizationService.new(language_code)
 	_apply_time_context()
+	manual_time_state = _time_state_from_context()
 	_build_scene()
 	spine_background.load_selected_background()
 	_refresh_all()
@@ -145,6 +152,13 @@ func _process(delta: float) -> void:
 		return
 
 	_refresh_timer_ui()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F1:
+		currencies.focus_points = int(currencies.get("focus_points", 0)) + 100
+		_save_game()
+		_refresh_progress_ui()
 
 
 func _notification(what: int) -> void:
@@ -256,11 +270,13 @@ func _build_scene() -> void:
 	add_child(music_controller)
 	music_controller.state_changed.connect(_save_game)
 	music_controller.setup(layers, saved_music_path, music_loop, music_volume, localizer)
+	_build_bottom_mode_controls(layers)
 	_build_alarm_player()
 
 
 func _build_top_bar(parent: Control) -> void:
 	var bar := PanelContainer.new()
+	top_bar = bar
 	bar.name = "TopBar"
 	bar.anchor_left = 1.0
 	bar.anchor_top = 0.0
@@ -313,6 +329,50 @@ func _build_top_bar(parent: Control) -> void:
 	var option_button := option_controller.create_top_bar_button() as Button
 	row.add_child(option_button)
 	option_controller.refresh_text()
+
+
+func _build_bottom_mode_controls(parent: Control) -> void:
+	var panel := Control.new()
+	bottom_mode_controls = panel
+	panel.name = "BottomModeControls"
+	panel.z_index = 150
+	panel.anchor_left = 1.0
+	panel.anchor_top = 1.0
+	panel.anchor_right = 1.0
+	panel.anchor_bottom = 1.0
+	panel.offset_left = -330
+	panel.offset_top = -50
+	panel.offset_right = -64
+	panel.offset_bottom = 0
+	parent.add_child(panel)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 8)
+	margin.add_theme_constant_override("margin_right", 8)
+	margin.add_theme_constant_override("margin_top", 4)
+	margin.add_theme_constant_override("margin_bottom", 4)
+	panel.add_child(margin)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	margin.add_child(row)
+
+	var simple_button := _new_icon_button("A", "Simple Mode")
+	simple_button.pressed.connect(_toggle_simple_mode)
+	row.add_child(simple_button)
+
+	var tasks_button := _new_icon_button("B", "Tasks")
+	tasks_button.pressed.connect(_toggle_tasks_ui)
+	row.add_child(tasks_button)
+
+	var timer_button := _new_icon_button("C", "Pomodoro")
+	timer_button.pressed.connect(_toggle_timer_ui)
+	row.add_child(timer_button)
+
+	var time_button := _new_icon_button("時間", "Time")
+	time_button.custom_minimum_size = Vector2(58, 32)
+	time_button.pressed.connect(_cycle_time_context)
+	row.add_child(time_button)
 
 
 func _build_stats_overlay(parent: Control) -> void:
@@ -887,6 +947,68 @@ func _toggle_stats_message() -> void:
 	stats_label.visible = not stats_label.visible
 
 
+func _toggle_simple_mode() -> void:
+	simple_mode_enabled = not simple_mode_enabled
+	_apply_ui_visibility()
+
+
+func _toggle_tasks_ui() -> void:
+	tasks_ui_visible = not tasks_ui_visible
+	_apply_ui_visibility()
+
+
+func _toggle_timer_ui() -> void:
+	timer_ui_visible = not timer_ui_visible
+	_apply_ui_visibility()
+
+
+func _apply_ui_visibility() -> void:
+	if top_bar != null:
+		top_bar.visible = not simple_mode_enabled
+	if stats_label != null:
+		stats_label.visible = false if simple_mode_enabled else stats_label.visible
+	if option_controller != null and simple_mode_enabled and option_controller.has_method("hide"):
+		option_controller.hide()
+	if store_controller != null and simple_mode_enabled and store_controller.has_method("hide_store"):
+		store_controller.hide_store()
+	if result_controller != null and simple_mode_enabled and result_controller.has_method("hide_result"):
+		result_controller.hide_result()
+	if music_controller != null and music_controller.has_method("set_ui_visible"):
+		music_controller.set_ui_visible(not simple_mode_enabled)
+	if task_controller != null and task_controller.has_method("set_panel_visible"):
+		task_controller.set_panel_visible(tasks_ui_visible)
+	if timer_rail != null and timer_rail.has_method("set_panel_visible"):
+		timer_rail.set_panel_visible(timer_ui_visible)
+	if timer_settings != null and timer_settings.has_method("hide") and (simple_mode_enabled or not timer_ui_visible):
+		timer_settings.hide()
+	if companion_controller != null and simple_mode_enabled:
+		_hide_break_interaction()
+		_hide_ambient_prompt()
+	if break_media_controller != null and simple_mode_enabled:
+		_stop_break_media()
+
+
+func _cycle_time_context() -> void:
+	match manual_time_state:
+		"day":
+			manual_time_state = "sunfall"
+			selected_context.time = "sunfall"
+			selected_context.weather = "clear"
+		"sunfall":
+			manual_time_state = "night"
+			selected_context.time = "night"
+			selected_context.weather = "clear"
+		"night":
+			manual_time_state = "cloudy"
+			selected_context.time = "day"
+			selected_context.weather = "rain"
+		_:
+			manual_time_state = "day"
+			selected_context.time = "day"
+			selected_context.weather = "clear"
+	spine_background.load_selected_background()
+
+
 func _toggle_store_panel() -> void:
 	if store_controller == null:
 		return
@@ -1010,6 +1132,13 @@ func _apply_time_context() -> void:
 		selected_context.time = "sunfall"
 	else:
 		selected_context.time = "day"
+	selected_context.weather = "clear"
+
+
+func _time_state_from_context() -> String:
+	if str(selected_context.get("weather", "clear")) == "rain":
+		return "cloudy"
+	return str(selected_context.get("time", "day"))
 
 
 func _context_id() -> String:

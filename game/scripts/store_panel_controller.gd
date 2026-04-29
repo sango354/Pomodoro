@@ -37,6 +37,7 @@ func show_store(items: Array) -> void:
 	status_label.text = ""
 	panel.visible = true
 	dismiss_layer.visible = true
+	_raise_to_front()
 
 
 func hide_store() -> void:
@@ -83,6 +84,7 @@ func _build_dismiss_layer(parent: Control) -> void:
 	dismiss_layer.visible = false
 	dismiss_layer.text = ""
 	dismiss_layer.focus_mode = Control.FOCUS_NONE
+	dismiss_layer.z_index = 180
 	dismiss_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	dismiss_layer.pressed.connect(hide_store)
 	parent.add_child(dismiss_layer)
@@ -91,14 +93,15 @@ func _build_dismiss_layer(parent: Control) -> void:
 func _build_panel(parent: Control) -> void:
 	panel = PanelContainer.new()
 	panel.name = "StorePanel"
-	panel.anchor_left = 1.0
-	panel.anchor_top = 0.0
-	panel.anchor_right = 1.0
-	panel.anchor_bottom = 0.0
-	panel.offset_left = -390
-	panel.offset_top = 58
-	panel.offset_right = -28
-	panel.offset_bottom = 430
+	panel.anchor_left = 0.5
+	panel.anchor_top = 0.5
+	panel.anchor_right = 0.5
+	panel.anchor_bottom = 0.5
+	panel.offset_left = -190
+	panel.offset_top = -210
+	panel.offset_right = 190
+	panel.offset_bottom = 210
+	panel.z_index = 200
 	panel.add_theme_stylebox_override("panel", _new_panel_style(0.78))
 	parent.add_child(panel)
 
@@ -138,6 +141,7 @@ func _build_confirm(parent: Control) -> void:
 	confirm_dismiss_layer.visible = false
 	confirm_dismiss_layer.text = ""
 	confirm_dismiss_layer.focus_mode = Control.FOCUS_NONE
+	confirm_dismiss_layer.z_index = 220
 	confirm_dismiss_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
 	confirm_dismiss_layer.pressed.connect(_hide_confirm)
 	parent.add_child(confirm_dismiss_layer)
@@ -152,6 +156,7 @@ func _build_confirm(parent: Control) -> void:
 	confirm_panel.offset_top = -92
 	confirm_panel.offset_right = 170
 	confirm_panel.offset_bottom = 92
+	confirm_panel.z_index = 240
 	confirm_panel.add_theme_stylebox_override("panel", _new_panel_style(0.9))
 	confirm_panel.visible = false
 	parent.add_child(confirm_panel)
@@ -248,6 +253,15 @@ func _confirm_purchase() -> void:
 	var content_id := str(selected_item.get("content_id", ""))
 	_hide_confirm()
 	purchase_requested.emit(content_id)
+
+
+func _raise_to_front() -> void:
+	for node in [dismiss_layer, panel, confirm_dismiss_layer, confirm_panel]:
+		if node == null:
+			continue
+		var parent: Node = node.get_parent()
+		if parent != null:
+			parent.move_child(node, parent.get_child_count() - 1)
 
 
 func _new_panel_style(alpha: float) -> StyleBoxFlat:

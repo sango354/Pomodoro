@@ -343,43 +343,48 @@ re-exported from Spine 4.1.x with premultiplied alpha disabled.
 
 ## Next Recommended Work
 
-If work resumes on another machine and the next step is unclear, start from the
-ambient prompt QA pass. The minimal ambient prompt implementation is already in
-place: it appears during idle/focus, uses the shared Bond/context/cooldown/weight
-dialogue selector, records `ambient_prompt_shown` /
-`ambient_prompt_dismissed`, can be dismissed, auto-hides after 8 seconds, and
-does not appear during Break. The recommended next action is to run the project
-in the Godot windowed editor/player and manually verify ambient prompt position
-and cadence, confirming it does not cover Tasks, the timer rail, the music bar,
-Break dialogue, or Break video UI.
+If work resumes on another machine and the next step is unclear, start from a
+windowed QA pass for the latest UI/debug controls. Headless validation only
+catches script/runtime load errors; the current risk is layout and interaction
+behavior.
 
-1. Manually verify the refactored UI in the Godot editor, especially timer rail,
-   bottom music controls, and the break companion panel.
-2. Continue M2 companion interaction:
-   - manually verify ambient prompt timing and placement in the Godot editor
-   - confirm the first idle prompt appears around 20 seconds after startup, then
-     returns to low-frequency idle cadence
-   - replace the prototype Break video with production art if needed
-   - manually verify Break Video playback with a supported Godot video format
-   - add optional Break media path selection later if needed
-3. Add lightweight content data files for unlocks and music metadata.
-4. Fill remaining localization columns and review UI fit for each language.
-5. Add manual QA checklist for:
-   - session start/pause/resume/reset
-   - completed/partial/abandoned rewards
-   - task rename persistence
-   - result popup dismissal
-   - music list/playback/loop/volume
-   - Spine background switching by mood/time
-   - break panel show/next/skip behavior
-   - auto restart after break completion
+1. Manually verify the bottom music bar and debug controls:
+   - `A`, `B`, `C`, and the time-cycle button sit on the music bar background
+     immediately left of the ambience button.
+   - `A` hides most UI while keeping Tasks and Pomodoro available.
+   - `B` toggles Tasks independently.
+   - `C` toggles Pomodoro independently and closes Timer Settings when hidden.
+   - The time-cycle button cycles Day, Sunset, Night, and Cloudy backgrounds.
+   - `F1` adds 100 Focus Points and updates the top-right Focus Points tooltip.
+2. Manually verify Store modal behavior:
+   - Store opens centered and above the Pomodoro rail.
+   - Store confirmation appears above the Store panel.
+   - Clicking outside the confirmation cancels only the confirmation.
+   - Purchases deduct Focus Points, persist after restart, and unlock the
+     matching background content.
+3. Decide the production UX for background content:
+   - current behavior is automatic context-based selection with unlock fallback;
+   - next likely step is an inventory/equipment panel if users should manually
+     choose unlocked backgrounds.
+4. Add lightweight data integrity probes:
+   - every `background_defs.json` Spine variant exists under
+     `game/assets/spine/backgrounds`;
+   - every `display_name_key` exists in `game/data/localization.csv`;
+   - every purchasable item has a positive Focus Point cost.
+5. Continue deferred settings/content work:
+   - Break Video path setting
+   - music autoplay setting
+   - alarm sound selection
+   - music metadata table
+   - remaining localization columns and language fit review
 
 Deferred from the 2026-04-29 planning pass:
 
 - Break Video path setting is intentionally not implemented yet.
 - Music autoplay setting is not implemented yet.
 - Alarm sound selection is not implemented yet.
-- Unlocks/content panel remains placeholder.
+- Store/content unlocks are implemented as a skeleton. There is still no final
+  thumbnail art, inventory/equipment flow, or production purchase balancing.
 - Music metadata table remains future work.
 
 ## Latest Validation
@@ -406,6 +411,17 @@ Deferred from the 2026-04-29 planning pass:
 - Clicking outside the purchase confirmation cancels the confirmation.
 - Purchased unlocks are saved in `user://save.json` under
   `unlocked_content`.
+- Added bottom-right debug/UI controls:
+  - `A`: Simple Mode, hides most UI while keeping Tasks and Pomodoro visible.
+  - `B`: toggles Tasks UI.
+  - `C`: toggles Pomodoro UI.
+  - `時間`: cycles background time context through Day, Sunset, Night, and
+    Cloudy, then reloads the matching unlocked Spine background.
+- Debug/UI controls sit on the bottom music bar background, immediately left of
+  the ambience button, without their own panel backing.
+- Added debug cheat: pressing `F1` grants 100 Focus Points.
+- Store UI now opens as a centered top-layer modal instead of overlapping the
+  Pomodoro rail.
 - Background Spine selection now respects unlock state. If the contextual
   background is locked, the runtime falls back to an unlocked normal background.
 - Default unlocked backgrounds:

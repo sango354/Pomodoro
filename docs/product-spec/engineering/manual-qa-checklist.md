@@ -24,6 +24,7 @@ E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless
 ## Store / Unlocks
 
 - Click the top-right `SH` button and confirm the Store panel opens.
+- Confirm the Store panel opens centered on screen and above the Pomodoro rail.
 - Confirm each background item shows a placeholder name and Focus Point cost.
 - Confirm default unlocked items are shown as unlocked and cannot be purchased.
 - Click a locked item and confirm the purchase dialog opens.
@@ -33,6 +34,18 @@ E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless
 - Restart the game and confirm the purchased item remains unlocked.
 - Confirm locked contextual backgrounds fall back to a normal unlocked
   background.
+
+## Debug UI Controls
+
+- `A` toggles Simple Mode and hides most UI while keeping Tasks and Pomodoro
+  visible.
+- `B` toggles Tasks UI.
+- `C` toggles Pomodoro UI.
+- `時間` cycles Day, Sunset, Night, and Cloudy background contexts.
+- `F1` adds 100 Focus Points and updates the top-right Focus Points tooltip.
+- Time button cycles Day, Sunset, Night, and Cloudy background contexts.
+- `A`, `B`, `C`, and Time sit on the music bar background immediately left of
+  the ambience button, without a separate backing panel.
 
 ## Timer
 

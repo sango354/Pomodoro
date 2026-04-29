@@ -12,6 +12,7 @@ const ICON_NEXT_PATH := "res://assets/icons/next.png"
 const ICON_PREVIOUS_PATH := "res://assets/icons/previous.png"
 
 var music_player: AudioStreamPlayer
+var music_bar: Control
 var music_files: Array[String] = []
 var current_music_index := -1
 var saved_music_path := ""
@@ -48,8 +49,16 @@ func get_state() -> Dictionary:
 	}
 
 
+func set_ui_visible(is_visible: bool) -> void:
+	if music_bar != null:
+		music_bar.visible = is_visible
+	if music_list_panel != null:
+		music_list_panel.visible = false if not is_visible else music_list_panel.visible
+
+
 func _build_bottom_bar(parent: Control) -> void:
 	var bar := PanelContainer.new()
+	music_bar = bar
 	bar.anchor_left = 0.0
 	bar.anchor_top = 1.0
 	bar.anchor_right = 1.0

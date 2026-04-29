@@ -10,6 +10,7 @@ const TASK_PANEL_WIDTH := 430
 const TASK_ITEM_WIDTH := 258
 
 var tasks: Array = []
+var task_panel: Control
 var task_list: VBoxContainer
 var tasks_title_label: Label
 var add_task_button: Button
@@ -95,6 +96,11 @@ func refresh_tasks() -> void:
 		row.add_child(archive)
 
 
+func set_panel_visible(is_visible: bool) -> void:
+	if task_panel != null:
+		task_panel.visible = is_visible
+
+
 func create_task(title: String) -> void:
 	var task := TaskService.create_task(tasks, title)
 	if task.is_empty():
@@ -132,6 +138,7 @@ func complete_task(task_id: String) -> void:
 
 func _build_task_panel(parent: Control) -> void:
 	var box := VBoxContainer.new()
+	task_panel = box
 	box.anchor_left = 0.0
 	box.anchor_top = 0.0
 	box.anchor_right = 0.0

@@ -32,6 +32,11 @@ func toggle_visible() -> void:
 	option_panel.visible = not option_panel.visible
 
 
+func hide() -> void:
+	if option_panel != null:
+		option_panel.visible = false
+
+
 func refresh_text() -> void:
 	if localizer == null:
 		return

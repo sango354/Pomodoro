@@ -13,6 +13,7 @@ const TIMER_RUNNING_COLOR := Color(1, 1, 1, 1)
 const TIMER_INACTIVE_COLOR := Color(0.5, 0.5, 0.5, 1)
 
 var timer_label: Label
+var timer_panel: Control
 var break_time_label: Label
 var phase_label: Label
 var primary_timer_button: Button
@@ -101,8 +102,14 @@ func set_localizer(localization_service) -> void:
 		reset_button.tooltip_text = _tr("timer.reset")
 
 
+func set_panel_visible(is_visible: bool) -> void:
+	if timer_panel != null:
+		timer_panel.visible = is_visible
+
+
 func _build_timer_rail(parent: Control) -> void:
 	var panel := _new_panel()
+	timer_panel = panel
 	panel.name = "TimerRail"
 	panel.anchor_left = 1.0
 	panel.anchor_top = 0.0
