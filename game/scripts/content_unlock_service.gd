@@ -29,7 +29,41 @@ static func store_items(background_defs: Array, unlocked_content: Array, localiz
 			"name": localizer.translate(name_key) if localizer != null else name_key,
 			"cost_focus_points": int(definition.get("cost_focus_points", 0)),
 			"unlocked": is_unlocked(definition, unlocked_content),
-			"default_unlocked": bool(definition.get("default_unlocked", false))
+			"default_unlocked": bool(definition.get("default_unlocked", false)),
+			"thumbnail_path": str(definition.get("thumbnail_path", ""))
+		})
+	return items
+
+
+static func background_inventory_items(background_defs: Array, unlocked_content: Array, selected_background_id: String, localizer) -> Array:
+	var items := [
+		{
+			"id": "lofi_auto",
+			"content_id": "lofi_auto",
+			"name": localizer.translate("background_menu.lofi") if localizer != null else "Lofi",
+			"locked": false,
+			"unlocked": true,
+			"equipped": selected_background_id == "lofi_auto",
+			"auto": true,
+			"cost_focus_points": 0
+		}
+	]
+	for definition in background_defs:
+		if typeof(definition) != TYPE_DICTIONARY:
+			continue
+		var content_id := str(definition.get("content_id", ""))
+		var name_key := str(definition.get("display_name_key", content_id))
+		var unlocked := is_unlocked(definition, unlocked_content)
+		items.append({
+			"id": content_id,
+			"content_id": content_id,
+			"name": localizer.translate(name_key) if localizer != null else name_key,
+			"locked": not unlocked,
+			"unlocked": unlocked,
+			"equipped": selected_background_id == content_id,
+			"auto": false,
+			"cost_focus_points": int(definition.get("cost_focus_points", 0)),
+			"thumbnail_path": str(definition.get("thumbnail_path", ""))
 		})
 	return items
 

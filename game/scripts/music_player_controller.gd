@@ -11,14 +11,17 @@ const ICON_MUSIC_PLAY_PATH := "res://assets/icons/musicplay.png"
 const ICON_NEXT_PATH := "res://assets/icons/next.png"
 const ICON_PREVIOUS_PATH := "res://assets/icons/previous.png"
 const MUSIC_MANIFEST_PATH := "res://data/music_manifest.json"
+const MUSIC_TRACK_DEFS_PATH := "res://data/music_track_defs.json"
 
 var music_player: AudioStreamPlayer
 var music_bar: Control
 var music_files: Array[String] = []
+var music_metadata := {}
 var current_music_index := -1
 var saved_music_path := ""
 var music_loop := false
 var music_volume := 0.7
+var music_autoplay_enabled := true
 var music_list_panel: PanelContainer
 var music_list: VBoxContainer
 var track_label: Label
@@ -32,11 +35,12 @@ var music_title_label: Label
 var localizer
 
 
-func setup(parent: Control, saved_path: String, loop_enabled: bool, volume: float, localization_service = null) -> void:
+func setup(parent: Control, saved_path: String, loop_enabled: bool, volume: float, localization_service = null, autoplay_enabled: bool = true) -> void:
 	localizer = localization_service
 	saved_music_path = saved_path
 	music_loop = loop_enabled
 	music_volume = volume
+	music_autoplay_enabled = autoplay_enabled
 	_build_bottom_bar(parent)
 	_build_audio_player()
 	_scan_music_files()
@@ -46,8 +50,17 @@ func get_state() -> Dictionary:
 	return {
 		"current_path": saved_music_path,
 		"loop": music_loop,
-		"volume": music_volume
+		"volume": music_volume,
+		"autoplay": music_autoplay_enabled
 	}
+
+
+func set_autoplay_enabled(enabled: bool) -> void:
+	music_autoplay_enabled = enabled
+	if not enabled and music_player != null and music_player.playing:
+		music_player.stream_paused = true
+		_refresh_play_button(false)
+	state_changed.emit()
 
 
 func set_ui_visible(is_visible: bool) -> void:
@@ -170,6 +183,7 @@ func _scan_music_files() -> void:
 			if ext == "ogg" or ext == "mp3" or ext == "wav":
 				music_files.append("%s/%s" % [MUSIC_ROOT, file_name])
 	_load_music_manifest()
+	_load_music_metadata()
 	music_files.sort()
 	_refresh_music_list()
 	if music_files.is_empty():
@@ -198,6 +212,30 @@ func _load_music_manifest() -> void:
 			continue
 		if not music_files.has(music_path):
 			music_files.append(music_path)
+
+
+func _load_music_metadata() -> void:
+	music_metadata.clear()
+	var file := FileAccess.open(MUSIC_TRACK_DEFS_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var parsed = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	var tracks = parsed.get("tracks", [])
+	if typeof(tracks) != TYPE_ARRAY:
+		return
+	for track in tracks:
+		if typeof(track) != TYPE_DICTIONARY:
+			continue
+		if not bool(track.get("enabled", true)):
+			continue
+		var path := str(track.get("path", ""))
+		if path == "":
+			continue
+		music_metadata[path] = track
+		if not music_files.has(path):
+			music_files.append(path)
 
 
 func _refresh_music_list() -> void:
@@ -315,6 +353,14 @@ func _update_track_label() -> void:
 
 
 func _music_display_name(path: String) -> String:
+	if music_metadata.has(path):
+		var track: Dictionary = music_metadata[path]
+		var display_name := str(track.get("display_name", ""))
+		var artist := str(track.get("artist", ""))
+		if display_name != "" and artist != "":
+			return "%s - %s" % [display_name, artist]
+		if display_name != "":
+			return display_name
 	return path.get_file().get_basename()
 
 
@@ -364,7 +410,7 @@ func _music_index_for_saved_path() -> int:
 
 
 func _can_autoplay_music() -> bool:
-	return DisplayServer.get_name() != "headless"
+	return music_autoplay_enabled and DisplayServer.get_name() != "headless"
 
 
 func _new_panel() -> PanelContainer:

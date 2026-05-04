@@ -209,13 +209,7 @@ func _rebuild_items() -> void:
 	for item in current_items:
 		if typeof(item) != TYPE_DICTIONARY:
 			continue
-		var button := Button.new()
-		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.custom_minimum_size = Vector2(0, 36)
-		button.text = _item_text(item)
-		button.disabled = bool(item.get("unlocked", false))
-		button.pressed.connect(_show_confirm.bind(item))
-		item_list.add_child(button)
+		item_list.add_child(_build_item_card(item))
 
 
 func _item_text(item: Dictionary) -> String:
@@ -223,6 +217,48 @@ func _item_text(item: Dictionary) -> String:
 	if bool(item.get("unlocked", false)):
 		return "%s  -  %s" % [name, _tr("store.unlocked")]
 	return "%s  -  %s" % [name, _trf("store.cost", {"focus_points": int(item.get("cost_focus_points", 0))})]
+
+
+func _build_item_card(item: Dictionary) -> Control:
+	var card := PanelContainer.new()
+	card.add_theme_stylebox_override("panel", _new_item_style(bool(item.get("unlocked", false))))
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	card.add_child(margin)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	margin.add_child(row)
+
+	row.add_child(_thumbnail_or_swatch(item, Vector2(72, 42)))
+
+	var text_box := VBoxContainer.new()
+	text_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	text_box.add_theme_constant_override("separation", 2)
+	row.add_child(text_box)
+
+	var name := Label.new()
+	name.text = str(item.get("name", ""))
+	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	text_box.add_child(name)
+
+	var detail := Label.new()
+	detail.text = _tr("store.unlocked") if bool(item.get("unlocked", false)) else _trf("store.cost", {"focus_points": int(item.get("cost_focus_points", 0))})
+	detail.add_theme_font_size_override("font_size", 12)
+	detail.add_theme_color_override("font_color", Color(0.82, 0.84, 0.86, 0.9))
+	text_box.add_child(detail)
+
+	var action := Button.new()
+	action.custom_minimum_size = Vector2(84, 30)
+	action.text = _tr("store.unlocked") if bool(item.get("unlocked", false)) else _tr("store.buy")
+	action.disabled = bool(item.get("unlocked", false))
+	action.pressed.connect(_show_confirm.bind(item))
+	row.add_child(action)
+	return card
 
 
 func _show_confirm(item: Dictionary) -> void:
@@ -274,6 +310,56 @@ func _new_panel_style(alpha: float) -> StyleBoxFlat:
 	style.corner_radius_bottom_left = 8
 	style.corner_radius_bottom_right = 8
 	return style
+
+
+func _new_item_style(unlocked: bool) -> StyleBoxFlat:
+	var style := _new_panel_style(0.42)
+	if unlocked:
+		style.bg_color = Color(0.05, 0.08, 0.06, 0.58)
+		style.border_color = Color(0.55, 0.8, 0.66, 0.55)
+	return style
+
+
+func _swatch_color(content_id: String, unlocked: bool) -> Color:
+	if not unlocked:
+		return Color(0.16, 0.16, 0.17, 0.95)
+	if content_id.contains("good"):
+		return Color(0.42, 0.34, 0.2, 0.95)
+	if content_id.contains("troubled"):
+		return Color(0.28, 0.24, 0.34, 0.95)
+	if content_id.contains("room"):
+		return Color(0.30, 0.28, 0.24, 0.95)
+	return Color(0.24, 0.30, 0.28, 0.95)
+
+
+func _thumbnail_or_swatch(item: Dictionary, size: Vector2) -> Control:
+	var path := str(item.get("thumbnail_path", ""))
+	var thumbnail := _load_thumbnail_texture(path)
+	if thumbnail != null:
+		var texture_rect := TextureRect.new()
+		texture_rect.custom_minimum_size = size
+		texture_rect.texture = thumbnail
+		texture_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		texture_rect.modulate = Color.WHITE if bool(item.get("unlocked", false)) else Color(0.45, 0.45, 0.45, 1.0)
+		return texture_rect
+	var swatch := ColorRect.new()
+	swatch.custom_minimum_size = size
+	swatch.color = _swatch_color(str(item.get("content_id", "")), bool(item.get("unlocked", false)))
+	return swatch
+
+
+func _load_thumbnail_texture(path: String) -> Texture2D:
+	if path == "":
+		return null
+	if ResourceLoader.exists(path):
+		return load(path)
+	if not FileAccess.file_exists(path):
+		return null
+	var image := Image.new()
+	if image.load(path) != OK:
+		return null
+	return ImageTexture.create_from_image(image)
 
 
 func _tr(key: String) -> String:

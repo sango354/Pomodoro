@@ -85,9 +85,14 @@ The MVP game scene currently covers the M1 loop from the product spec:
 - Play music from `res://assets/music`, restoring the last played track when
   possible.
 - Open a top-right Store panel for background Spine unlock placeholders.
-- Switch background mode from the bottom-right `BG` menu between Lo-fi,
-  Background 01, and Background 02.
+- Open Background Inventory from top-right `UL` or bottom-right `BG`.
+- Equip unlocked background modes from Background Inventory, including Lo-fi
+  automatic mode, Lo-fi variants, Background 01, and Background 02.
+- Open Stats & Goals from top-right `ST`.
+- Track daily missions, claim mission rewards, and unlock achievements.
 - Save selected background mode to `user://save.json`.
+- Show a top-left progress HUD for compact Focus Points, Focus Level, and XP
+  progress.
 
 Current UI implementation notes:
 
@@ -102,12 +107,26 @@ Current UI implementation notes:
 - Break interaction dialogue is loaded from `res://data/dialogue_defs.json`.
 - Localized UI text is loaded from `res://data/localization.csv`.
 - The top-right Option button opens a panel with language switching and Break
-  Video on/off plus Ambient Prompt Low/Normal frequency.
+  Video on/off, Break Video file selection, Music Autoplay, Alarm Sound, and
+  Ambient Prompt Low/Normal frequency.
 - The saved game payload includes `app_settings.language`,
   `app_settings.break_media_enabled`, `app_settings.break_media_path`, and
   `app_settings.ambient_prompt_frequency`.
 - Break media assets currently exist under `res://assets/videos/break/`.
 - Background unlock content is defined in `res://data/background_defs.json`.
+- Background thumbnails are stored in
+  `res://assets/thumbnails/backgrounds/` and referenced by `thumbnail_path` in
+  `res://data/background_defs.json`.
+- Background Inventory logic lives in
+  `res://scripts/inventory_panel_controller.gd`.
+- Background data integrity can be checked with
+  `res://scripts/content_integrity_probe.gd`, including localization
+  placeholder parity across supported languages.
+- Music metadata is defined in `res://data/music_track_defs.json`.
+- Daily mission definitions are in `res://data/mission_defs.json`.
+- Achievement definitions are in `res://data/achievement_defs.json`.
+- Mission and achievement reward rules can be checked with
+  `res://scripts/mission_achievement_probe.gd`.
 - Room Background 01 and Room Background 02 are Store content items and are
   currently default unlocked.
 - Purchased background unlocks are saved in `user://save.json` under

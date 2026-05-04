@@ -16,10 +16,15 @@ const SessionRewardCoordinator = preload("res://scripts/session_reward_coordinat
 const BreakMediaController = preload("res://scripts/break_media_controller.gd")
 const ContentUnlockService = preload("res://scripts/content_unlock_service.gd")
 const StorePanelController = preload("res://scripts/store_panel_controller.gd")
+const InventoryPanelController = preload("res://scripts/inventory_panel_controller.gd")
+const MissionAchievementService = preload("res://scripts/mission_achievement_service.gd")
+const StatsPanelController = preload("res://scripts/stats_panel_controller.gd")
 
 const SAVE_PATH := "user://save.json"
 const ALARM_SOUND_PATH := "res://assets/sfx/alarm_placeholder.wav"
+const ALARM_SOUND_PATHS := ["res://assets/sfx/alarm_placeholder.wav"]
 const DEFAULT_BREAK_MEDIA_PATH := "res://assets/videos/break/video.mp4"
+const BREAK_MEDIA_PATHS := ["res://assets/videos/break/video.mp4", "res://assets/videos/break/video.ogv"]
 const SETTINGS_PANEL_WIDTH := 264
 const TIMER_RAIL_WIDTH := 190
 const DEFAULT_FOCUS_MINUTES := 5
@@ -71,6 +76,14 @@ var bond_progress := {
 	"bond_points_lifetime": 0
 }
 var daily_stats := {
+	"local_date": "",
+	"focus_minutes_completed": 0,
+	"focus_minutes_partial": 0,
+	"completed_sessions": 0,
+	"partial_sessions": 0,
+	"tasks_completed": 0
+}
+var lifetime_stats := {
 	"focus_minutes_completed": 0,
 	"focus_minutes_partial": 0,
 	"completed_sessions": 0,
@@ -86,17 +99,22 @@ var task_controller: Node
 var result_controller: Node
 var break_media_controller: Node
 var store_controller: Node
+var inventory_controller: Node
+var stats_panel_controller: Node
 
 var root_2d: Node2D
 var ui_layer: CanvasLayer
 var app_container: Control
 var message_label: Label
 var top_bar: Control
+var left_progress_hud: Control
 var bottom_mode_controls: Control
-var background_menu_panel: PanelContainer
 var fp_label: Button
 var level_label: Button
 var bond_label: Button
+var left_focus_points_label: Label
+var left_level_label: Label
+var left_xp_bar: ProgressBar
 var stats_label: Label
 var duration_minutes := DEFAULT_FOCUS_MINUTES
 var break_duration_minutes := DEFAULT_BREAK_MINUTES
@@ -106,15 +124,21 @@ var timer_settings: Node
 var saved_music_path := ""
 var music_loop := false
 var music_volume := 0.7
+var music_autoplay_enabled := true
 var music_controller: Node
 var companion_controller: Node
 var alarm_player: AudioStreamPlayer
+var alarm_sound_path := ALARM_SOUND_PATH
 var language_code := "en"
 var break_media_enabled := false
 var break_media_path := DEFAULT_BREAK_MEDIA_PATH
 var ambient_prompt_frequency := AMBIENT_PROMPT_NORMAL
 var interaction_history: Array = []
 var background_defs: Array = []
+var mission_defs: Array = []
+var achievement_defs: Array = []
+var daily_missions: Array = []
+var user_achievements: Array = []
 var unlocked_content: Array = []
 var ambient_prompt_elapsed_sec := 0.0
 var ambient_prompt_visible_sec := 0.0
@@ -132,7 +156,12 @@ var selected_background_id := BACKGROUND_LOFI_AUTO
 func _ready() -> void:
 	_load_save()
 	background_defs = ContentUnlockService.load_background_defs()
+	mission_defs = MissionAchievementService.load_mission_defs()
+	achievement_defs = MissionAchievementService.load_achievement_defs()
 	localizer = LocalizationService.new(language_code)
+	_reset_daily_stats_if_needed()
+	_hydrate_lifetime_stats_if_needed()
+	_refresh_mission_achievement_state(false)
 	_apply_time_context()
 	manual_time_state = _time_state_from_context()
 	_build_scene()
@@ -212,17 +241,26 @@ func _build_scene() -> void:
 
 	option_controller = OptionPanelController.new()
 	add_child(option_controller)
-	option_controller.setup(layers, localizer, break_media_enabled, ambient_prompt_frequency)
+	option_controller.setup(layers, localizer, break_media_enabled, ambient_prompt_frequency, music_autoplay_enabled, break_media_path, alarm_sound_path)
 	option_controller.language_previous_pressed.connect(_on_previous_language_pressed)
 	option_controller.language_next_pressed.connect(_on_next_language_pressed)
 	option_controller.break_media_pressed.connect(_on_break_media_toggled)
+	option_controller.break_media_path_pressed.connect(_on_break_media_path_pressed)
 	option_controller.ambient_prompt_pressed.connect(_on_ambient_prompt_frequency_pressed)
+	option_controller.music_autoplay_pressed.connect(_on_music_autoplay_toggled)
+	option_controller.alarm_sound_pressed.connect(_on_alarm_sound_pressed)
 
 	_build_top_bar(layers)
+	_build_left_progress_hud(layers)
 	store_controller = StorePanelController.new()
 	add_child(store_controller)
 	store_controller.setup(layers, localizer)
 	store_controller.purchase_requested.connect(_on_store_purchase_requested)
+	inventory_controller = InventoryPanelController.new()
+	add_child(inventory_controller)
+	inventory_controller.setup(layers, localizer)
+	inventory_controller.background_selected.connect(_select_background)
+	inventory_controller.store_requested.connect(_open_store_panel)
 	task_controller = TaskPanelController.new()
 	add_child(task_controller)
 	task_controller.setup(layers, tasks, localizer)
@@ -256,6 +294,10 @@ func _build_scene() -> void:
 	result_controller.setup(layers, localizer)
 	result_controller.mark_task_done_pressed.connect(_on_mark_bound_task_done)
 	result_controller.break_pressed.connect(_on_break_pressed)
+	stats_panel_controller = StatsPanelController.new()
+	add_child(stats_panel_controller)
+	stats_panel_controller.setup(layers, localizer)
+	stats_panel_controller.mission_claim_requested.connect(_on_mission_claim_requested)
 	companion_controller = CompanionPanelController.new()
 	add_child(companion_controller)
 	companion_controller.setup(layers, localizer)
@@ -272,7 +314,7 @@ func _build_scene() -> void:
 	music_controller = MusicPlayerController.new()
 	add_child(music_controller)
 	music_controller.state_changed.connect(_save_game)
-	music_controller.setup(layers, saved_music_path, music_loop, music_volume, localizer)
+	music_controller.setup(layers, saved_music_path, music_loop, music_volume, localizer, music_autoplay_enabled)
 	_build_bottom_mode_controls(layers)
 	_build_alarm_player()
 
@@ -317,6 +359,7 @@ func _build_top_bar(parent: Control) -> void:
 
 	var unlocks := _new_icon_button("UL", "Unlocks")
 	unlocks_label = unlocks
+	unlocks.pressed.connect(_toggle_inventory_panel)
 	row.add_child(unlocks)
 
 	var shop := _new_icon_button("SH", "Store")
@@ -332,6 +375,64 @@ func _build_top_bar(parent: Control) -> void:
 	var option_button := option_controller.create_top_bar_button() as Button
 	row.add_child(option_button)
 	option_controller.refresh_text()
+
+
+func _build_left_progress_hud(parent: Control) -> void:
+	var hud := PanelContainer.new()
+	left_progress_hud = hud
+	hud.name = "LeftProgressHUD"
+	hud.anchor_left = 0.0
+	hud.anchor_top = 0.0
+	hud.anchor_right = 0.0
+	hud.anchor_bottom = 0.0
+	hud.offset_left = 0
+	hud.offset_top = 0
+	hud.offset_right = 286
+	hud.offset_bottom = 52
+	hud.add_theme_stylebox_override("panel", _new_panel_style(0.18))
+	parent.add_child(hud)
+
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 12)
+	margin.add_theme_constant_override("margin_right", 12)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	hud.add_child(margin)
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 20)
+	margin.add_child(row)
+
+	var points_group := HBoxContainer.new()
+	points_group.add_theme_constant_override("separation", 6)
+	row.add_child(points_group)
+
+	var points_icon := Label.new()
+	points_icon.text = "◇"
+	points_icon.add_theme_font_size_override("font_size", 24)
+	points_icon.add_theme_color_override("font_color", Color(0.88, 0.96, 1.0, 1.0))
+	points_group.add_child(points_icon)
+
+	left_focus_points_label = Label.new()
+	left_focus_points_label.add_theme_font_size_override("font_size", 24)
+	left_focus_points_label.add_theme_color_override("font_color", Color(0.94, 0.97, 1.0, 1.0))
+	points_group.add_child(left_focus_points_label)
+
+	var level_group := HBoxContainer.new()
+	level_group.add_theme_constant_override("separation", 6)
+	row.add_child(level_group)
+
+	left_level_label = Label.new()
+	left_level_label.add_theme_font_size_override("font_size", 24)
+	left_level_label.add_theme_color_override("font_color", Color(0.26, 0.80, 1.0, 1.0))
+	level_group.add_child(left_level_label)
+
+	left_xp_bar = ProgressBar.new()
+	left_xp_bar.custom_minimum_size = Vector2(92, 18)
+	left_xp_bar.show_percentage = false
+	left_xp_bar.add_theme_stylebox_override("background", _new_bar_style(Color(0.06, 0.13, 0.30, 0.82), Color(0.90, 0.96, 1.0, 0.95)))
+	left_xp_bar.add_theme_stylebox_override("fill", _new_bar_style(Color(0.20, 0.72, 0.88, 0.95), Color(0.20, 0.72, 0.88, 0.95)))
+	level_group.add_child(left_xp_bar)
 
 
 func _build_bottom_mode_controls(parent: Control) -> void:
@@ -379,85 +480,8 @@ func _build_bottom_mode_controls(parent: Control) -> void:
 
 	var background_button := _new_icon_button("BG", "Background")
 	background_button.custom_minimum_size = Vector2(46, 32)
-	background_button.pressed.connect(_toggle_background_menu)
+	background_button.pressed.connect(_toggle_inventory_panel)
 	row.add_child(background_button)
-
-	_build_background_menu(parent)
-
-
-func _build_background_menu(parent: Control) -> void:
-	background_menu_panel = _new_panel()
-	background_menu_panel.name = "BackgroundMenu"
-	background_menu_panel.visible = false
-	background_menu_panel.z_index = 170
-	background_menu_panel.anchor_left = 1.0
-	background_menu_panel.anchor_top = 1.0
-	background_menu_panel.anchor_right = 1.0
-	background_menu_panel.anchor_bottom = 1.0
-	background_menu_panel.offset_left = -250
-	background_menu_panel.offset_top = -206
-	background_menu_panel.offset_right = -64
-	background_menu_panel.offset_bottom = -58
-	parent.add_child(background_menu_panel)
-	_refresh_background_menu()
-
-
-func _refresh_background_menu() -> void:
-	if background_menu_panel == null:
-		return
-	var box: VBoxContainer
-	if background_menu_panel.get_child_count() == 0:
-		box = _panel_box(background_menu_panel)
-	else:
-		var margin := background_menu_panel.get_child(0)
-		box = margin.get_child(0) as VBoxContainer
-	for child in box.get_children():
-		child.queue_free()
-
-	var title := _new_title(localizer.translate("background_menu.title") if localizer != null else "Background")
-	title.add_theme_font_size_override("font_size", 16)
-	box.add_child(title)
-	for item in _background_menu_items():
-		var button := Button.new()
-		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		button.custom_minimum_size = Vector2(0, 30)
-		button.text = str(item.get("name", ""))
-		button.disabled = bool(item.get("locked", false))
-		button.tooltip_text = str(item.get("tooltip", ""))
-		button.pressed.connect(_select_background.bind(str(item.get("id", BACKGROUND_LOFI_AUTO))))
-		box.add_child(button)
-
-
-func _background_menu_items() -> Array:
-	var items := [
-		{
-			"id": BACKGROUND_LOFI_AUTO,
-			"name": _selected_prefix(BACKGROUND_LOFI_AUTO) + localizer.translate("background_menu.lofi"),
-			"locked": false,
-			"tooltip": localizer.translate("background_menu.lofi")
-		}
-	]
-	for entry in [
-		{"id": "room_bg_01", "key": "background_menu.room_01"},
-		{"id": "room_bg_02", "key": "background_menu.room_02"}
-	]:
-		var content_id: String = str(entry.id)
-		var definition := ContentUnlockService.find_by_content_id(background_defs, content_id)
-		var locked: bool = definition.is_empty() or not ContentUnlockService.is_unlocked(definition, unlocked_content)
-		var label: String = localizer.translate(str(entry.key))
-		if locked:
-			label = "%s  -  %s" % [label, localizer.translate("background_menu.locked")]
-		items.append({
-			"id": content_id,
-			"name": _selected_prefix(content_id) + label,
-			"locked": locked,
-			"tooltip": label
-		})
-	return items
-
-
-func _selected_prefix(background_id: String) -> String:
-	return "✓ " if selected_background_id == background_id else ""
 
 
 func _build_stats_overlay(parent: Control) -> void:
@@ -490,6 +514,14 @@ func _new_panel_style(alpha: float) -> StyleBoxFlat:
 	style.corner_radius_top_right = 8
 	style.corner_radius_bottom_left = 8
 	style.corner_radius_bottom_right = 8
+	return style
+
+
+func _new_bar_style(bg_color: Color, border_color: Color) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg_color
+	style.border_color = border_color
+	style.set_border_width_all(2)
 	return style
 
 
@@ -536,11 +568,18 @@ func _build_alarm_player() -> void:
 		return
 	alarm_player = AudioStreamPlayer.new()
 	alarm_player.name = "AlarmPlayer"
-	if ResourceLoader.exists(ALARM_SOUND_PATH):
-		alarm_player.stream = load(ALARM_SOUND_PATH)
+	_load_alarm_stream()
 	if alarm_player.stream == null:
 		alarm_player.stream = _new_silent_alarm_stream()
 	add_child(alarm_player)
+
+
+func _load_alarm_stream() -> void:
+	if alarm_player == null:
+		return
+	alarm_player.stream = null
+	if ResourceLoader.exists(alarm_sound_path):
+		alarm_player.stream = load(alarm_sound_path)
 
 
 func _new_silent_alarm_stream() -> AudioStreamWAV:
@@ -751,11 +790,13 @@ func _finish_session(status: String, start_break_after: bool = false) -> void:
 	}
 	sessions.append(session)
 	_update_stats(status, actual_sec)
+	var goal_summary := _refresh_mission_achievement_state(true)
 	selected_context.mood = "good" if status == "completed" else "troubled"
 	spine_background.load_selected_background()
 	_save_game()
 	_play_alarm()
 	_show_result_panel(status, actual_sec, rewards, bond_level_up_text, not start_break_after)
+	_append_goal_summary(goal_summary)
 	if start_break_after:
 		_start_break_countdown()
 		return
@@ -823,6 +864,9 @@ func _on_mark_bound_task_done() -> void:
 	if bool(result.get("changed", false)):
 		if result_controller != null and result_controller.has_method("append_reward_line"):
 			result_controller.append_reward_line(str(result.get("summary", "")))
+		lifetime_stats.tasks_completed += 1
+		var goal_summary := _refresh_mission_achievement_state(true)
+		_append_goal_summary(goal_summary)
 		_save_game()
 		_refresh_all()
 
@@ -844,6 +888,9 @@ func _on_task_renamed() -> void:
 
 func _on_task_completed(_task_id: String) -> void:
 	daily_stats.tasks_completed += 1
+	lifetime_stats.tasks_completed += 1
+	_refresh_mission_achievement_state(true)
+	_save_game()
 
 
 func _selected_task_id() -> String:
@@ -949,6 +996,20 @@ func _on_break_media_toggled() -> void:
 	_save_game()
 
 
+func _on_break_media_path_pressed() -> void:
+	var current_index := BREAK_MEDIA_PATHS.find(break_media_path)
+	if current_index < 0:
+		current_index = 0
+	else:
+		current_index = (current_index + 1) % BREAK_MEDIA_PATHS.size()
+	break_media_path = BREAK_MEDIA_PATHS[current_index]
+	if option_controller != null and option_controller.has_method("refresh_break_media_path"):
+		option_controller.refresh_break_media_path(break_media_path)
+	if break_media_controller != null and break_media_controller.has_method("set_media_path"):
+		break_media_controller.set_media_path(break_media_path)
+	_save_game()
+
+
 func _on_ambient_prompt_frequency_pressed() -> void:
 	if ambient_prompt_frequency == AMBIENT_PROMPT_NORMAL:
 		ambient_prompt_frequency = AMBIENT_PROMPT_LOW
@@ -961,6 +1022,30 @@ func _on_ambient_prompt_frequency_pressed() -> void:
 		_hide_ambient_prompt(true)
 	if option_controller != null and option_controller.has_method("refresh_ambient_prompt"):
 		option_controller.refresh_ambient_prompt(ambient_prompt_frequency)
+	_save_game()
+
+
+func _on_music_autoplay_toggled() -> void:
+	music_autoplay_enabled = not music_autoplay_enabled
+	if option_controller != null and option_controller.has_method("refresh_music_autoplay"):
+		option_controller.refresh_music_autoplay(music_autoplay_enabled)
+	if music_controller != null and music_controller.has_method("set_autoplay_enabled"):
+		music_controller.set_autoplay_enabled(music_autoplay_enabled)
+	_save_game()
+
+
+func _on_alarm_sound_pressed() -> void:
+	var current_index := ALARM_SOUND_PATHS.find(alarm_sound_path)
+	if current_index < 0:
+		current_index = 0
+	else:
+		current_index = (current_index + 1) % ALARM_SOUND_PATHS.size()
+	alarm_sound_path = ALARM_SOUND_PATHS[current_index]
+	if option_controller != null and option_controller.has_method("refresh_alarm_sound"):
+		option_controller.refresh_alarm_sound(alarm_sound_path)
+	_load_alarm_stream()
+	if alarm_player != null and alarm_player.stream == null:
+		alarm_player.stream = _new_silent_alarm_stream()
 	_save_game()
 
 
@@ -981,7 +1066,11 @@ func _refresh_localized_text() -> void:
 		option_controller.refresh_text()
 	if store_controller != null and store_controller.has_method("set_localizer"):
 		store_controller.set_localizer(localizer)
-	_refresh_background_menu()
+	if inventory_controller != null and inventory_controller.has_method("set_localizer"):
+		inventory_controller.set_localizer(localizer)
+	if stats_panel_controller != null and stats_panel_controller.has_method("set_localizer"):
+		stats_panel_controller.set_localizer(localizer)
+	_refresh_inventory_items()
 	_refresh_all()
 
 
@@ -1030,7 +1119,14 @@ func _play_alarm() -> void:
 
 
 func _toggle_stats_message() -> void:
-	stats_label.visible = not stats_label.visible
+	if stats_panel_controller == null:
+		stats_label.visible = not stats_label.visible
+		return
+	if stats_panel_controller.has_method("is_visible") and stats_panel_controller.is_visible():
+		stats_panel_controller.hide_panel()
+		return
+	_record_interaction_event("stats_screen_viewed", "stats_panel")
+	stats_panel_controller.show_panel(_stats_snapshot(), _mission_items(), _achievement_items())
 
 
 func _toggle_simple_mode() -> void:
@@ -1051,6 +1147,8 @@ func _toggle_timer_ui() -> void:
 func _apply_ui_visibility() -> void:
 	if top_bar != null:
 		top_bar.visible = not simple_mode_enabled
+	if left_progress_hud != null:
+		left_progress_hud.visible = not simple_mode_enabled
 	if stats_label != null:
 		stats_label.visible = false if simple_mode_enabled else stats_label.visible
 	if option_controller != null and simple_mode_enabled and option_controller.has_method("hide"):
@@ -1059,6 +1157,8 @@ func _apply_ui_visibility() -> void:
 		store_controller.hide_store()
 	if result_controller != null and simple_mode_enabled and result_controller.has_method("hide_result"):
 		result_controller.hide_result()
+	if stats_panel_controller != null and simple_mode_enabled and stats_panel_controller.has_method("hide_panel"):
+		stats_panel_controller.hide_panel()
 	if music_controller != null and music_controller.has_method("set_ui_visible"):
 		music_controller.set_ui_visible(not simple_mode_enabled)
 	if task_controller != null and task_controller.has_method("set_panel_visible"):
@@ -1072,8 +1172,8 @@ func _apply_ui_visibility() -> void:
 		_hide_ambient_prompt()
 	if break_media_controller != null and simple_mode_enabled:
 		_stop_break_media()
-	if background_menu_panel != null and simple_mode_enabled:
-		background_menu_panel.visible = false
+	if inventory_controller != null and simple_mode_enabled and inventory_controller.has_method("hide_inventory"):
+		inventory_controller.hide_inventory()
 
 
 func _cycle_time_context() -> void:
@@ -1095,23 +1195,28 @@ func _cycle_time_context() -> void:
 			selected_context.time = "day"
 			selected_context.weather = "clear"
 	spine_background.load_selected_background()
+	_record_interaction_event("context_switched", _context_id())
 
 
-func _toggle_background_menu() -> void:
-	if background_menu_panel == null:
+func _toggle_inventory_panel() -> void:
+	if inventory_controller == null:
 		return
-	_refresh_background_menu()
-	background_menu_panel.visible = not background_menu_panel.visible
+	if inventory_controller.has_method("is_inventory_visible") and inventory_controller.is_inventory_visible():
+		inventory_controller.hide_inventory()
+		return
+	inventory_controller.show_inventory(_inventory_items(), selected_background_id)
 
 
 func _select_background(background_id: String) -> void:
 	selected_background_id = background_id
-	if background_menu_panel != null:
-		background_menu_panel.visible = false
+	if inventory_controller != null and inventory_controller.has_method("hide_inventory"):
+		inventory_controller.hide_inventory()
 	if spine_background != null and spine_background.has_method("set_selected_background"):
 		spine_background.set_selected_background(selected_background_id)
 		spine_background.load_selected_background()
+	_record_interaction_event("content_equipped", selected_background_id)
 	_save_game()
+	_refresh_inventory_items()
 
 
 func _toggle_store_panel() -> void:
@@ -1120,11 +1225,26 @@ func _toggle_store_panel() -> void:
 	if store_controller.has_method("is_store_visible") and store_controller.is_store_visible():
 		store_controller.hide_store()
 		return
+	_open_store_panel()
+
+
+func _open_store_panel() -> void:
+	if store_controller == null:
+		return
 	store_controller.show_store(_store_items())
 
 
 func _store_items() -> Array:
 	return ContentUnlockService.store_items(background_defs, unlocked_content, localizer)
+
+
+func _inventory_items() -> Array:
+	return ContentUnlockService.background_inventory_items(background_defs, unlocked_content, selected_background_id, localizer)
+
+
+func _refresh_inventory_items() -> void:
+	if inventory_controller != null and inventory_controller.has_method("refresh_items"):
+		inventory_controller.refresh_items(_inventory_items(), selected_background_id)
 
 
 func _on_store_purchase_requested(content_id: String) -> void:
@@ -1136,10 +1256,12 @@ func _on_store_purchase_requested(content_id: String) -> void:
 		if spine_background != null and spine_background.has_method("set_content_state"):
 			spine_background.set_content_state(background_defs, unlocked_content)
 			spine_background.load_selected_background()
-		_refresh_background_menu()
+		_refresh_inventory_items()
 		if store_controller != null:
 			store_controller.refresh_items(_store_items())
 			store_controller.show_status(localizer.translate("store.purchase_success"))
+		_refresh_mission_achievement_state(true)
+		_save_game()
 		return
 	if store_controller == null:
 		return
@@ -1158,10 +1280,21 @@ func _refresh_tasks_ui() -> void:
 
 
 func _refresh_progress_ui() -> void:
+	_refresh_stats_panel()
 	fp_label.text = "FP"
 	fp_label.tooltip_text = "%s: %d" % [localizer.translate("top.focus_points"), currencies.focus_points]
 	level_label.text = "LV"
 	level_label.tooltip_text = "%s %d  XP %d / %d" % [localizer.translate("top.focus_level"), level_progress.focus_level, level_progress.focus_xp, _xp_required_for_next_level()]
+	if left_focus_points_label != null:
+		left_focus_points_label.text = _compact_number(int(currencies.get("focus_points", 0)))
+		left_focus_points_label.tooltip_text = fp_label.tooltip_text
+	if left_level_label != null:
+		left_level_label.text = str(level_progress.focus_level)
+		left_level_label.tooltip_text = level_label.tooltip_text
+	if left_xp_bar != null:
+		left_xp_bar.max_value = max(1, _xp_required_for_next_level())
+		left_xp_bar.value = int(level_progress.get("focus_xp", 0))
+		left_xp_bar.tooltip_text = level_label.tooltip_text
 	bond_label.text = "BD"
 	bond_label.tooltip_text = "%s Lv.%d  %d / %d" % [localizer.translate("top.bond"), bond_progress.bond_level, bond_progress.bond_points_current, _bond_required_for_next_level()]
 	if unlocks_label != null:
@@ -1183,14 +1316,164 @@ func _refresh_progress_ui() -> void:
 	]
 
 
+func _refresh_mission_achievement_state(grant_achievement_rewards: bool) -> Dictionary:
+	MissionAchievementService.refresh_daily_missions(mission_defs, daily_missions, _daily_stats_snapshot(), _local_date())
+	var summary := {
+		"claimable_missions": [],
+		"unlocked_achievements": []
+	}
+	for mission in daily_missions:
+		if typeof(mission) == TYPE_DICTIONARY and str(mission.get("status", "")) == "claimable":
+			summary.claimable_missions.append(str(mission.get("mission_id", "")))
+	if grant_achievement_rewards:
+		var unlocked := MissionAchievementService.refresh_achievements(
+			achievement_defs,
+			user_achievements,
+			_lifetime_stats_snapshot(),
+			currencies,
+			level_progress,
+			bond_progress
+		)
+		for achievement_id in unlocked:
+			_record_interaction_event("achievement_unlocked", str(achievement_id))
+			summary.unlocked_achievements.append(str(achievement_id))
+	else:
+		MissionAchievementService.refresh_achievements(
+			achievement_defs,
+			user_achievements,
+			_lifetime_stats_snapshot(),
+			{},
+			{},
+			{},
+			false
+		)
+	_refresh_stats_panel()
+	return summary
+
+
+func _on_mission_claim_requested(mission_id: String) -> void:
+	var result := MissionAchievementService.claim_mission(
+		mission_id,
+		mission_defs,
+		daily_missions,
+		currencies,
+		level_progress,
+		bond_progress
+	)
+	if bool(result.get("changed", false)):
+		_record_interaction_event("mission_claimed", mission_id)
+		if stats_panel_controller != null and stats_panel_controller.has_method("show_status"):
+			stats_panel_controller.show_status(_mission_claim_summary(result))
+		_save_game()
+		_refresh_all()
+
+
+func _append_goal_summary(summary: Dictionary) -> void:
+	if result_controller == null or not result_controller.has_method("append_reward_line"):
+		return
+	var unlocked: Array = summary.get("unlocked_achievements", [])
+	for achievement_id in unlocked:
+		result_controller.append_reward_line(localizer.trf("achievement.result_unlocked", {"name": _achievement_name(achievement_id)}))
+	var claimable: Array = summary.get("claimable_missions", [])
+	if not claimable.is_empty():
+		result_controller.append_reward_line(localizer.translate("mission.result_claimable"))
+
+
+func _mission_claim_summary(result: Dictionary) -> String:
+	return localizer.trf("mission.claimed_summary", {
+		"focus_points": int(result.get("focus_points", 0)),
+		"xp": int(result.get("xp", 0)),
+		"bond": int(result.get("bond", 0))
+	})
+
+
+func _achievement_name(achievement_id: String) -> String:
+	for item in _achievement_items():
+		if typeof(item) == TYPE_DICTIONARY and str(item.get("id", "")) == achievement_id:
+			return str(item.get("name", achievement_id))
+	return achievement_id
+
+
+func _refresh_stats_panel() -> void:
+	if stats_panel_controller != null and stats_panel_controller.has_method("refresh_panel"):
+		stats_panel_controller.refresh_panel(_stats_snapshot(), _mission_items(), _achievement_items())
+
+
+func _mission_items() -> Array:
+	return MissionAchievementService.panel_items(mission_defs, daily_missions, "mission_id", localizer)
+
+
+func _achievement_items() -> Array:
+	return MissionAchievementService.panel_items(achievement_defs, user_achievements, "achievement_id", localizer)
+
+
+func _stats_snapshot() -> Dictionary:
+	return MissionAchievementService.stats_snapshot(daily_stats, sessions, tasks, unlocked_content, level_progress, bond_progress)
+
+
+func _daily_stats_snapshot() -> Dictionary:
+	return MissionAchievementService.stats_snapshot(daily_stats, sessions, tasks, unlocked_content, level_progress, bond_progress)
+
+
+func _lifetime_stats_snapshot() -> Dictionary:
+	return MissionAchievementService.stats_snapshot(lifetime_stats, sessions, tasks, unlocked_content, level_progress, bond_progress)
+
+
+func _local_date() -> String:
+	var dict := Time.get_datetime_dict_from_system()
+	return "%04d-%02d-%02d" % [int(dict.year), int(dict.month), int(dict.day)]
+
+
+func _reset_daily_stats_if_needed() -> void:
+	var today := _local_date()
+	if str(daily_stats.get("local_date", "")) == "":
+		daily_stats.local_date = today
+		return
+	if str(daily_stats.get("local_date", "")) == today:
+		return
+	daily_stats = {
+		"local_date": today,
+		"focus_minutes_completed": 0,
+		"focus_minutes_partial": 0,
+		"completed_sessions": 0,
+		"partial_sessions": 0,
+		"tasks_completed": 0
+	}
+
+
+func _hydrate_lifetime_stats_if_needed() -> void:
+	if int(lifetime_stats.get("completed_sessions", 0)) > 0 or int(lifetime_stats.get("partial_sessions", 0)) > 0:
+		return
+	for session in sessions:
+		if typeof(session) != TYPE_DICTIONARY or str(session.get("mode", "")) != "focus":
+			continue
+		var minutes := int(round(int(session.get("actual_duration_sec", 0)) / 60.0))
+		if str(session.get("status", "")) == "completed":
+			lifetime_stats.completed_sessions += 1
+			lifetime_stats.focus_minutes_completed += minutes
+		elif str(session.get("status", "")) == "partial":
+			lifetime_stats.partial_sessions += 1
+			lifetime_stats.focus_minutes_partial += minutes
+	lifetime_stats.tasks_completed = max(int(lifetime_stats.get("tasks_completed", 0)), int(daily_stats.get("tasks_completed", 0)))
+
+
 func _update_stats(status: String, actual_sec: int) -> void:
 	SessionRewardCoordinator.update_focus_stats(daily_stats, session_mode, status, actual_sec)
+	SessionRewardCoordinator.update_focus_stats(lifetime_stats, session_mode, status, actual_sec)
 
 
 func _format_time(seconds: int) -> String:
 	var minutes := seconds / 60
 	var secs := seconds % 60
 	return "%02d:%02d" % [minutes, secs]
+
+
+func _compact_number(value: int) -> String:
+	if value >= 1000000:
+		return "%.2fm" % (value / 1000000.0)
+	if value >= 1000:
+		return "%.2fk" % (value / 1000.0)
+	return str(value)
 
 
 func _status_title(status: String) -> String:
@@ -1261,6 +1544,9 @@ func _load_save() -> void:
 	level_progress = parsed.get("level_progress", level_progress)
 	bond_progress = parsed.get("bond_progress", bond_progress)
 	daily_stats = parsed.get("daily_stats", daily_stats)
+	lifetime_stats = parsed.get("lifetime_stats", lifetime_stats)
+	daily_missions = parsed.get("daily_missions", daily_missions)
+	user_achievements = parsed.get("user_achievements", user_achievements)
 	interaction_history = parsed.get("interaction_history", interaction_history)
 	unlocked_content = parsed.get("unlocked_content", unlocked_content)
 	var timer_settings = parsed.get("timer_settings", {})
@@ -1275,12 +1561,15 @@ func _load_save() -> void:
 		saved_music_path = str(music_state.get("current_path", saved_music_path))
 		music_loop = bool(music_state.get("loop", music_loop))
 		music_volume = float(music_state.get("volume", music_volume))
+		music_autoplay_enabled = bool(music_state.get("autoplay", music_autoplay_enabled))
 	var app_settings = parsed.get("app_settings", {})
 	if typeof(app_settings) == TYPE_DICTIONARY:
 		language_code = str(app_settings.get("language", language_code))
 		break_media_enabled = bool(app_settings.get("break_media_enabled", break_media_enabled))
 		break_media_path = str(app_settings.get("break_media_path", break_media_path))
 		ambient_prompt_frequency = str(app_settings.get("ambient_prompt_frequency", ambient_prompt_frequency))
+		music_autoplay_enabled = bool(app_settings.get("music_autoplay_enabled", music_autoplay_enabled))
+		alarm_sound_path = str(app_settings.get("alarm_sound_path", alarm_sound_path))
 		selected_background_id = str(app_settings.get("selected_background_id", selected_background_id))
 		if ambient_prompt_frequency != AMBIENT_PROMPT_LOW and ambient_prompt_frequency != AMBIENT_PROMPT_NORMAL and ambient_prompt_frequency != AMBIENT_PROMPT_OFF:
 			ambient_prompt_frequency = AMBIENT_PROMPT_NORMAL
@@ -1303,6 +1592,9 @@ func _save_game() -> void:
 		"level_progress": level_progress,
 		"bond_progress": bond_progress,
 		"daily_stats": daily_stats,
+		"lifetime_stats": lifetime_stats,
+		"daily_missions": daily_missions,
+		"user_achievements": user_achievements,
 		"interaction_history": interaction_history,
 		"unlocked_content": unlocked_content,
 		"timer_settings": {
@@ -1317,6 +1609,8 @@ func _save_game() -> void:
 			"break_media_enabled": break_media_enabled,
 			"break_media_path": break_media_path,
 			"ambient_prompt_frequency": ambient_prompt_frequency,
+			"music_autoplay_enabled": music_autoplay_enabled,
+			"alarm_sound_path": alarm_sound_path,
 			"selected_background_id": selected_background_id
 		}
 	}

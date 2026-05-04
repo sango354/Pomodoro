@@ -1,150 +1,182 @@
-key,en,zh_TW,zh_CN,ja,ko,fr,de,it,ru,es_ES,pt_BR
-result.bond_level_up,Bond Level Up: Lv.{level},羈絆等級提升：Lv.{level},,,,,,,,,
-language.en,English,英文,,,,,,,,,
-language.zh_TW,Traditional Chinese,繁體中文,,,,,,,,,
-language.zh_CN,Simplified Chinese,簡體中文,,,,,,,,,
-language.ja,Japanese,日本語,,,,,,,,,
-language.ko,Korean,한국어,,,,,,,,,
-language.fr,French,Français,,,,,,,,,
-language.de,German,Deutsch,,,,,,,,,
-language.it,Italian,Italiano,,,,,,,,,
-language.ru,Russian,Русский,,,,,,,,,
-language.es_ES,Spanish - Spain,西班牙文-西班牙,,,,,,,,,
-language.pt_BR,Portuguese - Brazil,葡萄牙文-巴西,,,,,,,,,
-option.button,OP,選項,,,,,,,,,
-option.title,Options,選項,,,,,,,,,
-option.language,Language,語言,,,,,,,,,
-option.break_media,Break Video,休息影片,,,,,,,,,
-top.focus_points,Focus Points,專注點數,,,,,,,,,
-top.focus_level,Focus Level,專注等級,,,,,,,,,
-top.bond,Bond,羈絆,,,,,,,,,
-top.unlocks,Unlocks,解鎖,,,,,,,,,
-top.stats,Stats,統計,,,,,,,,,
-tasks.title,Tasks,任務,,,,,,,,,
-tasks.add,Add task,新增任務,,,,,,,,,
-tasks.default_title,Type Here,在此輸入,,,,,,,,,
-tasks.untitled,Untitled,未命名,,,,,,,,,
-tasks.archive,Archive task,封存任務,,,,,,,,,
-timer.focus,Focus,專注,,,,,,,,,
-timer.short_break,Short Break,短休息,,,,,,,,,
-timer.break_label,Break {time},休息 {time},,,,,,,,,
-timer.start,Start,開始,,,,,,,,,
-timer.pause,Pause,暫停,,,,,,,,,
-timer.resume,Resume,繼續,,,,,,,,,
-timer.reset,Reset,重置,,,,,,,,,
-timer.settings,Settings,設定,,,,,,,,,
-timer.state_idle,Idle,待機,,,,,,,,,
-timer.state_running,Running,進行中,,,,,,,,,
-timer.state_paused,Paused,已暫停,,,,,,,,,
-timer.state_completed,Completed,已完成,,,,,,,,,
-timer.state_partial,Partial,部分完成,,,,,,,,,
-timer.state_abandoned,Abandoned,已放棄,,,,,,,,,
-timer.message_focus,Stay with it.,保持專注。,,,,,,,,,
-timer.message_resume,Back in focus,回到專注,,,,,,,,,
-timer.message_pause,Paused,已暫停,,,,,,,,,
-timer.message_break,Take a short break.,短暫休息一下。,,,,,,,,,
-timer.message_session_logged,Session logged.,專注紀錄已儲存。,,,,,,,,,
-settings.title,Timer Settings,番茄鐘設定,,,,,,,,,
-settings.focus_duration,Focus duration,專注時間,,,,,,,,,
-settings.break_duration,Break duration,休息時間,,,,,,,,,
-settings.auto_restart,Auto restart,自動重新開始,,,,,,,,,
-settings.alarm,Alarm,提示音,,,,,,,,,
-settings.on,on,開,,,,,,,,,
-settings.off,off,關,,,,,,,,,
-result.title,Session Result,專注結果,,,,,,,,,
-result.mark_task_done,Mark Task Done,標記任務完成,,,,,,,,,
-result.start_break,Start Break,開始休息,,,,,,,,,
-result.no_reward,No reward. Session was below the reward threshold.,沒有獎勵。專注時間未達獎勵門檻。,,,,,,,,,
-result.reward_summary,+{focus_points} Focus Points  +{xp} XP  +{bond} Bond,+{focus_points} 專注點數  +{xp} 經驗  +{bond} 羈絆,,,,,,,,,
-result.task_bonus,Task bonus: +{focus_points} Focus Points  +{xp} XP,任務獎勵：+{focus_points} 專注點數  +{xp} 經驗,,,,,,,,,
-companion.break_title,Break,休息,,,,,,,,,
-companion.next,Next,下一句,,,,,,,,,
-companion.skip,Skip,略過,,,,,,,,,
-companion.dismiss,Close,關閉,,,,,,,,,
-dialogue.break_001,Nice work. Look away from the screen and let your eyes rest for a moment.,做得好。把視線從螢幕移開，讓眼睛休息一下。,,,,,,,,,
-dialogue.break_002,Take a slow breath. You have already moved the day forward.,慢慢深呼吸。你已經讓今天往前推進了。,,,,,,,,,
-dialogue.break_003,Stretch your shoulders before the next round. I will keep the room quiet.,下一輪之前伸展一下肩膀。我會讓房間保持安靜。,,,,,,,,,
-dialogue.break_004,If you need water this is the right time.,如果需要喝水，現在正是時候。,,,,,,,,,
-dialogue.break_005,Relax your jaw and let your hands rest.,放鬆下巴，也讓雙手休息一下。,,,,,,,,,
-dialogue.break_006,Blink a few times and soften your focus.,眨幾下眼睛，讓視線放柔。,,,,,,,,,
-dialogue.break_007,You kept the promise to yourself for this round.,這一輪你守住了對自己的承諾。,,,,,,,,,
-dialogue.break_008,Let the room stay quiet for a little longer.,讓房間再安靜一會兒。,,,,,,,,,
-dialogue.break_009,A small pause can make the next start easier.,短短停一下，下一次開始會更容易。,,,,,,,,,
-dialogue.break_010,Stand up if you can and let your back reset.,可以的話站起來，讓背部重新放鬆。,,,,,,,,,
-dialogue.break_011,The daylight is still with us. Take it in for a moment.,白天的光還在，稍微感受一下。,,,,,,,,,
-dialogue.break_012,The evening light is softer now. Slow down with it.,傍晚的光變柔了，也跟著慢下來。,,,,,,,,,
-dialogue.break_013,It is late. Keep this break gentle.,時間晚了，這次休息放輕一點。,,,,,,,,,
-dialogue.break_014,The cloudy room feels calm enough for a quiet reset.,陰天的房間很安靜，適合重新整理一下。,,,,,,,,,
-dialogue.break_015,That was a steady round. I noticed.,剛才那輪很穩，我有注意到。,,,,,,,,,
-dialogue.break_016,You are getting better at returning to the work.,你越來越擅長回到工作裡了。,,,,,,,,,
-dialogue.break_017,I will keep watch while you rest your eyes.,你休息眼睛時，我會在旁邊看著。,,,,,,,,,
-dialogue.break_018,You do not have to rush back. The next step can wait a minute.,不用急著回去，下一步可以等一分鐘。,,,,,,,,,
-dialogue.break_019,Even a difficult round still counts as showing up.,就算這輪很不容易，也算是你有出席。,,,,,,,,,
-dialogue.break_020,That went well. Let the good feeling settle before the next one.,剛才很順，讓這份感覺沉一下再開始下一輪。,,,,,,,,,
-dialogue.break_fallback,Take a short break. I will be here for the next round.,短暫休息一下。我會在這裡陪你進入下一輪。,,,,,,,,,
-dialogue.ambient_001,I am here. Keep an easy rhythm.,我在這裡。保持輕鬆的節奏。,,,,,,,,,
-dialogue.ambient_002,One calm step at a time.,一次只走穩一小步。,,,,,,,,,
-dialogue.ambient_003,The timer is moving. You only need to stay with this moment.,計時器正在前進。你只需要留在這一刻。,,,,,,,,,
-dialogue.ambient_004,The room is quiet enough for the next few minutes.,接下來幾分鐘，房間會保持安靜。,,,,,,,,,
-dialogue.ambient_005,Evening work can stay gentle.,傍晚的工作也可以放輕一點。,,,,,,,,,
-dialogue.ambient_006,It is late. Keep the pace kind.,時間晚了，讓步調溫和一點。,,,,,,,,,
-dialogue.ambient_007,You are settling into this well.,你正在慢慢進入狀態。,,,,,,,,,
-dialogue.ambient_008,I will keep the space steady while you work.,你工作時，我會讓這裡保持穩定。,,,,,,,,,
-dialogue.ambient_fallback,I am here. Keep an easy rhythm.,我在這裡。保持輕鬆的節奏。,,,,,,,,,
-music.title,Music,音樂,,,,,,,,,
-music.list,Music list,音樂清單,,,,,,,,,
-music.no_music_loaded,No music loaded,尚未載入音樂,,,,,,,,,
-music.add_files,Add .ogg .mp3 or .wav files to res://assets/music,請將 .ogg .mp3 或 .wav 檔放到 res://assets/music,,,,,,,,,
-music.no_files,No music files found.,找不到音樂檔。,,,,,,,,,
-music.previous,Previous,上一首,,,,,,,,,
-music.play,Play,播放,,,,,,,,,
-music.pause,Pause,暫停,,,,,,,,,
-music.next,Next,下一首,,,,,,,,,
-music.loop,Loop,循環,,,,,,,,,
-music.loop_on,Loop on,循環開啟,,,,,,,,,
-music.loop_off,Loop off,循環關閉,,,,,,,,,
-music.ambience,Ambience,環境音,,,,,,,,,
-stats.completed,Completed,完成,,,,,,,,,
-stats.partial,Partial,部分完成,,,,,,,,,
-stats.focus_minutes,Focus minutes,專注分鐘,,,,,,,,,
-stats.tasks_done,Tasks done,完成任務,,,,,,,,,
-option.ambient_prompt,Ambient Prompt,陪伴提示,,,,,,,,,
-option.ambient_low,Low,低頻率,,,,,,,,,
-option.ambient_normal,Normal,一般,,,,,,,,,
-store.title,Store,商店,,,,,,,,,
-store.confirm_title,Confirm Purchase,確認購買,,,,,,,,,
-store.buy,Buy,購買,,,,,,,,,
-store.cancel,Cancel,取消,,,,,,,,,
-store.cost,{focus_points} Focus Points,{focus_points} 專注點數,,,,,,,,,
-store.unlocked,Unlocked,已解鎖,,,,,,,,,
-store.no_items,No unlocks available.,目前沒有可解鎖項目。,,,,,,,,,
-store.purchase_confirm,Purchase {name} for {focus_points} Focus Points?,要花費 {focus_points} 專注點數購買 {name} 嗎？,,,,,,,,,
-store.purchase_success,Unlocked.,已解鎖。,,,,,,,,,
-store.insufficient,Need {focus_points} Focus Points.,需要 {focus_points} 專注點數。,,,,,,,,,
-store.already_unlocked,Already unlocked.,已經解鎖。,,,,,,,,,
-store.purchase_failed,Purchase failed.,購買失敗。,,,,,,,,,
-content.bg_normal_day,Normal Day,一般白天,,,,,,,,,
-content.bg_normal_night,Normal Night,一般夜晚,,,,,,,,,
-content.bg_normal_sunfall,Normal Sunset,一般黃昏,,,,,,,,,
-content.bg_normal_cloudy,Normal Cloudy,一般陰天,,,,,,,,,
-content.bg_good_day,Good Day,良好白天,,,,,,,,,
-content.bg_good_night,Good Night,良好夜晚,,,,,,,,,
-content.bg_good_sunfall,Good Sunset,良好黃昏,,,,,,,,,
-content.bg_troubled_day,Troubled Day,低落白天,,,,,,,,,
-content.bg_troubled_night,Troubled Night,低落夜晚,,,,,,,,,
-content.bg_troubled_sunfall,Troubled Sunset,低落黃昏,,,,,,,,,
-content.room_bg_01,Room Background 01,房間背景 01,,,,,,,,,
-content.room_bg_02,Room Background 02,房間背景 02,,,,,,,,,
-background_menu.title,Background,背景,,,,,,,,,
-background_menu.lofi,Lofi,Lo-fi,,,,,,,,,
-background_menu.room_01,Background 01,背景 01,,,,,,,,,
-background_menu.room_02,Background 02,背景 02,,,,,,,,,
-background_menu.locked,Locked,未解鎖,,,,,,,,,
-result.focus_duration,Focus duration: {minutes} min,專注設定：{minutes} 分鐘,,,,,,,,,
-result.actual_duration,Actual duration: {minutes} min,實際時間：{minutes} 分鐘,,,,,,,,,
-result.rewards,Rewards: {summary},獎勵：{summary},,,,,,,,,
-result.bond_level_up_line,Bond: {summary},羈絆：{summary},,,,,,,,,
-result.next_action,Next: {action},下一步：{action},,,,,,,,,
-result.next_action_break,Take a break.,開始休息。,,,,,,,,,
-result.next_action_retry,Reset and try another focus round.,重設後再開始一輪專注。,,,,,,,,,
-option.ambient_off,Off,關閉,,,,,,,,,
+"key","en","zh_TW","zh_CN","ja","ko","fr","de","it","ru","es_ES","pt_BR"
+"result.bond_level_up","Bond Level Up: Lv.{level}","羈絆等級提升：Lv.{level}","羁绊等级提升：Lv.{level}","絆レベルアップ：Lv.{level}","유대 레벨 상승: Lv.{level}","Niveau de lien augmente : Nv.{level}","Bindungslevel gestiegen: Lv.{level}","Livello legame aumentato: Lv.{level}","Уровень связи повышен: ур.{level}","Nivel de vínculo aumentado: Nv.{level}","Nível de vínculo aumentado: Nv.{level}"
+"language.en","English","英文","英文","英語","영어","Anglais","Englisch","Inglese","Английский","Inglés","Inglês"
+"language.zh_TW","Traditional Chinese","繁體中文","繁体中文","繁体字中国語","번체 중국어","Chinois traditionnel","Traditionelles Chinesisch","Cinese tradizionale","Традиционный китайский","Chino tradicional","Chinês tradicional"
+"language.zh_CN","Simplified Chinese","簡體中文","简体中文","簡体字中国語","간체 중국어","Chinois simplifié","Vereinfachtes Chinesisch","Cinese semplificato","Упрощенный китайский","Chino simplificado","Chinês simplificado"
+"language.ja","Japanese","日語","日语","日本語","일본어","Japonais","Japanisch","giapponese","японский","japonés","Japonês"
+"language.ko","Korean","韓語","韩语","韓国語","한국어","Coréen","Koreanisch","coreano","корейский","coreano","Coreano"
+"language.fr","French","法語","法语","フランス語","프랑스어","Français","Französisch","francese","французский","francés","Francês"
+"language.de","German","德文","德语","ドイツ語","독일어","Allemand","Deutsch","tedesco","немецкий","alemán","Alemão"
+"language.it","Italian","義大利語","意大利语","イタリア語","이탈리아어","Italien","Italienisch","italiano","итальянский","italiano","Italiano"
+"language.ru","Russian","俄文","俄语","ロシア語","러시아어","russe","Russisch","Russo","русский","ruso","Russo"
+"language.es_ES","Spanish - Spain","西班牙語 - 西班牙","西班牙语 - 西班牙","スペイン語 - スペイン","스페인어 - 스페인","Espagnol - Espagne","Spanisch - Spanien","Spagnolo - Spagna","Испанский - Испания","Español - España","Espanhol - Espanha"
+"language.pt_BR","Portuguese - Brazil","葡萄牙語 - 巴西","葡萄牙语 - 巴西","ポルトガル語 - ブラジル","포르투갈어 - 브라질","Portugais - Brésil","Portugiesisch – Brasilien","Portoghese - Brasile","Португальский - Бразилия","Portugués - Brasil","Português - Brasil"
+"option.button","OP","選項","选项","設定","옵션","Opt.","Opt.","Opz.","Опц.","Opc.","Opç."
+"option.title","Options","選項","选项","オプション","옵션","Possibilités","Optionen","Opzioni","Опции","Opciones","Opções"
+"option.language","Language","語言","语言","言語","언어","Langue","Sprache","Lingua","Язык","Idioma","Idioma"
+"option.break_media","Break Video","打破視頻","打破视频","休憩ビデオ","브레이크 비디오","Pause vidéo","Video unterbrechen","Interrompi il video","Перерыв видео","Romper vídeo","Quebrar vídeo"
+"top.focus_points","Focus Points","焦點","焦点","注目ポイント","초점","Points de concentration","Fokuspunkte","Punti focali","Точки фокусировки","Puntos de enfoque","Pontos de foco"
+"top.focus_level","Focus Level","焦點層級","焦点级别","集中レベル","초점 수준","Niveau de mise au point","Fokusebene","Livello di messa a fuoco","Уровень фокусировки","Nivel de enfoque","Nível de foco"
+"top.bond","Bond","龐德","邦德","ボンド","채권","Lien","Bindung","Legame","Бонд","vínculo","Vínculo"
+"top.unlocks","Unlocks","解鎖","解锁","ロックを解除します","잠금 해제","Déverrouille","Entsperrt","Sblocca","Разблокирует","Desbloquea","Desbloqueia"
+"top.stats","Stats","統計數據","统计数据","統計","통계","Statistiques","Statistiken","Statistiche","Статистика","Estadísticas","Estatísticas"
+"tasks.title","Tasks","任務","任务","タスク","작업","Tâches","Aufgaben","Compiti","Задачи","Tareas","Tarefas"
+"tasks.add","Add task","新增任務","添加任务","タスクの追加","작업 추가","Ajouter une tâche","Aufgabe hinzufügen","Aggiungi attività","Добавить задачу","Agregar tarea","Adicionar tarefa"
+"tasks.default_title","Type Here","在此輸入","在此输入","ここに入力してください","여기에 입력하세요","Tapez ici","Geben Sie hier ein","Digita qui","Введите здесь","Escriba aquí","Digite aqui"
+"tasks.untitled","Untitled","無題","无题","無題","제목 없음","Sans titre","Ohne Titel","Senza titolo","Без названия","Sin título","Sem título"
+"tasks.archive","Archive task","存檔任務","存档任务","アーカイブタスク","아카이브 작업","Tâche d'archivage","Archivierungsaufgabe","Attività di archiviazione","Задача архивирования","Tarea de archivo","Tarefa de arquivamento"
+"timer.focus","Focus","焦點","焦点","フォーカス","초점","Concentrez-vous","Konzentrieren Sie sich","Concentrarsi","Фокус","Enfoque","Foco"
+"timer.short_break","Short Break","短暫休息","短暂休息","短い休憩","짧은 휴식","Courte pause","Kurze Pause","Breve pausa","Короткий перерыв","Breve descanso","Curta pausa"
+"timer.break_label","Break {time}","休息 {time}","休息 {time}","休憩 {time}","휴식 {time}","Pause {time}","Pause {time}","Pausa {time}","Перерыв {time}","Descanso {time}","Pausa {time}"
+"timer.start","Start","開始","开始","スタート","시작","Commencer","Starten","Inizia","Старт","Empezar","Começar"
+"timer.pause","Pause","暫停","暂停","一時停止","일시중지","Pause","Pause","Pausa","Пауза","Pausa","Pausa"
+"timer.resume","Resume","履歷","简历","再開","이력서","CV","Lebenslauf","Riprendi","Резюме","Currículum","Currículo"
+"timer.reset","Reset","重置","重置","リセット","재설정","Réinitialiser","Zurücksetzen","Ripristina","Сброс","Reiniciar","Redefinir"
+"timer.settings","Settings","設定","设置","設定","설정","Paramètres","Einstellungen","Impostazioni","Настройки","Configuración","Configurações"
+"timer.state_idle","Idle","空閒","空闲","アイドル状態","유휴","Inactif","Leerlauf","Inattivo","Простой","inactivo","Inativo"
+"timer.state_running","Running","跑步","跑步","ランニング","달리기","Courir","Laufen","Correre","Бег","corriendo","Correndo"
+"timer.state_paused","Paused","已暫停","已暂停","一時停止中","일시중지됨","En pause","Angehalten","In pausa","Приостановлено","En pausa","Pausado"
+"timer.state_completed","Completed","已完成","已完成","完了","완료됨","Terminé","Abgeschlossen","Completato","Завершено","Completado","Concluído"
+"timer.state_partial","Partial","部分","部分","部分的","부분","Partielle","Teilweise","Parziale","Частичный","Parcial","Parcial"
+"timer.state_abandoned","Abandoned","被遺棄","被遗弃","放棄された","버려진","Abandonné","Verlassen","Abbandonato","Заброшенный","abandonado","Abandonado"
+"timer.message_focus","Stay with it.","堅持下去。","坚持下去。","そのままにしておいてください。","그것을 유지하십시오.","Restez avec ça.","Bleib dabei.","Resta con esso.","Оставайся с этим.","Quédate con eso.","Fique com isso."
+"timer.message_resume","Back in focus","回到焦點","回到焦点","焦点が戻る","다시 초점을 맞추다","Retour au point","Zurück im Fokus","Di nuovo a fuoco","Снова в фокусе","De nuevo en foco","De volta ao foco"
+"timer.message_pause","Paused","已暫停","已暂停","一時停止中","일시중지됨","En pause","Angehalten","In pausa","Приостановлено","En pausa","Pausado"
+"timer.message_break","Take a short break.","短暫休息一下。","短暂休息一下。","少し休憩してください。","잠시 휴식을 취하세요.","Faites une petite pause.","Machen Sie eine kurze Pause.","Fai una breve pausa.","Сделайте небольшой перерыв.","Tómate un breve descanso.","Faça uma pequena pausa."
+"timer.message_session_logged","Session logged.","會話已記錄。","会话已记录。","セッションが記録されました。","세션이 기록되었습니다.","Session enregistrée.","Sitzung protokolliert.","Sessione registrata.","Сессия зарегистрирована.","Sesión registrada.","Sessão registrada."
+"settings.title","Timer Settings","定時器設定","定时器设置","タイマー設定","타이머 설정","Paramètres de la minuterie","Timer-Einstellungen","Impostazioni del timer","Настройки таймера","Configuración del temporizador","Configurações do temporizador"
+"settings.focus_duration","Focus duration","聚焦持續時間","聚焦持续时间","集中期間","초점 지속 시간","Durée de mise au point","Fokusdauer","Durata della messa a fuoco","Продолжительность фокуса","Duración del enfoque","Duração do foco"
+"settings.break_duration","Break duration","休息時間","休息时间","休憩時間","휴식 시간","Durée de la pause","Pausendauer","Durata della pausa","Продолжительность перерыва","Duración del descanso","Duração do intervalo"
+"settings.auto_restart","Auto restart","自動重啟","自动重启","自動再起動","자동 재시작","Redémarrage automatique","Automatischer Neustart","Riavvio automatico","Автоматический перезапуск","Reinicio automático","Reinicialização automática"
+"settings.alarm","Alarm","報警","报警","アラーム","알람","Alarme","Alarm","Allarme","Сигнализация","alarma","Alarme"
+"settings.on","on","上","上","に","에","sur","auf","su","на","en","ligado"
+"settings.off","off","關閉","关闭","オフ","떨어져서","éteint","aus","spento","выкл.","apagado","desligado"
+"result.title","Session Result","會議結果","会议结果","セッション結果","세션 결과","Résultat de la séance","Sitzungsergebnis","Risultato della sessione","Результат сеанса","Resultado de la sesión","Resultado da sessão"
+"result.mark_task_done","Mark Task Done","標記任務已完成","标记任务已完成","タスクを完了としてマークする","작업 완료로 표시","Marquer la tâche comme terminée","Aufgabe als erledigt markieren","Contrassegna l'attività completata","Отметить задачу как выполненную","Marcar tarea realizada","Marcar tarefa concluída"
+"result.start_break","Start Break","開始休息","开始休息","休憩開始","휴식 시작","Début de la pause","Pause starten","Inizio pausa","Начать перерыв","Iniciar descanso","Iniciar intervalo"
+"result.no_reward","No reward. Session was below the reward threshold.","沒有獎勵。會話低於獎勵閾值。","没有奖励。会话低于奖励阈值。","報酬はありません。セッションが報酬のしきい値を下回りました。","보상이 없습니다. 세션이 보상 기준점보다 낮았습니다.","Aucune récompense. La session était inférieure au seuil de récompense.","Keine Belohnung. Die Sitzung lag unter dem Belohnungsschwellenwert.","Nessuna ricompensa. La sessione era al di sotto della soglia di ricompensa.","Никакой награды. Сеанс был ниже порога вознаграждения.","Sin recompensa. La sesión estuvo por debajo del umbral de recompensa.","Nenhuma recompensa. A sessão estava abaixo do limite de recompensa."
+"result.reward_summary","+{focus_points} Focus Points  +{xp} XP  +{bond} Bond","+{focus_points} 專注幣  +{xp} XP  +{bond} 羈絆","+{focus_points} 专注币  +{xp} XP  +{bond} 羁绊","+{focus_points} 集中ポイント  +{xp} XP  +{bond} 絆","+{focus_points} 집중 포인트  +{xp} XP  +{bond} 유대","+{focus_points} points focus  +{xp} XP  +{bond} lien","+{focus_points} Fokuspunkte  +{xp} XP  +{bond} Bindung","+{focus_points} punti focus  +{xp} XP  +{bond} legame","+{focus_points} очков фокуса  +{xp} XP  +{bond} связи","+{focus_points} puntos de enfoque  +{xp} XP  +{bond} vínculo","+{focus_points} pontos de foco  +{xp} XP  +{bond} vínculo"
+"result.task_bonus","Task bonus: +{focus_points} Focus Points  +{xp} XP","任務獎勵：+{focus_points} 專注幣  +{xp} XP","任务奖励：+{focus_points} 专注币  +{xp} XP","タスクボーナス: +{focus_points} 集中ポイント  +{xp} XP","작업 보너스: +{focus_points} 집중 포인트  +{xp} XP","Bonus de tâche : +{focus_points} points focus  +{xp} XP","Aufgabenbonus: +{focus_points} Fokuspunkte  +{xp} XP","Bonus attività: +{focus_points} punti focus  +{xp} XP","Бонус задания: +{focus_points} очков фокуса  +{xp} XP","Bonificación de tarea: +{focus_points} puntos de enfoque  +{xp} XP","Bônus da tarefa: +{focus_points} pontos de foco  +{xp} XP"
+"companion.break_title","Break","休息","休息","休憩","휴식","Pause","Pause","Pausa","Перерыв","descanso","Pausa"
+"companion.next","Next","下一步","下一步","次へ","다음","Suivant","Als nächstes","Avanti","Далее","Siguiente","Próximo"
+"companion.skip","Skip","跳過","跳过","スキップ","건너뛰기","Sauter","Überspringen","Salta","Пропустить","Saltar","Pular"
+"companion.dismiss","Close","關閉","关闭","閉じる","닫기","Fermer","Schließen","Chiudi","Закрыть","Cerrar","Fechar"
+"dialogue.break_001","Nice work. Look away from the screen and let your eyes rest for a moment.","幹得好。將目光從螢幕移開，讓眼睛休息一會兒。","干得好。将目光从屏幕上移开，让眼睛休息一会儿。","素晴らしい仕事だ。画面から目を離し、少しの間目を休めてください。","잘했어요. 잠시 화면에서 눈을 떼고 눈을 쉬어보세요.","Beau travail. Détournez le regard de l’écran et laissez vos yeux se reposer un instant.","Schöne Arbeit. Schauen Sie vom Bildschirm weg und lassen Sie Ihre Augen einen Moment ruhen.","Bel lavoro. Distogli lo sguardo dallo schermo e lascia riposare gli occhi per un momento.","Хорошая работа. Отведите взгляд от экрана и дайте глазам отдохнуть на мгновение.","Buen trabajo. Aparta la mirada de la pantalla y deja que la vista descanse un momento.","Bom trabalho. Desvie o olhar da tela e deixe-os descansar por um momento."
+"dialogue.break_002","Take a slow breath. You have already moved the day forward.","緩慢呼吸。你已經把這一天提早了。","缓慢呼吸。你已经把这一天提前了。","ゆっくり呼吸してください。あなたはすでに一日を前進させています。","천천히 숨을 쉬어보세요. 당신은 이미 하루를 앞당겼습니다.","Respirez lentement. Vous avez déjà avancé la journée.","Atmen Sie langsam ein. Sie haben den Tag bereits vorverlegt.","Fai un respiro lento. Hai già spostato la giornata in avanti.","Сделайте медленный вдох. Вы уже продвинули день вперед.","Respira lentamente. Ya has adelantado el día.","Respire devagar. Você já adiantou o dia."
+"dialogue.break_003","Stretch your shoulders before the next round. I will keep the room quiet.","在下一輪之前伸展肩膀。我會讓房間保持安靜。","在下一轮之前伸展肩膀。我会让房间保持安静。","次のラウンドの前に肩をストレッチしてください。部屋を静かにしておきます。","다음 라운드 전에 어깨를 펴십시오. 방을 조용히 할게요.","Étirez vos épaules avant le prochain tour. Je garderai la pièce silencieuse.","Strecken Sie Ihre Schultern vor der nächsten Runde. Ich werde den Raum ruhig halten.","Allunga le spalle prima del giro successivo. Terrò la stanza silenziosa.","Растяните плечи перед следующим раундом. Я буду держать комнату в тишине.","Estire los hombros antes de la siguiente ronda. Mantendré la habitación en silencio.","Alongue os ombros antes da próxima rodada. Vou manter a sala silenciosa."
+"dialogue.break_004","If you need water this is the right time.","如果您需要水，現在正是時候。","如果您需要水，现在正是时候。","水が必要な場合は、この時期が最適です。","물이 필요하다면 지금이 적기입니다.","Si vous avez besoin d'eau, c'est le bon moment.","Wenn Sie Wasser brauchen, ist jetzt der richtige Zeitpunkt.","Se hai bisogno di acqua questo è il momento giusto.","Если вам нужна вода, сейчас самое время.","Si necesitas agua este es el momento indicado.","Se você precisa de água, este é o momento certo."
+"dialogue.break_005","Relax your jaw and let your hands rest.","放鬆下巴，讓雙手休息。","放松下巴，让双手休息。","顎をリラックスさせ、手を休めます。","턱의 긴장을 풀고 손을 쉬게 하십시오.","Détendez votre mâchoire et laissez vos mains se reposer.","Entspannen Sie Ihren Kiefer und lassen Sie Ihre Hände ruhen.","Rilassa la mascella e lascia riposare le mani.","Расслабьте челюсть и дайте рукам отдохнуть.","Relaja tu mandíbula y deja descansar tus manos.","Relaxe a mandíbula e deixe as mãos descansarem."
+"dialogue.break_006","Blink a few times and soften your focus.","眨眼幾次，柔化你的注意力。","眨眼几次，柔化你的注意力。","数回まばたきして、集中力を和らげます。","눈을 몇 번 깜박이면 집중력이 부드러워집니다.","Clignez des yeux plusieurs fois et adoucissez votre concentration.","Blinzeln Sie ein paar Mal und konzentrieren Sie sich sanfter.","Sbatti le palpebre alcune volte e attenua la concentrazione.","Моргните несколько раз и смягчите концентрацию.","Parpadea unas cuantas veces y suaviza tu concentración.","Pisque algumas vezes e suavize seu foco."
+"dialogue.break_007","You kept the promise to yourself for this round.","這一輪你兌現了對自己的承諾。","这一轮你兑现了对自己的承诺。","このラウンドでは自分との約束を守りました。","이번 라운드에는 스스로와의 약속을 지켰습니다.","Vous avez tenu votre promesse pour ce tour.","Du hast das Versprechen, das du dir für diese Runde gegeben hast, gehalten.","Hai mantenuto la promessa fatta a te stessa per questo round.","Вы сдержали данное себе обещание в этом раунде.","Cumpliste tu promesa para esta ronda.","Você manteve a promessa feita a si mesmo nesta rodada."
+"dialogue.break_008","Let the room stay quiet for a little longer.","讓房間安靜一會兒。","让房间安静一会儿。","部屋をもう少し静かにさせてください。","방을 조금 더 조용히 있게 해주세요.","Laissez la pièce rester silencieuse un peu plus longtemps.","Lassen Sie den Raum etwas länger ruhig bleiben.","Lascia che la stanza rimanga silenziosa ancora per un po'.","Пусть в комнате еще немного побудет тихо.","Deje que la habitación permanezca en silencio un rato más.","Deixe a sala ficar quieta por mais um pouco."
+"dialogue.break_009","A small pause can make the next start easier.","短暫的停頓可以讓下一次的開始變得更容易。","短暂的停顿可以让下一次的开始变得更容易。","少し立ち止まると、次の始動が容易になります。","잠시 멈추면 다음 시작이 더 쉬워질 수 있습니다.","Une petite pause peut faciliter le prochain démarrage.","Eine kleine Pause kann den nächsten Start erleichtern.","Una piccola pausa può rendere più semplice l'avvio successivo.","Небольшая пауза может облегчить следующий старт.","Una pequeña pausa puede facilitar el siguiente comienzo.","Uma pequena pausa pode facilitar o próximo início."
+"dialogue.break_010","Stand up if you can and let your back reset.","如果可以的話，站起來，讓背部復位。","如果可以的话，站起来，让背部复位。","可能であれば立ち上がって背中をリセットしてください。","가능하다면 일어서서 허리를 다시 펴십시오.","Levez-vous si vous le pouvez et laissez votre dos se réinitialiser.","Stehen Sie auf, wenn Sie können, und lassen Sie Ihren Rücken ruhen.","Alzati se puoi e lascia che la schiena si ripristini.","Встаньте, если можете, и позвольте своей спине восстановиться.","Levántate si puedes y deja que tu espalda se reinicie.","Levante-se se puder e deixe suas costas reiniciarem."
+"dialogue.break_011","The daylight is still with us. Take it in for a moment.","白天仍然與我們同在。暫時接受一下。","白天仍然与我们同在。暂时接受一下。","日の光はまだ私たちにあります。ちょっと取り入れてみましょう。","일광은 여전히 ​​우리와 함께 있습니다. 잠시 받아보세요.","La lumière du jour est toujours parmi nous. Prenez-le un instant.","Das Tageslicht ist immer noch bei uns. Nehmen Sie es für einen Moment in sich auf.","La luce del giorno è ancora con noi. Prendilo per un momento.","Дневной свет все еще с нами. Займите это на мгновение.","La luz del día todavía está con nosotros. Tómalo por un momento.","A luz do dia ainda está conosco. Absorva por um momento."
+"dialogue.break_012","The evening light is softer now. Slow down with it.","現在傍晚的光線更加柔和了。慢慢來吧。","现在傍晚的光线更加柔和了。慢慢来吧。","夕方の光が柔らかくなりました。それと一緒にゆっくりしてください。","이제 저녁빛이 더 부드러워졌습니다. 천천히 하세요.","La lumière du soir est plus douce maintenant. Ralentissez avec.","Das Abendlicht ist jetzt weicher. Machen Sie es langsamer.","La luce della sera adesso è più morbida. Rallenta con esso.","Вечерний свет стал мягче. Помедленнее с этим.","La luz del atardecer es ahora más suave. Más despacio con eso.","A luz da noite está mais suave agora. Vá devagar com isso."
+"dialogue.break_013","It is late. Keep this break gentle.","現在已經太晚了。保持這種休息的輕柔。","现在已经晚了。保持这种休息的轻柔。","遅いです。この休憩はゆっくりと行ってください。","늦었어요. 이 휴식 시간을 부드럽게 유지하세요.","Il est tard. Gardez cette pause douce.","Es ist spät. Halten Sie diese Pause sanft.","È tardi. Mantieni questa pausa delicata.","Поздно. Сделайте этот перерыв мягким.","Es tarde. Mantenga este descanso suave.","É tarde. Mantenha esta pausa suave."
+"dialogue.break_014","The cloudy room feels calm enough for a quiet reset.","陰暗的房間感覺足夠平靜，可以安靜地重置。","阴暗的房间感觉足够平静，可以安静地重置。","曇った部屋は、静かにリセットするのに十分な落ち着きを感じます。","흐린 방은 조용히 재설정할 수 있을 만큼 차분한 느낌을 줍니다.","La pièce nuageuse semble suffisamment calme pour une réinitialisation silencieuse.","Der wolkige Raum fühlt sich ruhig genug für einen ruhigen Neustart an.","La stanza nuvolosa sembra abbastanza calma per un ripristino silenzioso.","Облачная комната кажется достаточно спокойной для тихой перезагрузки.","La habitación nublada se siente lo suficientemente tranquila como para permitir un reinicio silencioso.","A sala nublada parece calma o suficiente para uma reinicialização silenciosa."
+"dialogue.break_015","That was a steady round. I noticed.","這是一輪穩定的比賽。我注意到了。","这是一轮稳定的比赛。我注意到了。","安定したラウンドでした。私は気づきました。","꾸준한 라운드였습니다. 나는 알아 차렸다.","C'était un tour régulier. J'ai remarqué.","Das war eine gleichmäßige Runde. Ich habe es bemerkt.","È stato un giro costante. Ho notato.","Это был стабильный раунд. Я заметил.","Esa fue una ronda constante. Me di cuenta de.","Essa foi uma rodada constante. Percebi."
+"dialogue.break_016","You are getting better at returning to the work.","你在重返工作崗位方面做得越來越好。","你在重返工作岗位方面做得越来越好。","あなたは仕事に戻るのが上手になってきています。","당신은 직장에 복귀하는 것이 점점 좋아지고 있습니다.","Vous vous améliorez dans votre retour au travail.","Es gelingt Ihnen immer besser, wieder an den Arbeitsplatz zurückzukehren.","Stai migliorando nel tornare al lavoro.","Вы лучше возвращаетесь к работе.","Está mejorando en su regreso al trabajo.","Você está melhorando no retorno ao trabalho."
+"dialogue.break_017","I will keep watch while you rest your eyes.","當你休息眼睛的時候，我會監視你。","当你休息眼睛的时候，我会监视你。","あなたが目を休めている間、私は見守ります。","당신이 눈을 쉬고 있는 동안 나는 계속 지켜볼 것입니다.","Je veillerai pendant que tu reposes tes yeux.","Ich werde Wache halten, während du deinen Augen eine Pause gibst.","Starò di guardia mentre riposi gli occhi.","Я буду наблюдать, пока ты дашь глазам отдохнуть.","Yo vigilaré mientras descansas la vista.","Ficarei vigiando enquanto você descansa os olhos."
+"dialogue.break_018","You do not have to rush back. The next step can wait a minute.","您不必急著回來。下一步可以稍等一下。","您不必急着回来。下一步可以稍等一下。","急いで戻る必要はありません。次のステップは少しお待ちください。","서두르지 않아도 됩니다. 다음 단계는 잠시 기다릴 수 있습니다.","Vous n'êtes pas obligé de revenir en courant. La prochaine étape peut attendre une minute.","Sie müssen nicht zurückeilen. Der nächste Schritt kann eine Minute warten.","Non devi correre indietro. Il passaggio successivo può attendere un minuto.","Вам не нужно спешить назад. Следующий шаг может подождать минуту.","No tienes que apresurarte a regresar. El siguiente paso puede esperar un minuto.","Você não precisa voltar correndo. A próxima etapa pode esperar um minuto."
+"dialogue.break_019","Even a difficult round still counts as showing up.","即使是艱難的一輪仍然算作出現。","即使是艰难的一轮仍然算作出现。","難しいラウンドでも出場とみなされます。","어려운 라운드라도 여전히 나타나는 것으로 간주됩니다.","Même un tour difficile compte toujours comme une présence.","Auch eine schwierige Runde zählt noch als Erscheinen.","Anche un round difficile conta comunque come presenza.","Даже сложный раунд по-прежнему засчитывается.","Incluso una ronda difícil cuenta como presentarse.","Mesmo uma rodada difícil ainda conta como presença."
+"dialogue.break_020","That went well. Let the good feeling settle before the next one.","進展順利。讓美好的感覺在下一個感覺之前就安定下來。","进展顺利。让美好的感觉在下一个感觉之前安定下来。","それはうまくいきました。次のイベントまでに良い気分を落ち着かせましょう。","잘 됐어요. 다음 감정이 생기기 전에 좋은 감정이 정착되도록 하세요.","Cela s'est bien passé. Laissez le bon sentiment s’installer avant le prochain.","Das ist gut gelaufen. Lassen Sie das gute Gefühl vor dem nächsten ruhen.","È andata bene. Lascia che la bella sensazione si calmi prima di quella successiva.","Все прошло хорошо. Пусть хорошее чувство утихнет перед следующим.","Eso salió bien. Deja que el buen sentimiento se calme antes del siguiente.","Isso correu bem. Deixe o sentimento bom se instalar antes do próximo."
+"dialogue.break_fallback","Take a short break. I will be here for the next round.","短暫休息一下。下一輪我會在這裡。","短暂休息一下。下一轮我会在这里。","少し休憩してください。次のラウンドもここに来ます。","잠시 휴식을 취하세요. 나는 다음 라운드를 위해 여기에 있을 것이다.","Faites une petite pause. Je serai là pour le prochain tour.","Machen Sie eine kurze Pause. Ich werde in der nächsten Runde hier sein.","Fai una breve pausa. Sarò qui per il prossimo turno.","Сделайте небольшой перерыв. Я буду здесь на следующий раунд.","Tómate un breve descanso. Estaré aquí para la próxima ronda.","Faça uma pequena pausa. Estarei aqui para a próxima rodada."
+"dialogue.ambient_001","I am here. Keep an easy rhythm.","我在這兒。保持輕鬆的節奏。","我在这儿。保持轻松的节奏。","私はここにいます。楽なリズムを保ちましょう。","나는 여기 있다. 쉬운 리듬을 유지하세요.","Je suis là. Gardez un rythme facile.","Ich bin hier. Behalten Sie einen lockeren Rhythmus bei.","Io sono qui. Mantieni un ritmo rilassato.","Я здесь. Сохраняйте легкий ритм.","Estoy aquí. Mantenga un ritmo fácil.","Eu estou aqui. Mantenha um ritmo fácil."
+"dialogue.ambient_002","One calm step at a time.","一次冷靜地邁出一步。","一次冷静地迈出一步。","静かに一歩ずつ。","차분하게 한걸음씩.","Un pas calme à la fois.","Ein ruhiger Schritt nach dem anderen.","Un passo calmo alla volta.","Один спокойный шаг за раз.","Un paso tranquilo a la vez.","Um passo calmo de cada vez."
+"dialogue.ambient_003","The timer is moving. You only need to stay with this moment.","計時器正在轉動。你只需要停留在這一刻。","计时器正在转动。你只需要停留在这一刻。","タイマーが動いています。あなたはただこの瞬間に留まればいいのです。","타이머가 움직이고 있습니다. 지금 이 순간에만 머물면 됩니다.","La minuterie bouge. Il vous suffit de rester avec ce moment.","Der Timer läuft. Sie müssen nur bei diesem Moment bleiben.","Il timer si sta muovendo. Devi solo restare con questo momento.","Таймер движется. Вам нужно только остаться с этим моментом.","El cronómetro se está moviendo. Sólo necesitas quedarte con este momento.","O cronômetro está se movendo. Você só precisa ficar com este momento."
+"dialogue.ambient_004","The room is quiet enough for the next few minutes.","接下來的幾分鐘房間裡很安靜。","接下来的几分钟房间里很安静。","部屋はその後数分間十分に静かです。","방은 앞으로 몇 분 동안 충분히 조용합니다.","La pièce est suffisamment calme pour les prochaines minutes.","Für die nächsten Minuten ist es im Raum ruhig genug.","La stanza è abbastanza silenziosa per i prossimi minuti.","В комнате достаточно тихо на следующие несколько минут.","La habitación está lo suficientemente silenciosa durante los siguientes minutos.","A sala fica silenciosa o suficiente pelos próximos minutos."
+"dialogue.ambient_005","Evening work can stay gentle.","晚上的工作可以保持溫和。","晚上的工作可以保持温和。","夜の仕事は穏やかに過ごすことができます。","저녁 근무는 조용히 지낼 수 있습니다.","Le travail du soir peut rester doux.","Die Abendarbeit kann sanft bleiben.","Il lavoro serale può rimanere delicato.","Вечерняя работа может оставаться легкой.","El trabajo nocturno puede ser sencillo.","O trabalho noturno pode permanecer suave."
+"dialogue.ambient_006","It is late. Keep the pace kind.","現在已經太晚了。保持節奏。","现在已经晚了。保持节奏。","遅いです。優しいペースを保ってください。","늦었어요. 속도를 친절하게 유지하십시오.","Il est tard. Gardez le bon rythme.","Es ist spät. Behalten Sie das Tempo bei.","È tardi. Mantieni il ritmo gentile.","Поздно. Держите темп.","Es tarde. Mantenga el ritmo amable.","É tarde. Mantenha o ritmo gentil."
+"dialogue.ambient_007","You are settling into this well.","你正在適應這口井。","你正在适应这口井。","あなたはこの井戸に落ち着きつつあります。","당신은 이 우물에 정착하고 있습니다.","Vous vous installez bien dans ce puits.","Du gewöhnst dich hier gut ein.","Ti stai ambientando bene.","Вы хорошо устроились в этом.","Te estás adaptando bien a esto.","Você está se adaptando bem a isso."
+"dialogue.ambient_008","I will keep the space steady while you work.","你工作時我會保持空間穩定。","你工作时我会保持空间稳定。","あなたが作業している間、私はスペースを安定させます。","당신이 일하는 동안 공간을 안정적으로 유지하겠습니다.","Je garderai l'espace stable pendant que vous travaillez.","Ich sorge dafür, dass der Raum stabil bleibt, während Sie arbeiten.","Manterrò lo spazio stabile mentre lavori.","Я буду поддерживать пространство в порядке, пока ты работаешь.","Mantendré el espacio estable mientras trabajas.","Vou manter o espaço estável enquanto você trabalha."
+"dialogue.ambient_fallback","I am here. Keep an easy rhythm.","我在這兒。保持輕鬆的節奏。","我在这儿。保持轻松的节奏。","私はここにいます。楽なリズムを保ちましょう。","나는 여기 있다. 쉬운 리듬을 유지하세요.","Je suis là. Gardez un rythme facile.","Ich bin hier. Behalten Sie einen lockeren Rhythmus bei.","Io sono qui. Mantieni un ritmo rilassato.","Я здесь. Сохраняйте легкий ритм.","Estoy aquí. Mantenga un ritmo fácil.","Eu estou aqui. Mantenha um ritmo fácil."
+"music.title","Music","音樂","音乐","音楽","음악","Musique","Musik","Musica","Музыка","musica","Música"
+"music.list","Music list","音樂列表","音乐列表","音楽リスト","음악 목록","Liste de musique","Musikliste","Elenco musicale","Список музыки","lista de musica","Lista de músicas"
+"music.no_music_loaded","No music loaded","沒有加載音樂","没有加载音乐","音楽が読み込まれていません","로드된 음악 없음","Aucune musique chargée","Keine Musik geladen","Nessuna musica caricata","Музыка не загружена","No hay música cargada","Nenhuma música carregada"
+"music.add_files","Add .ogg .mp3 or .wav files to res://assets/music","將 .ogg .mp3 或 .wav 檔案加入 res://assets/music","将 .ogg .mp3 或 .wav 文件添加到 res://assets/music",".ogg .mp3 または .wav ファイルを res://assets/music に追加します","res://assets/music에 .ogg .mp3 또는 .wav 파일 추가","Ajoutez des fichiers .ogg .mp3 ou .wav à res://assets/music","Fügen Sie .ogg .mp3- oder .wav-Dateien zu res://assets/music hinzu","Aggiungi file .ogg .mp3 o .wav a res://assets/music","Добавьте файлы .ogg, .mp3 или .wav в res://assets/music.","Agregue archivos .ogg .mp3 o .wav a res://assets/music","Adicione arquivos .ogg .mp3 ou .wav a res://assets/music"
+"music.no_files","No music files found.","未找到音樂檔案。","未找到音乐文件。","音楽ファイルが見つかりませんでした。","음악 파일을 찾을 수 없습니다.","Aucun fichier musical trouvé.","Keine Musikdateien gefunden.","Nessun file musicale trovato.","Музыкальные файлы не найдены.","No se encontraron archivos de música.","Nenhum arquivo de música encontrado."
+"music.previous","Previous","上一頁","上一页","前へ","이전","Précédent","Zurück","Precedente","Предыдущий","Anterior","Anterior"
+"music.play","Play","玩","玩","遊ぶ","플레이","Jouer","Spielen","Gioca","Играть","Jugar","Jogar"
+"music.pause","Pause","暫停","暂停","一時停止","일시중지","Pause","Pause","Pausa","Пауза","Pausa","Pausa"
+"music.next","Next","下一步","下一步","次へ","다음","Suivant","Als nächstes","Avanti","Далее","Siguiente","Próximo"
+"music.loop","Loop","循環","循环","ループ","루프","Boucle","Schleife","Ciclo","Петля","Bucle","Ciclo"
+"music.loop_on","Loop on","循環播放","循环播放","ループオン","루프 온","Boucle sur","Schleife weiter","Continua il ciclo","Цикл включен","Bucle encendido","Ativar loop"
+"music.loop_off","Loop off","循環關閉","循环关闭","ループオフ","루프 끄기","Boucle","Schleife ab","Chiudi il ciclo","Выключение петли","bucle fuera","Loop desligado"
+"music.ambience","Ambience","氛圍","氛围","雰囲気","분위기","Ambiance","Ambiente","Ambiente","атмосфера","Ambiente","Ambiente"
+"stats.completed","Completed","已完成","已完成","完了","완료됨","Terminé","Abgeschlossen","Completato","Завершено","Completado","Concluído"
+"stats.partial","Partial","部分","部分","部分的","부분","Partielle","Teilweise","Parziale","Частичный","Parcial","Parcial"
+"stats.focus_minutes","Focus minutes","焦點分鐘","焦点分钟","集中する分","집중 시간(분)","Minutes de concentration","Fokusminuten","Concentrarsi sui minuti","Фокус минут","Minutos de enfoque","Minutos de foco"
+"stats.tasks_done","Tasks done","完成的任務","完成的任务","完了したタスク","완료된 작업","Tâches effectuées","Aufgaben erledigt","Compiti completati","Задачи выполнены","Tareas realizadas","Tarefas concluídas"
+"option.ambient_prompt","Ambient Prompt","環境提示","环境提示","アンビエントプロンプト","주변 프롬프트","Invite ambiante","Umgebungsaufforderung","Prompt ambientale","Окружающая подсказка","Aviso ambiental","Alerta ambiental"
+"option.ambient_low","Low","低","低","低い","낮음","Faible","Niedrig","Basso","Низкий","Bajo","Baixo"
+"option.ambient_normal","Normal","正常","正常","ノーマル","보통","Normale","Normal","Normale","Нормальный","normales","Normais"
+"store.title","Store","商店","商店","ストア","매장","Magasin","Speichern","Negozio","Магазин","Tienda","Loja"
+"store.confirm_title","Confirm Purchase","確認購買","确认购买","購入を確認する","구매 확인","Confirmer l'achat","Bestätigen Sie den Kauf","Conferma acquisto","Подтвердить покупку","Confirmar compra","Confirmar compra"
+"store.buy","Buy","購買","购买","購入する","구매","Acheter","Kaufen","Acquista","Купить","comprar","Comprar"
+"store.cancel","Cancel","取消","取消","キャンセル","취소","Annuler","Abbrechen","Annulla","Отмена","Cancelar","Cancelar"
+"store.cost","{focus_points} Focus Points","{focus_points} 專注幣","{focus_points} 专注币","{focus_points} 集中ポイント","{focus_points} 집중 포인트","{focus_points} points focus","{focus_points} Fokuspunkte","{focus_points} punti focus","{focus_points} очков фокуса","{focus_points} puntos de enfoque","{focus_points} pontos de foco"
+"store.unlocked","Unlocked","解鎖","解锁","ロック解除済み","잠금 해제됨","Débloqué","Entsperrt","Sbloccato","Разблокировано","desbloqueado","Desbloqueado"
+"store.no_items","No unlocks available.","沒有可用的解鎖。","没有可用的解锁。","利用可能なロック解除はありません。","잠금 해제가 가능하지 않습니다.","Aucun déverrouillage disponible.","Keine Freischaltungen verfügbar.","Nessuno sblocco disponibile.","Нет доступных разблокировок.","No hay desbloqueos disponibles.","Não há desbloqueios disponíveis."
+"store.purchase_confirm","Purchase {name} for {focus_points} Focus Points?","要用 {focus_points} 專注幣購買「{name}」嗎？","要用 {focus_points} 专注币购买“{name}”吗？","{focus_points} 集中ポイントで「{name}」を購入しますか？","{focus_points} 집중 포인트로 {name}을(를) 구매할까요?","Acheter {name} pour {focus_points} points focus ?","{name} für {focus_points} Fokuspunkte kaufen?","Acquistare {name} per {focus_points} punti focus?","Купить {name} за {focus_points} очков фокуса?","¿Comprar {name} por {focus_points} puntos de enfoque?","Comprar {name} por {focus_points} pontos de foco?"
+"store.purchase_success","Unlocked.","已解鎖。","已解锁。","ロック解除されました。","잠금 해제되었습니다.","Débloqué.","Entsperrt.","Sbloccato.","Разблокировано.","Desbloqueado.","Desbloqueado."
+"store.insufficient","Need {focus_points} Focus Points.","需要 {focus_points} 專注幣。","需要 {focus_points} 专注币。","{focus_points} 集中ポイントが必要です。","{focus_points} 집중 포인트가 필요합니다.","Il faut {focus_points} points focus.","{focus_points} Fokuspunkte erforderlich.","Servono {focus_points} punti focus.","Нужно {focus_points} очков фокуса.","Necesitas {focus_points} puntos de enfoque.","Precisa de {focus_points} pontos de foco."
+"store.already_unlocked","Already unlocked.","已經解鎖了。","已经解锁了。","すでにロックが解除されています。","이미 잠금이 해제되었습니다.","Déjà débloqué.","Bereits freigeschaltet.","Già sbloccato.","Уже разблокирован.","Ya desbloqueado.","Já desbloqueado."
+"store.purchase_failed","Purchase failed.","購買失敗。","购买失败。","購入に失敗しました。","구매에 실패했습니다.","L'achat a échoué.","Der Kauf ist fehlgeschlagen.","Acquisto fallito.","Покупка не удалась.","Compra fallida.","A compra falhou."
+"content.bg_normal_day","Normal Day","正常的一天","正常的一天","通常日","보통날","Journée normale","Normaler Tag","Giorno normale","Обычный день","Día normal","Dia normal"
+"content.bg_normal_night","Normal Night","正常的夜晚","正常的夜晚","通常の夜","보통밤","Nuit normale","Normale Nacht","Notte normale","Обычная ночь","noche normal","Noite normal"
+"content.bg_normal_sunfall","Normal Sunset","正常日落","正常日落","通常の日没","일반 일몰","Coucher de soleil normal","Normaler Sonnenuntergang","Tramonto normale","Обычный закат","Puesta de sol normal","Pôr do sol normal"
+"content.bg_normal_cloudy","Normal Cloudy","正常 多雲","正常 多云","通常曇り","보통 흐림","Normal Nuageux","Normal bewölkt","Normale Nuvoloso","Нормально Облачно","Normal Nublado","Normal Nublado"
+"content.bg_good_day","Good Day","美好的一天","美好的一天","良い一日","좋은 하루","Bonne journée","Guten Tag","Buona giornata","Добрый день","buen dia","Bom dia"
+"content.bg_good_night","Good Night","晚安","晚安","おやすみ","좋은 밤","Bonne nuit","Gute Nacht","Buonanotte","Спокойной ночи","buenas noches","Boa noite"
+"content.bg_good_sunfall","Good Sunset","美好的日落","美好的日落","良い夕日","좋은 일몰","Bon coucher de soleil","Guter Sonnenuntergang","Buon tramonto","Хороший закат","Buen atardecer","Bom pôr do sol"
+"content.bg_troubled_day","Troubled Day","麻煩的一天","麻烦的一天","困った日","괴로운 날","Journée troublée","Unruhiger Tag","Giornata travagliata","Тревожный день","Día turbulento","Dia conturbado"
+"content.bg_troubled_night","Troubled Night","煩惱之夜","烦恼之夜","トラブルの夜","고민하는 밤","Nuit troublée","Unruhige Nacht","Notte travagliata","тревожная ночь","Noche turbulenta","Noite Conturbada"
+"content.bg_troubled_sunfall","Troubled Sunset","麻煩的日落","麻烦的日落","トラブルの夕日","고민하는 일몰","Coucher de soleil troublé","Unruhiger Sonnenuntergang","Tramonto travagliato","Тревожный закат","Puesta de sol turbulenta","Pôr do sol conturbado"
+"content.room_bg_01","Room Background 01","房間背景01","房间背景01","部屋の背景01","방 배경 01","Fond de pièce 01","Raumhintergrund 01","Sfondo della stanza 01","Фон комнаты 01","Fondo de la habitación 01","Fundo da sala 01"
+"content.room_bg_02","Room Background 02","房間背景02","房间背景02","部屋の背景02","방 배경 02","Fond de pièce 02","Raumhintergrund 02","Sfondo della stanza 02","Фон комнаты 02","Fondo de la habitación 02","Fundo da sala 02"
+"background_menu.title","Background","背景","背景","背景","배경","Contexte","Hintergrund","Sfondo","Фон","Antecedentes","Plano de fundo"
+"background_menu.lofi","Lofi","洛菲","洛菲","ロフィ","로피","Lofi","Lofi","Lofi","Лофи","lofi","Lofi"
+"background_menu.room_01","Background 01","背景01","背景01","背景01","배경 01","Contexte 01","Hintergrund 01","Sfondo 01","Фон 01","Fondo 01","Plano de fundo 01"
+"background_menu.room_02","Background 02","背景02","背景02","背景02","배경 02","Contexte 02","Hintergrund 02","Sfondo 02","Фон 02","Fondo 02","Plano de fundo 02"
+"background_menu.locked","Locked","鎖定","锁定","ロックされています","잠김","Verrouillé","Gesperrt","Bloccato","Заблокировано","bloqueado","Bloqueado"
+"result.focus_duration","Focus duration: {minutes} min","專注時間：{minutes} 分鐘","专注时间：{minutes} 分钟","集中時間: {minutes} 分","집중 시간: {minutes}분","Durée de focus : {minutes} min","Fokusdauer: {minutes} Min.","Durata focus: {minutes} min","Длительность фокуса: {minutes} мин","Duración del enfoque: {minutes} min","Duração do foco: {minutes} min"
+"result.actual_duration","Actual duration: {minutes} min","實際時間：{minutes} 分鐘","实际时间：{minutes} 分钟","実際の時間: {minutes} 分","실제 시간: {minutes}분","Durée réelle : {minutes} min","Tatsächliche Dauer: {minutes} Min.","Durata effettiva: {minutes} min","Фактическая длительность: {minutes} мин","Duración real: {minutes} min","Duração real: {minutes} min"
+"result.rewards","Rewards: {summary}","獎勵：{summary}","奖励：{summary}","報酬: {summary}","보상: {summary}","Récompenses : {summary}","Belohnungen: {summary}","Ricompense: {summary}","Награды: {summary}","Recompensas: {summary}","Recompensas: {summary}"
+"result.bond_level_up_line","Bond: {summary}","羈絆：{summary}","羁绊：{summary}","絆: {summary}","유대: {summary}","Lien : {summary}","Bindung: {summary}","Legame: {summary}","Связь: {summary}","Vínculo: {summary}","Vínculo: {summary}"
+"result.next_action","Next: {action}","下一步：{action}","下一步：{action}","次: {action}","다음: {action}","Suivant : {action}","Weiter: {action}","Successivo: {action}","Далее: {action}","Siguiente: {action}","Próximo: {action}"
+"result.next_action_break","Take a break.","休息一下。","休息一下。","休憩してください。","휴식을 취하세요.","Faites une pause.","Machen Sie eine Pause.","Prenditi una pausa.","Сделайте перерыв.","Tómate un descanso.","Faça uma pausa."
+"result.next_action_retry","Reset and try another focus round.","重置並嘗試另一輪焦點。","重置并尝试另一轮焦点。","リセットして別のフォーカスラウンドを試してください。","재설정하고 다른 초점 라운드를 시도해 보세요.","Réinitialisez et essayez un autre cycle de mise au point.","Setzen Sie den Vorgang zurück und versuchen Sie es mit einer anderen Fokusrunde.","Reimposta e prova un altro ciclo di messa a fuoco.","Сбросьте настройки и попробуйте еще один раунд фокусировки.","Reinicie e intente con otra ronda de enfoque.","Reinicie e tente outra rodada de foco."
+"option.ambient_off","Off","關閉","关闭","オフ","끄기","Désactivé","Aus","Spento","Выкл.","Apagado","Desligado"
+"inventory.title","Background Inventory","背景庫存","背景库存","バックグラウンドインベントリ","배경 인벤토리","Inventaire de fond","Hintergrundinventur","Inventario di fondo","Фоновый инвентарь","Inventario de antecedentes","Inventário em segundo plano"
+"inventory.open_store","Store","商店","商店","ストア","매장","Magasin","Speichern","Negozio","Магазин","Tienda","Loja"
+"inventory.empty","No backgrounds available.","沒有可用的背景。","没有可用的背景。","利用可能な背景はありません。","사용할 수 있는 배경이 없습니다.","Aucun arrière-plan disponible.","Keine Hintergründe verfügbar.","Nessuno sfondo disponibile.","Нет доступных фонов.","No hay antecedentes disponibles.","Nenhum plano de fundo disponível."
+"inventory.equip","Equip","裝備","装备","装備する","장비하다","Équiper","Ausrüsten","Equipaggiare","Оборудовать","Equipar","Equipar"
+"inventory.equipped","Equipped","裝備齊全","装备齐全","装備済み","갖추고 있음","Équipé","Ausgestattet","Attrezzato","Оборудовано","Equipado","Equipado"
+"inventory.status_equipped","Currently equipped","目前裝備","目前装备","現在装備されているもの","현재 갖추고 있는","Actuellement équipé","Derzeit ausgestattet","Attualmente attrezzato","В настоящее время оборудовано","Actualmente equipado","Atualmente equipado"
+"inventory.status_locked","Locked","鎖定","锁定","ロックされています","잠김","Verrouillé","Gesperrt","Bloccato","Заблокировано","bloqueado","Bloqueado"
+"inventory.status_unlocked","Unlocked","解鎖","解锁","ロック解除済み","잠금 해제됨","Débloqué","Entsperrt","Sbloccato","Разблокировано","desbloqueado","Desbloqueado"
+"inventory.status_auto","Automatic context background","自動上下文背景","自动上下文背景","自動コンテキスト背景","자동 컨텍스트 배경","Fond de contexte automatique","Automatischer Kontexthintergrund","Sfondo del contesto automatico","Автоматический контекстный фон","Fondo de contexto automático","Plano de fundo de contexto automático"
+"option.music_autoplay","Music Autoplay","音樂自動播放","音乐自动播放","音楽の自動再生","음악 자동 재생","Lecture automatique de la musique","Musik-Autoplay","Riproduzione automatica della musica","Автовоспроизведение музыки","Reproducción automática de música","Reprodução automática de música"
+"option.break_media_path","Break Video File","打破影片檔案","打破视频文件","ビデオ ファイルを中断する","비디오 파일 나누기","Casser le fichier vidéo","Videodatei brechen","Rompi il file video","Разбить видеофайл","Romper archivo de vídeo","Quebrar arquivo de vídeo"
+"option.alarm_sound","Alarm Sound","警報聲","警报声","アラーム音","알람 소리","Son d'alarme","Alarmton","Suono di allarme","Звуковой сигнал","Sonido de alarma","Som de alarme"
+"stats_panel.title","Stats & Goals","統計數據和目標","统计数据和目标","統計と目標","통계 및 목표","Statistiques et objectifs","Statistiken und Ziele","Statistiche e obiettivi","Статистика и цели","Estadísticas y objetivos","Estatísticas e metas"
+"stats_panel.hint","Complete sessions and tasks to progress goals.","完成課程和任務以實現目標。","完成课程和任务以实现目标。","セッションとタスクを完了して目標を達成します。","세션과 작업을 완료하여 목표를 진행하세요.","Terminez des sessions et des tâches pour progresser vers les objectifs.","Absolvieren Sie Sitzungen und Aufgaben, um Ihre Ziele zu erreichen.","Completa sessioni e attività per raggiungere gli obiettivi.","Выполняйте сеансы и задания для достижения целей.","Complete sesiones y tareas para avanzar en los objetivos.","Conclua sessões e tarefas para progredir nas metas."
+"stats_panel.missions","Daily Missions","每日任務","每日任务","デイリーミッション","일일 임무","Missions quotidiennes","Tägliche Missionen","Missioni giornaliere","Ежедневные миссии","Misiones Diarias","Missões Diárias"
+"stats_panel.achievements","Achievements","成就","成就","業績","업적","Réalisations","Erfolge","Risultati","Достижения","Logros","Conquistas"
+"mission.claim","Claim","索賠","索赔","クレーム","청구","Réclamation","Anspruch","Richiedi","Претензия","Reclamar","Reivindicar"
+"mission.claimed_summary","Claimed: +{focus_points} FP +{xp} XP +{bond} Bond","已領取：+{focus_points} 專注幣 +{xp} XP +{bond} 羈絆","已领取：+{focus_points} 专注币 +{xp} XP +{bond} 羁绊","受け取り済み: +{focus_points} FP +{xp} XP +{bond} 絆","수령 완료: +{focus_points} FP +{xp} XP +{bond} 유대","Réclamé : +{focus_points} FP +{xp} XP +{bond} lien","Abgeholt: +{focus_points} FP +{xp} XP +{bond} Bindung","Riscattato: +{focus_points} FP +{xp} XP +{bond} legame","Получено: +{focus_points} FP +{xp} XP +{bond} связи","Reclamado: +{focus_points} FP +{xp} XP +{bond} vínculo","Resgatado: +{focus_points} FP +{xp} XP +{bond} vínculo"
+"mission.result_claimable","Daily mission ready to claim.","每日任務已準備好領取。","每日任务已准备好领取。","デイリーミッションを申請する準備ができています。","일일 임무를 받을 준비가 되었습니다.","Mission quotidienne prête à réclamer.","Tägliche Mission bereit zum Einfordern.","Missione quotidiana pronta a rivendicare.","Ежедневная миссия готова к выполнению.","Misión diaria lista para reclamar.","Missão diária pronta para ser reivindicada."
+"mission.reward","+{focus_points} FP +{xp} XP +{bond} Bond","+{focus_points} 專注幣 +{xp} XP +{bond} 羈絆","+{focus_points} 专注币 +{xp} XP +{bond} 羁绊","+{focus_points} FP +{xp} XP +{bond} 絆","+{focus_points} FP +{xp} XP +{bond} 유대","+{focus_points} FP +{xp} XP +{bond} lien","+{focus_points} FP +{xp} XP +{bond} Bindung","+{focus_points} FP +{xp} XP +{bond} legame","+{focus_points} FP +{xp} XP +{bond} связи","+{focus_points} FP +{xp} XP +{bond} vínculo","+{focus_points} FP +{xp} XP +{bond} vínculo"
+"mission.daily_complete_session","Complete 1 focus session","完成 1 次焦點課程","完成 1 次焦点课程","1 つの集中セッションを完了する","집중 세션 1개 완료","Terminer 1 séance de concentration","Absolvieren Sie 1 Fokussitzung","Completa 1 sessione focalizzata","Завершите 1 фокус-сессию","Completa 1 sesión de enfoque","Conclua 1 sessão de foco"
+"mission.daily_focus_minutes","Focus for 25 minutes","集中註意力25分鐘","集中注意力25分钟","25分間集中する","25분 동안 집중하세요","Concentrez-vous pendant 25 minutes","Konzentrieren Sie sich 25 Minuten lang","Concentrati per 25 minuti","Сосредоточьтесь на 25 минут.","Concéntrate durante 25 minutos","Concentre-se por 25 minutos"
+"mission.daily_complete_tasks","Complete 2 tasks","完成2個任務","完成2个任务","2 つのタスクを完了する","작업 2개 완료","Terminez 2 tâches","Erledige 2 Aufgaben","Completa 2 attività","Выполните 2 задания","Completa 2 tareas","Conclua 2 tarefas"
+"achievement.active","Active","活躍","活跃","アクティブ","활성","Actif","Aktiv","Attivo","Активный","Activo","Ativo"
+"achievement.unlocked","Unlocked","解鎖","解锁","ロック解除済み","잠금 해제됨","Débloqué","Entsperrt","Sbloccato","Разблокировано","desbloqueado","Desbloqueado"
+"achievement.result_unlocked","Achievement unlocked: {name}","成就解鎖：{name}","成就解锁：{name}","実績解除: {name}","업적 잠금 해제: {name}","Succès débloqué : {name}","Erfolg freigeschaltet: {name}","Obiettivo sbloccato: {name}","Достижение открыто: {name}","Logro desbloqueado: {name}","Conquista desbloqueada: {name}"
+"achievement.first_session","First Focus","第一焦點","第一焦点","最初の焦点","첫 번째 초점","Premier objectif","Erster Fokus","Primo focus","Первый фокус","Primer enfoque","Primeiro foco"
+"achievement.three_sessions","Three Good Rounds","三輪好球","三轮好球","3 つの良いラウンド","세 번의 좋은 라운드","Trois bons tours","Drei gute Runden","Tre buoni giri","Три хороших раунда","Tres buenas rondas","Três boas rodadas"
+"achievement.focus_hour","Focused Hour","專注時間","专注时间","集中した時間","집중시간","Heure ciblée","Konzentrierte Stunde","Ora focalizzata","Сосредоточенный час","Hora enfocada","Hora Focada"
+"achievement.three_tasks","Task Starter","工作啟動器","任务启动器","タスクスターター","작업 스타터","Démarreur de tâches","Aufgabenstarter","Inizio attività","Стартер задач","Iniciador de tarea","Iniciador de tarefas"
+"achievement.bond_level_two","Closer Bond","更緊密的聯繫","更紧密的联系","より近い絆","더 가까운 유대","Lien plus étroit","Engere Bindung","Legame più stretto","Ближе Бонд","Vínculo más estrecho","Vínculo mais próximo"
+"achievement.first_unlock","First Unlock","首次解鎖","首次解锁","最初のロック解除","첫 번째 잠금 해제","Premier déverrouillage","Zuerst freischalten","Primo sblocco","Первая разблокировка","Primer desbloqueo","Primeiro desbloqueio"

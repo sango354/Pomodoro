@@ -1,6 +1,6 @@
 # Manual QA Checklist
 
-Last updated: 2026-05-03
+Last updated: 2026-05-04
 
 Use this checklist after UI, timer, companion, media, localization, or save/load
 changes. Run the headless checks first, then verify the windowed game manually.
@@ -12,6 +12,8 @@ E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless
 E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game res://scenes/spine_background_probe.tscn --quit
 E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/break_media_probe.gd
 E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/room_spine_probe.gd
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/content_integrity_probe.gd
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/mission_achievement_probe.gd
 E:\ProjectPomodoro\build-windows.cmd
 ```
 
@@ -27,7 +29,8 @@ E:\ProjectPomodoro\build-windows.cmd
 
 - Click the top-right `SH` button and confirm the Store panel opens.
 - Confirm the Store panel opens centered on screen and above the Pomodoro rail.
-- Confirm each background item shows a placeholder name and Focus Point cost.
+- Confirm each background item shows thumbnail art, localized name, and Focus
+  Point cost.
 - Confirm default unlocked items are shown as unlocked and cannot be purchased.
 - Confirm Room Background 01 and Room Background 02 are listed as unlocked
   background content.
@@ -39,28 +42,52 @@ E:\ProjectPomodoro\build-windows.cmd
 - Confirm locked contextual backgrounds fall back to a normal unlocked
   background.
 
+## Stats / Missions / Achievements
+
+- Click top-right `ST` and confirm the centered Stats & Goals panel opens.
+- Confirm the panel shows daily completed sessions, partial sessions, focus
+  minutes, and completed tasks.
+- Complete a focus session and confirm daily mission progress updates.
+- Claim a claimable mission and confirm Focus Points, XP, and Bond rewards are
+  added once.
+- Confirm the claim success message appears in Stats & Goals.
+- Confirm claimed missions stay claimed after restart.
+- Complete the first-session achievement and confirm it shows as unlocked.
+- Confirm newly unlocked achievements are also appended to the session result
+  summary.
+- Confirm achievement rewards are not granted repeatedly after restart.
+- Change system date or clear save only for controlled QA, then confirm daily
+  mission state resets for a new local date.
+
 ## Background Selection
 
 - Confirm the `BG` button appears next to the bottom-right time-cycle button.
-- Click `BG` and confirm the menu opens above the music bar.
-- Confirm the menu contains Lo-fi, Background 01, and Background 02.
+- Click `BG` and confirm the Background Inventory opens as a centered panel.
+- Click the top-right `UL` button and confirm it opens the same Background
+  Inventory.
+- Confirm the inventory lists Lo-fi automatic mode, unlocked backgrounds, and
+  locked purchasable backgrounds with thumbnails and clear locked/equipped
+  states.
 - Select Lo-fi and confirm the original context-driven Lo-fi Spine background
   behavior returns.
-- Select Background 01 and confirm the Room Spine background loads.
-- Select Background 02 and confirm the second Room Spine background loads.
+- Equip an unlocked Lo-fi or Room background and confirm the background updates.
+- Click Store from the inventory header and confirm it opens the Store panel.
 - Cycle Day, Sunset, Night, and Cloudy while Background 01 and Background 02
   are selected, and confirm the Room animation changes without layout jumps.
 - Restart the game and confirm the selected background mode persists.
 
 ## Debug UI Controls
 
+- Confirm the top-left progress HUD shows compact Focus Points, Focus Level,
+  and XP progress.
 - `A` toggles Simple Mode and hides most UI while keeping Tasks and Pomodoro
   visible.
+- Confirm Simple Mode hides the top-left progress HUD.
 - `B` toggles Tasks UI.
 - `C` toggles Pomodoro UI.
 - `F1` adds 100 Focus Points and updates the top-right Focus Points tooltip.
 - Time button cycles Day, Sunset, Night, and Cloudy background contexts.
-- `BG` opens the background selection menu.
+- `BG` opens the Background Inventory.
 - `A`, `B`, `C`, Time, `BG`, and ambience sit on the music bar background
   without a separate backing panel.
 
@@ -143,6 +170,11 @@ E:\ProjectPomodoro\build-windows.cmd
 - Selected language updates visible labels/tooltips immediately.
 - Selected language persists after restart.
 - Break Video switch updates saved setting immediately.
+- Break Video File cycles the bundled prototype media path and persists after
+  restart.
+- Music Autoplay switch pauses current music when turned off and persists after
+  restart.
+- Alarm Sound shows the current alarm sound path and persists after restart.
 - Ambient Prompt button cycles `Normal`, `Low`, and `Off`.
 - Ambient Prompt `Off` hides the current prompt and prevents future idle/focus
   prompts.

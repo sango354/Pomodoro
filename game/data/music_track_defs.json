@@ -1,0 +1,16 @@
+{
+	"tracks": [
+		{
+			"path": "res://assets/music/Have a Good Day.wav",
+			"display_name": "Have a Good Day",
+			"artist": "Prototype Music",
+			"enabled": true
+		},
+		{
+			"path": "res://assets/music/Stay Strong.wav",
+			"display_name": "Stay Strong",
+			"artist": "Prototype Music",
+			"enabled": true
+		}
+	]
+}

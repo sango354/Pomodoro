@@ -1,0 +1,64 @@
+{
+	"achievements": [
+		{
+			"achievement_id": "ach_first_session",
+			"display_name_key": "achievement.first_session",
+			"metric": "completed_sessions",
+			"target": 1,
+			"reward_focus_points": 25,
+			"reward_xp": 20,
+			"reward_bond": 5,
+			"is_active": true
+		},
+		{
+			"achievement_id": "ach_three_sessions",
+			"display_name_key": "achievement.three_sessions",
+			"metric": "completed_sessions",
+			"target": 3,
+			"reward_focus_points": 60,
+			"reward_xp": 40,
+			"reward_bond": 10,
+			"is_active": true
+		},
+		{
+			"achievement_id": "ach_focus_hour",
+			"display_name_key": "achievement.focus_hour",
+			"metric": "focus_minutes_total",
+			"target": 60,
+			"reward_focus_points": 50,
+			"reward_xp": 35,
+			"reward_bond": 8,
+			"is_active": true
+		},
+		{
+			"achievement_id": "ach_three_tasks",
+			"display_name_key": "achievement.three_tasks",
+			"metric": "tasks_completed",
+			"target": 3,
+			"reward_focus_points": 30,
+			"reward_xp": 20,
+			"reward_bond": 5,
+			"is_active": true
+		},
+		{
+			"achievement_id": "ach_bond_level_two",
+			"display_name_key": "achievement.bond_level_two",
+			"metric": "bond_level",
+			"target": 2,
+			"reward_focus_points": 40,
+			"reward_xp": 25,
+			"reward_bond": 0,
+			"is_active": true
+		},
+		{
+			"achievement_id": "ach_first_unlock",
+			"display_name_key": "achievement.first_unlock",
+			"metric": "unlocked_count",
+			"target": 1,
+			"reward_focus_points": 20,
+			"reward_xp": 15,
+			"reward_bond": 4,
+			"is_active": true
+		}
+	]
+}

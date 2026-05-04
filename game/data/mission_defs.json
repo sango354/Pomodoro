@@ -1,0 +1,34 @@
+{
+	"missions": [
+		{
+			"mission_id": "daily_complete_session",
+			"display_name_key": "mission.daily_complete_session",
+			"metric": "completed_sessions",
+			"target": 1,
+			"reward_focus_points": 15,
+			"reward_xp": 10,
+			"reward_bond": 3,
+			"is_active": true
+		},
+		{
+			"mission_id": "daily_focus_minutes",
+			"display_name_key": "mission.daily_focus_minutes",
+			"metric": "focus_minutes_total",
+			"target": 25,
+			"reward_focus_points": 20,
+			"reward_xp": 15,
+			"reward_bond": 5,
+			"is_active": true
+		},
+		{
+			"mission_id": "daily_complete_tasks",
+			"display_name_key": "mission.daily_complete_tasks",
+			"metric": "tasks_completed",
+			"target": 2,
+			"reward_focus_points": 12,
+			"reward_xp": 8,
+			"reward_bond": 2,
+			"is_active": true
+		}
+	]
+}

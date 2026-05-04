@@ -99,10 +99,22 @@ Implemented:
   next, loop, and ambience.
 - Bottom-right debug/background controls include `A`, `B`, `C`, time-cycle,
   background menu (`BG`), and ambience.
-- Background menu can switch between automatic Lo-fi context backgrounds,
-  Room Background 01, and Room Background 02.
+- Background Inventory can switch between automatic Lo-fi context backgrounds,
+  unlocked Lo-fi variants, Room Background 01, and Room Background 02.
+- `UL` and `BG` both open the centered Background Inventory panel.
+- Background Inventory shows locked/equipped states and includes a Store
+  shortcut for purchases.
 - Selected background mode is saved under
   `app_settings.selected_background_id` in `user://save.json`.
+- M3/M4 goals prototype is implemented:
+  - daily mission definitions in `game/data/mission_defs.json`;
+  - achievement definitions in `game/data/achievement_defs.json`;
+  - mission/achievement state and rewards through
+    `game/scripts/mission_achievement_service.gd`;
+  - centered Stats & Goals panel through
+    `game/scripts/stats_panel_controller.gd`;
+  - `daily_stats` resets by local date while `lifetime_stats` powers
+    achievements.
 - Loop off is shown with a gray overlay on the loop icon.
 - Music playback auto-starts the last played track, or the first scanned track
   when there is no saved track.
@@ -123,12 +135,15 @@ Implemented:
   - `result_panel_controller.gd`
   - `session_reward_coordinator.gd`
   - `break_media_controller.gd`
+  - `inventory_panel_controller.gd`
+  - `mission_achievement_service.gd`
+  - `stats_panel_controller.gd`
 - Localization table created at `game/data/localization.csv`.
-  - Columns are open for English, Traditional Chinese, Simplified Chinese,
+  - Columns are filled for English, Traditional Chinese, Simplified Chinese,
     Japanese, Korean, French, German, Italian, Russian, Spanish-Spain, and
     Portuguese-Brazil.
-  - English and Traditional Chinese values are filled for current game UI text.
-  - Other language columns are currently placeholders.
+  - Placeholder variables such as `{time}`, `{focus_points}`, `{xp}`, and
+    `{bond}` are now validated by the content integrity probe.
 - Top-right Option button opens an option panel with language switching.
 - Current language is saved under `app_settings.language` in `user://save.json`.
 - To edit UI text, update `game/data/localization.csv` and restart the game.
@@ -173,12 +188,15 @@ Implemented:
 
 ## Current UI Layout
 
+- Top-left: reference-style progress HUD.
+  - Shows compact Focus Points, Focus Level, and XP-to-next-level progress.
+  - Hides with Simple Mode.
 - Top-right: compact icon HUD.
   - `FP`: Focus Points tooltip.
   - `LV`: Focus Level / XP tooltip.
   - `BD`: Bond tooltip.
-  - `UL`: Unlocks placeholder.
-  - `ST`: Stats toggle.
+  - `UL`: opens Background Inventory.
+  - `ST`: opens Stats & Goals.
   - `OP`: opens Options.
 - Options panel:
   - Currently contains language switching with previous/next arrow buttons.
@@ -262,7 +280,13 @@ The current icon set includes list, previous, musicplay, musicpause, next,
 loop, ambience, reset, and settings PNG assets.
 
 The saved game payload includes `music_state` for current track, loop state,
-and volume.
+volume, and autoplay.
+
+Music metadata is stored in:
+
+```text
+game/data/music_track_defs.json
+```
 
 ## Localization And Options
 
@@ -284,16 +308,20 @@ key,en,zh_TW,zh_CN,ja,ko,fr,de,it,ru,es_ES,pt_BR
 
 Current state:
 
-- English and Traditional Chinese are filled for active scripted UI text.
-- Empty language cells fall back to English.
+- All supported language columns are filled for active scripted UI text.
+- Empty language cells still fall back to English if future rows are added
+  without translations.
 - The selected language is saved as `app_settings.language` in
   `user://save.json`.
 - The top-right `OP` button opens the Options panel.
-- Options currently contain language previous/next switching only.
 - Options currently contain language previous/next switching and Break Video
   on/off.
 - Options also contain an Ambient Prompt frequency cycle button:
   `Normal` -> `Low` -> `Off` -> `Normal`.
+- Options include Break Video file selection for bundled prototype media.
+- Options include Music Autoplay on/off.
+- Options include Alarm Sound selection. The current selectable sound is the
+  bundled silent placeholder until final SFX is supplied.
 - Break media playback during Break countdown is implemented behind the Break
   Video switch. The default path is `res://assets/videos/break/video.mp4`.
 - Changing the Break Video switch during an active Break countdown only updates
@@ -351,15 +379,13 @@ re-exported from Spine 4.1.x with premultiplied alpha disabled.
 - Break media playback has a simple prototype `.ogv` video asset. A final
   production video can replace `game/assets/videos/break/video.mp4` or use a
   supported `.mp4` path if the target Godot build supports it.
-- Break media path selection is not exposed in Options yet.
 - Windows export is available through `build-windows.cmd` and
   `scripts/build-windows.ps1`. Build outputs and generated export/manifest
   files are intentionally ignored and regenerated locally.
 - Music playback should still be manually tested with real local audio files
   after pulling on another machine.
-- Localization currently covers the active scripted UI and break dialogue keys,
-  but needs manual UI review for text length in every target language once those
-  translations are filled.
+- Localization currently covers the active scripted UI and break dialogue keys.
+  Text fit still needs a manual UI pass for every target language.
 
 ## Next Recommended Work
 
@@ -375,8 +401,7 @@ behavior.
    - `B` toggles Tasks independently.
    - `C` toggles Pomodoro independently and closes Timer Settings when hidden.
    - The time-cycle button cycles Day, Sunset, Night, and Cloudy backgrounds.
-   - `BG` opens the background menu and switches Lo-fi, Background 01, and
-     Background 02.
+   - `BG` and `UL` open Background Inventory and switch equipped backgrounds.
    - `F1` adds 100 Focus Points and updates the top-right Focus Points tooltip.
 2. Manually verify Store modal behavior:
    - Store opens centered and above the Pomodoro rail.
@@ -384,32 +409,81 @@ behavior.
    - Clicking outside the confirmation cancels only the confirmation.
    - Purchases deduct Focus Points, persist after restart, and unlock the
      matching background content.
-3. Continue Inventory / Equipment design from the new background menu:
-   - current behavior is a small runtime background selector;
-   - next likely step is a full inventory/equipment panel with thumbnails,
-     clearer locked states, and production unlock balancing.
-4. Add lightweight data integrity probes:
-   - every `background_defs.json` Spine variant exists under
-     `game/assets/spine/backgrounds`;
-   - every `display_name_key` exists in `game/data/localization.csv`;
-   - every purchasable item has a positive Focus Point cost.
-5. Continue deferred settings/content work:
-   - Break Video path setting
-   - music autoplay setting
-   - alarm sound selection
-   - music metadata table
-   - remaining localization columns and language fit review
+3. Continue content production polish:
+   - replace inventory color swatches with final thumbnails when available;
+   - tune production unlock pricing;
+   - replace the silent alarm placeholder with final SFX;
+   - expand inventory/equipment behavior if non-background content becomes
+     equippable.
+4. Continue localization production work:
+   - fill remaining language columns;
+   - review text fit for every target language.
 
 Deferred from the 2026-04-29 planning pass:
 
-- Break Video path setting is intentionally not implemented yet.
-- Music autoplay setting is not implemented yet.
-- Alarm sound selection is not implemented yet.
-- Store/content unlocks are implemented as a skeleton. There is still no final
-  thumbnail art, inventory/equipment flow, or production purchase balancing.
-- Music metadata table remains future work.
+- Store/content unlocks are implemented with generated background thumbnails.
+  Production purchase balancing can still be tuned after playtesting.
 
 ## Latest Validation
+
+2026-05-04:
+
+- Added generated background thumbnail assets under
+  `game/assets/thumbnails/backgrounds/`.
+- Added `thumbnail_path` to every background entry in
+  `game/data/background_defs.json`.
+- Store and Background Inventory now display thumbnail art, falling back to
+  swatches only when an image cannot load.
+- Added a top-left Focus Points / Focus Level / XP HUD inspired by the provided
+  reference layout.
+- Filled all localization table language columns for the active runtime text.
+- Content integrity probe now validates localization columns, non-empty cells,
+  and placeholder parity against English text.
+- Added centered Background Inventory / Equipment panel:
+  - available from top-right `UL` and bottom-right `BG`;
+  - lists Lo-fi automatic mode and all background unlock content;
+  - shows locked, unlocked, and equipped states;
+  - can equip unlocked backgrounds and open Store.
+- Added `game/scripts/inventory_panel_controller.gd`.
+- Added `ContentUnlockService.background_inventory_items`.
+- Added `game/scripts/content_integrity_probe.gd`.
+- Added Options controls for:
+  - Break Video file selection;
+  - Music Autoplay;
+  - Alarm Sound selection.
+- Added `game/data/music_track_defs.json` and music metadata loading in
+  `music_player_controller.gd`.
+- Added M3/M4 runtime goals:
+  - `game/data/mission_defs.json`;
+  - `game/data/achievement_defs.json`;
+  - `game/scripts/mission_achievement_service.gd`;
+  - `game/scripts/stats_panel_controller.gd`;
+  - `game/scripts/mission_achievement_probe.gd`.
+- `ST` now opens a Stats & Goals panel with daily stats, claimable daily
+  missions, and achievements.
+- Mission rewards are claimed manually. Achievement rewards are granted once
+  when the achievement first unlocks.
+- Mission claim success and new achievement unlocks are surfaced in UI instead
+  of only changing saved data.
+- Runtime events now include `stats_screen_viewed`, `content_equipped`, and
+  `context_switched`.
+- Save data now stores `daily_missions`, `user_achievements`, and
+  `lifetime_stats`.
+- Content integrity probe validates:
+  - background content IDs are unique;
+  - every `display_name_key` exists in `game/data/localization.csv`;
+  - every referenced Spine variant has `.skel`, `.atlas`, and `.png`;
+  - every purchasable background has a positive Focus Point cost.
+  - every enabled music metadata row points at an existing audio file.
+  - mission and achievement definitions have IDs, localization keys, metrics,
+    and positive targets.
+- Headless validation passed on `E:\ProjectPomodoro`:
+
+```powershell
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --quit
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/content_integrity_probe.gd
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/mission_achievement_probe.gd
+```
 
 2026-05-03:
 
