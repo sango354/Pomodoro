@@ -25,6 +25,16 @@ const ALARM_SOUND_PATH := "res://assets/sfx/alarm_placeholder.wav"
 const ALARM_SOUND_PATHS := ["res://assets/sfx/alarm_placeholder.wav"]
 const DEFAULT_BREAK_MEDIA_PATH := "res://assets/videos/break/video.mp4"
 const BREAK_MEDIA_PATHS := ["res://assets/videos/break/video.mp4", "res://assets/videos/break/video.ogv"]
+const HUD_ICON_PATHS := {
+	"focus_points": "res://assets/icons/hud/focus_points.png",
+	"level": "res://assets/icons/hud/level.png",
+	"bond": "res://assets/icons/hud/bond.png",
+	"unlock": "res://assets/icons/hud/unlock.png",
+	"store": "res://assets/icons/hud/store.png",
+	"stats": "res://assets/icons/hud/stats.png",
+	"options": "res://assets/icons/hud/options.png",
+	"time": "res://assets/icons/hud/time.png"
+}
 const SETTINGS_PANEL_WIDTH := 264
 const TIMER_RAIL_WIDTH := 190
 const DEFAULT_FOCUS_MINUTES := 5
@@ -112,7 +122,9 @@ var bottom_mode_controls: Control
 var fp_label: Button
 var level_label: Button
 var bond_label: Button
+var left_focus_points_icon: Control
 var left_focus_points_label: Label
+var left_level_icon: Control
 var left_level_label: Label
 var left_xp_bar: ProgressBar
 var stats_label: Label
@@ -327,52 +339,45 @@ func _build_top_bar(parent: Control) -> void:
 	bar.anchor_top = 0.0
 	bar.anchor_right = 1.0
 	bar.anchor_bottom = 0.0
-	bar.offset_left = -380
+	bar.offset_left = -220
 	bar.offset_top = 0
 	bar.offset_right = 0
 	bar.offset_bottom = 46
-	bar.add_theme_stylebox_override("panel", _new_panel_style(0.42))
+	bar.add_theme_stylebox_override("panel", _new_panel_style(0.28))
 	parent.add_child(bar)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 14)
-	margin.add_theme_constant_override("margin_right", 14)
+	margin.add_theme_constant_override("margin_left", 8)
+	margin.add_theme_constant_override("margin_right", 8)
 	margin.add_theme_constant_override("margin_top", 8)
 	margin.add_theme_constant_override("margin_bottom", 8)
 	bar.add_child(margin)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.alignment = BoxContainer.ALIGNMENT_END
+	row.add_theme_constant_override("separation", 6)
 	margin.add_child(row)
 
-	var focus_button := _new_icon_button("FP", "Focus Points")
-	fp_label = focus_button
-	row.add_child(focus_button)
-
-	var level_button := _new_icon_button("LV", "Focus Level")
-	level_label = level_button
-	row.add_child(level_button)
-
-	var bond_button := _new_icon_button("BD", "Bond")
+	var bond_button := _new_hud_icon_button("bond", "Bond")
 	bond_label = bond_button
 	row.add_child(bond_button)
 
-	var unlocks := _new_icon_button("UL", "Unlocks")
+	var unlocks := _new_hud_icon_button("unlock", "Unlocks")
 	unlocks_label = unlocks
 	unlocks.pressed.connect(_toggle_inventory_panel)
 	row.add_child(unlocks)
 
-	var shop := _new_icon_button("SH", "Store")
+	var shop := _new_hud_icon_button("store", "Store")
 	store_button = shop
 	shop.pressed.connect(_toggle_store_panel)
 	row.add_child(shop)
 
-	var stats := _new_icon_button("ST", "Stats")
+	var stats := _new_hud_icon_button("stats", "Stats")
 	stats_button = stats
 	stats.pressed.connect(_toggle_stats_message)
 	row.add_child(stats)
 
-	var option_button := option_controller.create_top_bar_button() as Button
+	var option_button := option_controller.create_top_bar_button(_icon_texture("options")) as Button
 	row.add_child(option_button)
 	option_controller.refresh_text()
 
@@ -385,9 +390,9 @@ func _build_left_progress_hud(parent: Control) -> void:
 	hud.anchor_top = 0.0
 	hud.anchor_right = 0.0
 	hud.anchor_bottom = 0.0
-	hud.offset_left = 0
+	hud.offset_left = 448
 	hud.offset_top = 0
-	hud.offset_right = 286
+	hud.offset_right = 716
 	hud.offset_bottom = 52
 	hud.add_theme_stylebox_override("panel", _new_panel_style(0.18))
 	parent.add_child(hud)
@@ -400,18 +405,15 @@ func _build_left_progress_hud(parent: Control) -> void:
 	hud.add_child(margin)
 
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 20)
+	row.add_theme_constant_override("separation", 16)
 	margin.add_child(row)
 
 	var points_group := HBoxContainer.new()
 	points_group.add_theme_constant_override("separation", 6)
 	row.add_child(points_group)
 
-	var points_icon := Label.new()
-	points_icon.text = "◇"
-	points_icon.add_theme_font_size_override("font_size", 24)
-	points_icon.add_theme_color_override("font_color", Color(0.88, 0.96, 1.0, 1.0))
-	points_group.add_child(points_icon)
+	left_focus_points_icon = _new_hud_icon_image("focus_points", Vector2(24, 24))
+	points_group.add_child(left_focus_points_icon)
 
 	left_focus_points_label = Label.new()
 	left_focus_points_label.add_theme_font_size_override("font_size", 24)
@@ -421,6 +423,9 @@ func _build_left_progress_hud(parent: Control) -> void:
 	var level_group := HBoxContainer.new()
 	level_group.add_theme_constant_override("separation", 6)
 	row.add_child(level_group)
+
+	left_level_icon = _new_hud_icon_image("level", Vector2(24, 24))
+	level_group.add_child(left_level_icon)
 
 	left_level_label = Label.new()
 	left_level_label.add_theme_font_size_override("font_size", 24)
@@ -473,8 +478,7 @@ func _build_bottom_mode_controls(parent: Control) -> void:
 	timer_button.pressed.connect(_toggle_timer_ui)
 	row.add_child(timer_button)
 
-	var time_button := _new_icon_button("時間", "Time")
-	time_button.custom_minimum_size = Vector2(58, 32)
+	var time_button := _new_hud_icon_button("time", "Time")
 	time_button.pressed.connect(_cycle_time_context)
 	row.add_child(time_button)
 
@@ -553,6 +557,53 @@ func _new_icon_button(text: String, tip: String) -> Button:
 	button.custom_minimum_size = Vector2(42, 32)
 	button.focus_mode = Control.FOCUS_NONE
 	return button
+
+
+func _new_hud_icon_button(icon_key: String, tip: String) -> Button:
+	var button := _new_icon_button("", tip)
+	button.custom_minimum_size = Vector2(34, 32)
+	button.icon = _icon_texture(icon_key)
+	button.expand_icon = true
+	button.add_theme_stylebox_override("normal", _new_icon_button_style(0.0))
+	button.add_theme_stylebox_override("hover", _new_icon_button_style(0.18))
+	button.add_theme_stylebox_override("pressed", _new_icon_button_style(0.26))
+	button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	return button
+
+
+func _new_hud_icon_image(icon_key: String, size: Vector2) -> TextureRect:
+	var texture_rect := TextureRect.new()
+	texture_rect.custom_minimum_size = size
+	texture_rect.texture = _icon_texture(icon_key)
+	texture_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	return texture_rect
+
+
+func _new_icon_button_style(alpha: float) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.13, 0.24, alpha)
+	style.border_color = Color(0.55, 0.8, 1.0, 0.35 if alpha > 0.0 else 0.0)
+	style.set_border_width_all(1 if alpha > 0.0 else 0)
+	style.corner_radius_top_left = 4
+	style.corner_radius_top_right = 4
+	style.corner_radius_bottom_left = 4
+	style.corner_radius_bottom_right = 4
+	return style
+
+
+func _icon_texture(icon_key: String) -> Texture2D:
+	var path := str(HUD_ICON_PATHS.get(icon_key, ""))
+	if path == "":
+		return null
+	if ResourceLoader.exists(path):
+		return load(path)
+	if not FileAccess.file_exists(path):
+		return null
+	var image := Image.new()
+	if image.load(path) != OK:
+		return null
+	return ImageTexture.create_from_image(image)
 
 
 func _new_muted_label(text: String) -> Label:
@@ -1281,26 +1332,35 @@ func _refresh_tasks_ui() -> void:
 
 func _refresh_progress_ui() -> void:
 	_refresh_stats_panel()
-	fp_label.text = "FP"
-	fp_label.tooltip_text = "%s: %d" % [localizer.translate("top.focus_points"), currencies.focus_points]
-	level_label.text = "LV"
-	level_label.tooltip_text = "%s %d  XP %d / %d" % [localizer.translate("top.focus_level"), level_progress.focus_level, level_progress.focus_xp, _xp_required_for_next_level()]
+	var focus_points_tip := "%s: %d" % [localizer.translate("top.focus_points"), currencies.focus_points]
+	var focus_level_tip := "%s %d  XP %d / %d" % [localizer.translate("top.focus_level"), level_progress.focus_level, level_progress.focus_xp, _xp_required_for_next_level()]
+	if fp_label != null:
+		fp_label.text = ""
+		fp_label.tooltip_text = focus_points_tip
+	if level_label != null:
+		level_label.text = ""
+		level_label.tooltip_text = focus_level_tip
 	if left_focus_points_label != null:
 		left_focus_points_label.text = _compact_number(int(currencies.get("focus_points", 0)))
-		left_focus_points_label.tooltip_text = fp_label.tooltip_text
+		left_focus_points_label.tooltip_text = focus_points_tip
+	if left_focus_points_icon != null:
+		left_focus_points_icon.tooltip_text = focus_points_tip
 	if left_level_label != null:
 		left_level_label.text = str(level_progress.focus_level)
-		left_level_label.tooltip_text = level_label.tooltip_text
+		left_level_label.tooltip_text = focus_level_tip
+	if left_level_icon != null:
+		left_level_icon.tooltip_text = focus_level_tip
 	if left_xp_bar != null:
 		left_xp_bar.max_value = max(1, _xp_required_for_next_level())
 		left_xp_bar.value = int(level_progress.get("focus_xp", 0))
-		left_xp_bar.tooltip_text = level_label.tooltip_text
-	bond_label.text = "BD"
-	bond_label.tooltip_text = "%s Lv.%d  %d / %d" % [localizer.translate("top.bond"), bond_progress.bond_level, bond_progress.bond_points_current, _bond_required_for_next_level()]
+		left_xp_bar.tooltip_text = focus_level_tip
+	if bond_label != null:
+		bond_label.text = ""
+		bond_label.tooltip_text = "%s Lv.%d  %d / %d" % [localizer.translate("top.bond"), bond_progress.bond_level, bond_progress.bond_points_current, _bond_required_for_next_level()]
 	if unlocks_label != null:
 		unlocks_label.tooltip_text = localizer.translate("top.unlocks")
 	if store_button != null:
-		store_button.text = "SH"
+		store_button.text = ""
 		store_button.tooltip_text = localizer.translate("store.title")
 	if stats_button != null:
 		stats_button.tooltip_text = localizer.translate("top.stats")

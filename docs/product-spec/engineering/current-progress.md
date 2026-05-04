@@ -189,15 +189,17 @@ Implemented:
 ## Current UI Layout
 
 - Top-left: reference-style progress HUD.
+  - Positioned to the right of the Tasks panel.
   - Shows compact Focus Points, Focus Level, and XP-to-next-level progress.
+  - Focus Points and Focus Level reuse the same tooltip text previously shown
+    by the right-side HUD buttons.
   - Hides with Simple Mode.
 - Top-right: compact icon HUD.
-  - `FP`: Focus Points tooltip.
-  - `LV`: Focus Level / XP tooltip.
-  - `BD`: Bond tooltip.
-  - `UL`: opens Background Inventory.
-  - `ST`: opens Stats & Goals.
-  - `OP`: opens Options.
+  - Icon-only Bond button: Bond tooltip.
+  - Icon-only Unlocks button: opens Background Inventory.
+  - Icon-only Store button: opens Store.
+  - Icon-only Stats button: opens Stats & Goals.
+  - Icon-only Options button: opens Options.
 - Options panel:
   - Currently contains language switching with previous/next arrow buttons.
   - Language switching updates the main UI labels/tooltips immediately.
@@ -430,12 +432,21 @@ Deferred from the 2026-04-29 planning pass:
 
 - Added generated background thumbnail assets under
   `game/assets/thumbnails/backgrounds/`.
+- Added HUD icon assets under `game/assets/icons/hud/`.
 - Added `thumbnail_path` to every background entry in
   `game/data/background_defs.json`.
 - Store and Background Inventory now display thumbnail art, falling back to
   swatches only when an image cannot load.
 - Added a top-left Focus Points / Focus Level / XP HUD inspired by the provided
   reference layout.
+- Replaced the top-right text HUD buttons with fixed-size icon-only buttons.
+- Removed duplicate Focus Points and Focus Level buttons from the top-right HUD.
+- Moved the Tasks panel back to the top-left and shifted the Focus Points /
+  Focus Level HUD to its right.
+- Added `game/scripts/ui_layout_probe.gd` to validate that the top-left HUD,
+  top-right HUD, and Tasks panel do not overlap.
+- Widened and tightened the Stats & Goals panel layout so summary and item
+  rows avoid hard-to-read wrapping.
 - Filled all localization table language columns for the active runtime text.
 - Content integrity probe now validates localization columns, non-empty cells,
   and placeholder parity against English text.

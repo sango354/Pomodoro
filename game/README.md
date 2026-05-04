@@ -91,8 +91,10 @@ The MVP game scene currently covers the M1 loop from the product spec:
 - Open Stats & Goals from top-right `ST`.
 - Track daily missions, claim mission rewards, and unlock achievements.
 - Save selected background mode to `user://save.json`.
-- Show a top-left progress HUD for compact Focus Points, Focus Level, and XP
-  progress.
+- Show a top progress HUD to the right of Tasks for compact Focus Points, Focus
+  Level, and XP progress.
+- Use icon-only top-right HUD buttons for Bond, Unlocks, Store, Stats, and
+  Options.
 
 Current UI implementation notes:
 
@@ -103,6 +105,7 @@ Current UI implementation notes:
 - The Alarm switch currently plays a silent placeholder from
   `res://assets/sfx/alarm_placeholder.wav`.
 - The bottom music bar uses icon-only controls from `res://assets/icons`.
+- The top HUD icon assets live under `res://assets/icons/hud/`.
 - Loop off is represented by a gray overlay on the loop icon.
 - Break interaction dialogue is loaded from `res://data/dialogue_defs.json`.
 - Localized UI text is loaded from `res://data/localization.csv`.
@@ -127,6 +130,8 @@ Current UI implementation notes:
 - Achievement definitions are in `res://data/achievement_defs.json`.
 - Mission and achievement reward rules can be checked with
   `res://scripts/mission_achievement_probe.gd`.
+- Top HUD / Tasks geometry can be checked with
+  `res://scripts/ui_layout_probe.gd`.
 - Room Background 01 and Room Background 02 are Store content items and are
   currently default unlocked.
 - Purchased background unlocks are saved in `user://save.json` under

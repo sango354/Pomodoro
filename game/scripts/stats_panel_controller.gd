@@ -88,10 +88,10 @@ func _build_panel(parent: Control) -> void:
 	panel.anchor_top = 0.5
 	panel.anchor_right = 0.5
 	panel.anchor_bottom = 0.5
-	panel.offset_left = -300
-	panel.offset_top = -245
-	panel.offset_right = 300
-	panel.offset_bottom = 245
+	panel.offset_left = -420
+	panel.offset_top = -260
+	panel.offset_right = 420
+	panel.offset_bottom = 260
 	panel.z_index = 205
 	panel.add_theme_stylebox_override("panel", _new_panel_style(0.84))
 	parent.add_child(panel)
@@ -111,6 +111,9 @@ func _build_panel(parent: Control) -> void:
 	root.add_child(title_label)
 
 	stats_label = _new_muted_label("")
+	stats_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	stats_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	stats_label.add_theme_font_size_override("font_size", 13)
 	root.add_child(stats_label)
 
 	status_label = _new_muted_label("")
@@ -118,7 +121,7 @@ func _build_panel(parent: Control) -> void:
 	root.add_child(status_label)
 
 	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", 14)
+	columns.add_theme_constant_override("separation", 18)
 	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	root.add_child(columns)
 
@@ -135,10 +138,11 @@ func _build_column(parent: Control, title: String) -> VBoxContainer:
 	var label := Label.new()
 	label.text = title
 	label.add_theme_font_size_override("font_size", 16)
+	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	box.add_child(label)
 
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(0, 300)
+	scroll.custom_minimum_size = Vector2(0, 332)
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(scroll)
 
@@ -201,6 +205,7 @@ func _build_item(item: Dictionary, claimable: bool) -> Control:
 
 	var name := Label.new()
 	name.text = str(item.get("name", ""))
+	name.tooltip_text = name.text
 	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	box.add_child(name)
 
@@ -220,19 +225,26 @@ func _build_item(item: Dictionary, claimable: bool) -> Control:
 		int(item.get("target", 1)),
 		_reward_text(item)
 	])
+	detail.autowrap_mode = TextServer.AUTOWRAP_OFF
+	detail.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	detail.add_theme_font_size_override("font_size", 12)
+	detail.tooltip_text = detail.text
 	detail.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	footer.add_child(detail)
 
 	if claimable:
 		var button := Button.new()
 		button.text = _tr("mission.claim")
-		button.custom_minimum_size = Vector2(76, 28)
+		button.custom_minimum_size = Vector2(86, 28)
 		button.disabled = str(item.get("status", "")) != "claimable"
 		button.pressed.connect(func(): mission_claim_requested.emit(str(item.get("id", ""))))
 		footer.add_child(button)
 	else:
 		var status := Label.new()
 		status.text = _tr("achievement.unlocked") if str(item.get("status", "")) == "unlocked" else _tr("achievement.active")
+		status.custom_minimum_size = Vector2(86, 0)
+		status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		status.tooltip_text = status.text
 		footer.add_child(status)
 	return card
 

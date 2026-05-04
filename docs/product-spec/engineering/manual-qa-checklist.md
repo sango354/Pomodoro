@@ -14,6 +14,7 @@ E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless
 E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/room_spine_probe.gd
 E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/content_integrity_probe.gd
 E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/mission_achievement_probe.gd
+E:\ProjectPomodoro\tools\godot-spine-4.1.3\godot-4.1-4.1.3-stable.exe --headless --path E:\ProjectPomodoro\game --script res://scripts/ui_layout_probe.gd
 E:\ProjectPomodoro\build-windows.cmd
 ```
 
@@ -45,6 +46,8 @@ E:\ProjectPomodoro\build-windows.cmd
 ## Stats / Missions / Achievements
 
 - Click top-right `ST` and confirm the centered Stats & Goals panel opens.
+- Confirm the Stats & Goals panel summary and mission/achievement rows do not
+  wrap into hard-to-read multi-line fragments.
 - Confirm the panel shows daily completed sessions, partial sessions, focus
   minutes, and completed tasks.
 - Complete a focus session and confirm daily mission progress updates.
@@ -80,12 +83,19 @@ E:\ProjectPomodoro\build-windows.cmd
 
 - Confirm the top-left progress HUD shows compact Focus Points, Focus Level,
   and XP progress.
+- Confirm the top-left progress HUD sits to the right of the Tasks panel.
+- Hover the top-left Focus Points and Focus Level HUD areas and confirm they
+  show the same tooltip details that the former right-side buttons showed.
+- Confirm the top-right HUD uses icon-only buttons for Bond, Unlocks, Store,
+  Stats, and Options only.
+- Confirm the top-left progress HUD, top-right HUD, and Tasks panel do not
+  overlap.
 - `A` toggles Simple Mode and hides most UI while keeping Tasks and Pomodoro
   visible.
 - Confirm Simple Mode hides the top-left progress HUD.
 - `B` toggles Tasks UI.
 - `C` toggles Pomodoro UI.
-- `F1` adds 100 Focus Points and updates the top-right Focus Points tooltip.
+- `F1` adds 100 Focus Points and updates the top-left Focus Points tooltip.
 - Time button cycles Day, Sunset, Night, and Cloudy background contexts.
 - `BG` opens the Background Inventory.
 - `A`, `B`, `C`, Time, `BG`, and ambience sit on the music bar background

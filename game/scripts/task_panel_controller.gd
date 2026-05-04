@@ -139,6 +139,7 @@ func complete_task(task_id: String) -> void:
 func _build_task_panel(parent: Control) -> void:
 	var box := VBoxContainer.new()
 	task_panel = box
+	box.name = "TaskPanel"
 	box.anchor_left = 0.0
 	box.anchor_top = 0.0
 	box.anchor_right = 0.0

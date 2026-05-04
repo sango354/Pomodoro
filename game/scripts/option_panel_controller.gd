@@ -28,6 +28,7 @@ var music_autoplay_enabled := true
 var alarm_sound_label: Label
 var alarm_sound_button: Button
 var alarm_sound_path := ""
+var top_bar_icon: Texture2D = null
 
 
 func setup(parent: Control, localization_service, media_enabled: bool = false, ambient_frequency: String = "normal", autoplay_enabled: bool = true, media_path: String = "", alarm_path: String = "") -> Button:
@@ -56,7 +57,7 @@ func refresh_text() -> void:
 	if localizer == null:
 		return
 	if option_button != null:
-		option_button.text = localizer.translate("option.button")
+		option_button.text = "" if top_bar_icon != null else localizer.translate("option.button")
 		option_button.tooltip_text = localizer.translate("option.title")
 	if language_title != null:
 		language_title.text = localizer.translate("option.language")
@@ -289,9 +290,13 @@ func _build_option_panel(parent: Control) -> void:
 	refresh_alarm_sound(alarm_sound_path)
 
 
-func create_top_bar_button() -> Button:
+func create_top_bar_button(icon_texture: Texture2D = null) -> Button:
+	top_bar_icon = icon_texture
 	option_button = Button.new()
-	option_button.custom_minimum_size = Vector2(42, 32)
+	option_button.custom_minimum_size = Vector2(34, 32)
+	option_button.text = ""
+	option_button.icon = top_bar_icon
+	option_button.expand_icon = true
 	option_button.focus_mode = Control.FOCUS_NONE
 	option_button.pressed.connect(toggle_visible)
 	return option_button
